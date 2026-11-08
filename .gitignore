@@ -1,0 +1,60 @@
+# Skills other than beanfx, and their kits and drafts
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/beanfx
+kit_char/
+kit_scene/
+chars/
+scenes/
+
+# Generated
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+out/
+pixelfx/
+.wrangler/
+
+# Heavy media: keep only the JSON and scripts of each result
+*.png
+*.gif
+*.jpg
+*.jpeg
+*.webp
+*.mp4
+*.webm
+
+# Local only
+site/
+
+# README previews
+!docs/media/*.gif
+
+# Personal task tracking
+tasks/
+PROGRESS.md
+
+# Drafts: only the published examples are tracked; new drafts stay local (git add -f to publish one)
+drafts/*
+!drafts/aura_long_bang_v2/
+!drafts/aura_thunder_v3/
+!drafts/dai_hoang_tu_thien_chi/
+!drafts/dot_pha_hoa_than/
+!drafts/hoa_cong/
+!drafts/loc_gio_v2/
+!drafts/meteor_rite/
+!drafts/mua_bang_v2/
+!drafts/nam_man_nhap_xam/
+!drafts/phat_no_hoa_lien/
+!drafts/phi_long_tai_thien/
+!drafts/sigil_thunder_strike/
+!drafts/star_dragon_strike/
+!drafts/su_tu_hong/
+!drafts/tinh_long_chuong/
+!drafts/van_hon_phien/
+!drafts/van_kiem_quy_tong_v3/
+!drafts/van_kiem_quy_tong_v5/
+!drafts/van_tien/
+!drafts/wind_burst/

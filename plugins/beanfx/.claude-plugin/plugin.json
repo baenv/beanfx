@@ -1,0 +1,16 @@
+{
+  "name": "beanfx",
+  "version": "0.1.0",
+  "description": "Pixel-art effects drawn as code: /beanfx designs an effect from words or a reference image and exports a sprite sheet, JSON and gifs.",
+  "author": {
+    "name": "bien"
+  },
+  "repository": "https://github.com/baenv/beanfx",
+  "keywords": [
+    "pixel-art",
+    "vfx",
+    "sprite-sheet",
+    "gamedev"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "beanfx",
+  "description": "Pixel-art effect skills for Claude Code.",
+  "owner": {
+    "name": "bien"
+  },
+  "plugins": [
+    {
+      "name": "beanfx",
+      "description": "Pixel-art effects drawn as code: /beanfx designs an effect from words or a reference image and exports a sprite sheet, JSON and gifs.",
+      "source": "./plugins/beanfx",
+      "category": "design"
+    }
+  ]
+}
