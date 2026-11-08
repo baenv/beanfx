@@ -29,7 +29,10 @@ The rest, when the JSON has it:
   each key's `t` (s from frame 0) play the character's animation mapped to its `pose` name (idle, guard, windup,
   cast, channel, release, follow, recover); `snap` cuts to it, `smooth` blends. `act.hits[k]`: at `t` (frame
   `frame`) freeze everything, effect and characters, for `freeze` s, shake the camera `shake` px, push the target
-  `push` px away from the caster and play its `react` (flinch, stagger, knockback, launch). `act.target.x` is
+  `push` px away from the caster and play its `react` (flinch, stagger, knockback, launch). When the hit has them:
+  shake along `dir` (degrees, y down, 0 along the facing; mirror it to 180 - dir for a flipped sprite) for
+  `shake_time` s, tint the target white for `flash` s then half for one frame, and play the `sound` cue (`hit_light`,
+  `hit_heavy`, `hit_finisher`, `hit_blast`, mapped to the game's own sounds) on the contact frame. `act.target.x` is
   where the target stands, px from the pivot along the facing.
 - **Pages.** A big effect splits into `<name>_p<k>.png`, each with its own Aseprite JSON. `<name>.json` lists every
   frame with its `page`, and `meta.beanfx.pages` lists the files. Load every page and build one animation whose

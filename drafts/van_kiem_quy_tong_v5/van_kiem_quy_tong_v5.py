@@ -4,14 +4,16 @@
 a round hole opens in its eye, a giant jian slides out tip down and plunges into the ground, then bursts into the
 48 swords, which fan out wide and circle back round the caster before they go out in glints.
 
-Side view, 1 direction plus mirror, 560x400, 30 fps, 150 frames, one-shot. Painterly HD, glow strong, clarity hazy.
+Side view, 1 direction plus mirror, 560x400, 30 fps, 210 frames, one-shot. Painterly HD, glow strong, clarity hazy.
 
-| state  | frames | s   | what moves                                                              | carrier      |
-|--------|--------|-----|-------------------------------------------------------------------------|--------------|
-| rise   | 0-23   | 0.8 | swords fan round the caster, launch one after another into the clouds   | small swords |
-| swirl  | 24-77  | 1.8 | the deck winds into a vortex, glints circle inside, the eye opens       | clouds       |
-| plunge | 78-98  | 0.7 | the giant sword slides out of the hole, holds, plunges; contact 96      | giant sword  |
-| return | 99-149 | 1.7 | white-hot sword bursts into 48 swords that arc out and orbit the caster | small swords |
+| state  | frames  | s   | what moves                                                                | carrier      |
+|--------|---------|-----|---------------------------------------------------------------------------|--------------|
+| rise   | 0-59    | 2.0 | swords fan into two rings round the caster, circle, peel off one by one   | small swords |
+|        |         |     | and climb near upright into the near half of the deck                     |              |
+| swirl  | 60-137  | 2.6 | the deck winds into a vortex, glints circle inside, the eye opens         | clouds       |
+| plunge | 138-158 | 0.7 | the giant sword comes down through the eye, holds, plunges; contact 156   | giant sword  |
+| return | 159-209 | 1.7 | white-hot sword bursts into 48 swords that slide into two counter-turning | small swords |
+|        |         |     | tilted rings round the caster, far side dim and behind it                 |              |
 
 Giant jian, by its overall length (research): blade 78 % with a centre ridge and a tip taper over the last 8 %,
 guard 3 % about four blade widths wide with short wings drooping toward the blade, grip 15 % wrapped, pommel 4 %.
@@ -36,12 +38,33 @@ import target as tg  # noqa: E402
 NAME = "van_kiem_quy_tong_v5"
 OUT = HERE / "out"
 W, H = 560, 400
-FPS, N = 30, 150
+FPS, N = 30, 210
 SEED = 11
 TAU = math.tau
 
-RISE0, SWIRL0, HOLE0, PLUNGE0 = 0, 24, 50, 78
-DROP0, IMPACT, BURST, RETURN0 = 92, 96, 102, 99
+CAST, CHAN, SHIFT = 2.5, 78 / 54, 60   # rise and swirl slowed against the first cut; later states shift by SHIFT
+
+
+def T(t):
+    """Frame in this cut of a frame t of the first cut (rise 0-23, swirl 24-77, then plunge)."""
+    if t < 24:
+        return t * CAST
+    if t < 78:
+        return 24 * CAST + (t - 24) * CHAN
+    return t + SHIFT
+
+
+def T_old(f):
+    """Inverse of T, and the first cut's frames per frame here."""
+    if f < 24 * CAST:
+        return f / CAST, 1 / CAST
+    if f < 24 * CAST + 54 * CHAN:
+        return 24 + (f - 24 * CAST) / CHAN, 1 / CHAN
+    return f - SHIFT, 1.0
+
+
+RISE0, SWIRL0, HOLE0, PLUNGE0 = 0, 60, 98, 138
+DROP0, IMPACT, BURST, RETURN0 = 152, 156, 162, 159
 STATES = {"rise": [RISE0, SWIRL0 - 1], "swirl": [SWIRL0, PLUNGE0 - 1], "plunge": [PLUNGE0, RETURN0 - 1],
           "return": [RETURN0, N - 1]}
 
@@ -51,7 +74,6 @@ PIVOT = FOOT
 EX, EY, RX, FLAT = 360, 72, 180, 0.26  # vortex eye, deck radius, deck squash (side view of a disc)
 TH = 14                                # deck thickness: the belly under it
 NSW = 48
-ORB = (150, 310, 64, 16)               # orbit round the caster: centre, rx, ry
 
 SW = ["#141826", "#2e3548", "#56627c", "#909eb8", "#cbd6e6", "#f6faff", "#1a1018", "#36222c", "#5a3a40"]
 CL = ["#22101e", "#46202a", "#743434", "#a8503a", "#d8803e", "#f4b85c", "#fff0c8"]
@@ -143,44 +165,48 @@ def star(cv, x, y, size, a=1.0):
     cv.over(P[:, 0], P[:, 1], np.stack(cols), a)
 
 
-LS = 260                 # overall length, px
-BW = 9.0                 # blade half width
-HW = 38                  # half width of the local map
-POMMEL, GRIP, GUARD = 10, 49, 57  # part boundaries from the pommel end, px (4 %, 15 %, 3 %)
+K = 3                    # the giant sword at three times the first cut: its hilt stays hidden in the clouds
+LS = 260 * K             # overall length, px
+BW = 9.0 * K             # blade half width
+HW = 38 * K              # half width of the local map
+POMMEL, GRIP, GUARD = 10, 49, 57  # part boundaries from the pommel end, in units of K px (4 %, 15 %, 3 %)
 
 
 def big_sword(trace=False):
     """Tone map (indices into SW, -1 empty) and part map (pommel 0, grip 1, guard 2, blade 3) of the giant jian,
-    vertical, tip down, pommel end at row 0, the axis at column HW."""
-    s = np.arange(LS) + 0.5
-    v = np.arange(-HW, HW + 1).astype(float)
-    S, V = np.meshgrid(s, v, indexing="ij")
+    vertical, tip down, pommel end at row 0, the axis at column HW. The blade is drawn in pixels (ridge, bevels,
+    edge, sheen); the hilt, never on screen, keeps the first cut's shapes scaled by K."""
+    S, V = np.meshgrid(np.arange(LS) + 0.5, np.arange(-HW, HW + 1).astype(float), indexing="ij")
     av = np.abs(V)
     tone = np.full(S.shape, -1, int)
     part = np.full(S.shape, -1, int)
 
     tipz = LS * 0.085
     hw = BW * np.clip((LS - S) / tipz, 0, 1) ** 0.8
-    blade = (S >= GUARD - 1) & (av <= hw + 0.15) & ((av < 0.6) | (hw >= 0.9))
+    blade = (S >= (GUARD - 1) * K) & (av <= hw + 0.15) & ((av < 0.6) | (hw >= 0.9))
     t = np.where(V < 0, 3, 2)
-    t = np.where((V <= -1) & (V >= -2), 4, t)
-    t = np.where((V >= 1) & (V <= 2), 1, t)
+    bev = np.maximum(1.5, hw * 0.3)                      # the ridge's two faces: lit left, shaded right
+    t = np.where((V <= -1) & (V >= -bev), 4, t)
+    t = np.where((V >= 1) & (V <= bev), 1, t)
     t = np.where(V == 0, 5, t)
-    edge = av >= np.floor(hw + 0.15)
+    edge = av >= np.floor(hw + 0.15) - (hw > 6)          # a 2 px edge where the blade is wide
     t = np.where(edge & (V < 0), 4, t)
     t = np.where(edge & (V > 0), 3, t)
-    sheen = ((S * 0.8 - V * 2.2) % 64) < 5
-    t = np.where(sheen & (V < 0) & (V > -8), 4, t)
-    groove = (V == 5) & (S > GUARD + 4) & (S < GUARD + 70)
-    t = np.where(groove, 1, t)
+    sheen = ((S * 0.8 - V * 2.2) % 150) < 10
+    t = np.where(sheen & (V < -bev) & (V > -hw + 2), 4, t)
+    sheen2 = ((S * 0.8 - V * 2.2 + 60) % 150) < 4
+    t = np.where(sheen2 & (V < -bev) & (V > -hw + 2), 5, t)
     tone[blade], part[blade] = t[blade], 3
 
+    S, V = S / K, V / K                                  # the hilt in the first cut's units
+    av = np.abs(V)
+
     core = (S >= GRIP) & (S < GUARD) & (av <= 12.5)
-    wing = (av > 12) & (av <= 4 * BW) & (S >= GRIP + (av - 12) * 0.24) & (S <= GUARD - 2.5 + (av - 12) * 0.45)
+    wing = (av > 12) & (av <= 4 * BW / K) & (S >= GRIP + (av - 12) * 0.24) & (S <= GUARD - 2.5 + (av - 12) * 0.45)
     guard = core | wing
     g = np.where(V < 0, 3, 2)
     g = np.where(S < GRIP + 2 + (av - 12).clip(0) * 0.24, 4, g)
-    g = np.where(av > 4 * BW - 3, 4, g)
+    g = np.where(av > 4 * BW / K - 3, 4, g)
     g = np.where((av < 3) & (S > GRIP + 2) & (S < GUARD - 2), 5, g)
     g = np.where((S > GUARD - 2 + (av - 12).clip(0) * 0.45) & (V > 0), 1, g)
     tone[guard], part[guard] = g[guard], 2
@@ -204,7 +230,11 @@ def big_sword(trace=False):
 
 BIG_TONE, BIG_PART = big_sword(trace=True)
 BIG_MASK = BIG_TONE >= 0
-BURST_LOCAL = dv.local(dv.scatter(BIG_MASK & (np.arange(LS) < LS - 20)[:, None], NSW, seed=SEED), (HW, 0))   # the part above ground
+CLOUD_LOW = 124          # the deck's underside over the blade: below it the sword is in the open
+_rows = np.arange(LS)[:, None] + (GROUND + 20 - LS)  # world rows of the sword once it is planted
+BURST_LOCAL = dv.local(dv.scatter(BIG_MASK & (_rows > CLOUD_LOW + 6) & (_rows < GROUND), NSW, seed=SEED), (HW, 0))
+RISE_LAUNCH = 30         # first sword peels off the rings; the last goes 20 frames later
+EMERGE = 46              # px of tip that slide out under the deck before the plunge
 
 
 def sword_top(f):
@@ -212,12 +242,13 @@ def sword_top(f):
     if f < PLUNGE0 or f >= BURST:
         return None
     tip_hole = EY - 4
+    out = CLOUD_LOW + EMERGE - tip_hole
     if f < DROP0:
         s = ease((f - PLUNGE0) / (DROP0 - 2 - PLUNGE0))
-        tip = tip_hole + 82 * s + 2 * max(0, f - (DROP0 - 2))
+        tip = tip_hole + out * s + 2 * max(0, f - (DROP0 - 2))
     elif f < IMPACT:
         s = (f - DROP0) / (IMPACT - DROP0)
-        tip = tip_hole + 86 + (GROUND + 20 - tip_hole - 86) * s ** 1.6
+        tip = tip_hole + out + 4 + (GROUND + 20 - tip_hole - out - 4) * s ** 1.6
     else:
         tip = GROUND + 20
     return tip - LS
@@ -231,49 +262,57 @@ def heat_of(f):
     return 0.0
 
 
-def draw_big(cv, L, f, hole):
+def draw_big(cv, L, f, hole, ctone):
+    """The giant sword coming down through the open eye: behind the eye's centre line only the hole shows it, in
+    front of it the blade passes over the deck, under a 1 px pale lip where the hole's front edge crosses it. The
+    hilt stays above the eye, in the clouds."""
     top = sword_top(f)
     if top is None:
         return
     y0, x0 = int(round(top)), EX - HW
     rr, cc = np.nonzero(BIG_MASK)
     ys, xs = rr + y0, cc + x0
-    keep = (ys < GROUND) & (ys >= 0)
-    up = ys < EY
-    keep &= ~up | hole[np.clip(ys, 0, H - 1), np.clip(xs, 0, W - 1)]
+    keep = (ys < GROUND) & (ys >= 0) & (xs >= 0) & (xs < W)
+    yc, xc = np.clip(ys, 0, H - 1), np.clip(xs, 0, W - 1)
+    keep &= hole[yc, xc] | (ys >= EY)
     rgb = SWF[BIG_TONE[rr, cc]]
     h = heat_of(f)
     if h > 0:
         rgb = rgb * (1 - h) + WHITE * h
     cv.over(ys[keep], xs[keep], rgb[keep], 1.0)
-    vis_top = max(y0 + GUARD, EY - 6)
+    lip = keep & (ys >= EY) & (ctone[yc, xc] == 6)       # the hole's front rim drawn back over the blade
+    cv.over(ys[lip], xs[lip], CLF[6], 1.0)
+    vis_top = EY
     tip = min(y0 + LS, GROUND)
     if tip > vis_top:
-        glow_line(L, (EX - 4, vis_top), (EX - 4, tip), 6, 0.32 + 0.4 * h)
-        glow_line(L, (EX, vis_top), (EX, tip), 20, 0.14 + 0.2 * h)
+        glow_line(L, (EX - 9, vis_top), (EX - 9, tip - 8), 10, 0.16 + 0.4 * h)    # the lit face and ridge
+        glow_line(L, (EX, vis_top), (EX, tip), 40, 0.13 + 0.2 * h)
     if f < IMPACT:
-        glow(L, EX, tip - 4, 12, 0.6)
-        if f >= DROP0:                                    # speed lines above the falling blade
-            for j in range(6):
-                xx = EX - 20 + j * 8
-                ln = 30 + (j * 13) % 22
-                yy = np.arange(int(vis_top - ln), int(vis_top))
+        glow(L, EX, tip - 10, 18, 0.6)
+        if f >= DROP0:                                    # speed lines beside the falling blade
+            for j in range(8):
+                side = -1 if j % 2 else 1
+                xx = EX + side * (BW + 5 + (j // 2) * 7)
+                ln = 50 + (j * 23) % 40
+                y1 = tip - 30 - (j * 17) % 30
+                yy = np.arange(int(max(y1 - ln, vis_top)), int(y1))
                 cv.over(yy, np.full(yy.size, int(xx)), hexf(GOLD), np.linspace(0, 0.7, yy.size))
     if h > 0:
-        glow(L, EX, y0 + LS * 0.55, 70, 0.35 * h, flat=1.6)
+        glow(L, EX, (vis_top + GROUND) / 2, 110, 0.35 * h, flat=1.0)
 
 
 LIGHT_SW = [hexf("#fffdf6"), hexf("#eef4ff"), hexf("#b8cceb"), hexf("#ffe2a0")]   # core, lit edge, far edge, hilt
 
 
-def small(cv, L, x, y, ang, a=1.0, heat=0.0, lk=1.0, i=0, f=0, seed=SEED):
-    """A 34 px light sword at (x, y) (the guard), tip along ang: a white core line, translucent pale edges, a pale
-    gold hilt, no dark tones. The lit edge stays top-left in the world."""
+def small(cv, L, x, y, ang, a=1.0, heat=0.0, lk=1.0, i=0, f=0, seed=SEED, fs=1.0):
+    """A light sword (34 px times SC) at (x, y) (the guard), tip along ang, shortened by fs along its length: a 1 px
+    white core line, translucent pale edges, a pale gold hilt, no dark tones. The lit edge stays top-left."""
     c, s = math.cos(ang), math.sin(ang)
-    sy, sx = _win(x - 27, x + 27, y - 27, y + 27)
+    e = 27 * SC
+    sy, sx = _win(x - e, x + e, y - e, y + e)
     X, Y = XX[sy, sx] - x, YY[sy, sx] - y
-    u = X * c + Y * s
-    v = -X * s + Y * c
+    u = (X * c + Y * s) / (SC * fs)
+    v = (-X * s + Y * c) / SC
     av = np.abs(v)
     bh = 1.7 * np.clip((24 - u) / 8, 0, 1) ** 0.7
     blade = (u >= 0) & (u <= 24) & (av <= np.maximum(bh, 0.5))
@@ -285,19 +324,21 @@ def small(cv, L, x, y, ang, a=1.0, heat=0.0, lk=1.0, i=0, f=0, seed=SEED):
     al = np.zeros(u.shape)
     hilt = guard | grip | pommel
     t[hilt], al[hilt] = 3, 0.8
-    t[blade] = np.where(av[blade] < 0.55, 0, np.where(lit[blade], 1, 2))
-    al[blade] = np.where(av[blade] < 0.55, 1.0, np.where(lit[blade], 0.75, 0.5))
+    core = av * SC < 0.6
+    t[blade] = np.where(core[blade], 0, np.where(lit[blade], 1, 2))
+    al[blade] = np.where(core[blade], 1.0, np.where(lit[blade], 0.75, 0.5))
     ys, xs = np.nonzero(t >= 0)
     rgb = np.stack(LIGHT_SW)[t[ys, xs]]
     if heat > 0:
         rgb = rgb * (1 - heat) + WHITE * heat
     cv.over(ys + sy.start, xs + sx.start, rgb, al[ys, xs] * a)
     if lk > 0:
-        tx, ty = x + c * 23, y + s * 23
+        ln = SC * fs
+        tx, ty = x + c * 23 * ln, y + s * 23 * ln
         k = lk * a * (0.6 + 0.4 * flick(i, f, seed))
-        glow(L, tx, ty, 4, 0.5 * k)
-        glow_line(L, (x + c * 2, y + s * 2), (tx, ty), 4, 0.3 * k)
-        glow_line(L, (x, y), (tx, ty), 9, 0.12 * k)
+        glow(L, tx, ty, 5, 0.5 * k)
+        glow_line(L, (x + c * 2 * ln, y + s * 2 * ln), (tx, ty), 5, 0.3 * k)
+        glow_line(L, (x, y), (tx, ty), 11, 0.12 * k)
 
 
 def trail(cv, pts, a0=0.8):
@@ -319,6 +360,35 @@ def bez(p, t):
     return out
 
 
+SC = 1.4                 # small sword scale: 34 px in the first cut, about 46 px now
+# Two sword rings round the caster, flat discs seen a little from above: the lower one wide, the upper one tight,
+# turning against each other, each tilted (roll) the other way.
+RINGS = [dict(cy=FOOT[1] - 24, R=84, roll=0.10, spin=1.0), dict(cy=FOOT[1] - 52, R=60, roll=-0.14, spin=-1.0)]
+PITCH = 0.27             # how far the camera looks down on the rings
+BEND = 0.38              # tips lean outward from the ring's tangent, rad
+OMEGA = 0.13             # ring turn, rad per frame
+
+
+def orbit3(i, th, f, grow=None, lift=None):
+    """Guard point, heading, foreshortening and depth of ring sword i at ring angle th at frame f. grow and lift
+    default to the return's: the rings close in as they settle, then rise before the swords go out."""
+    rg = RINGS[i % 2]
+    if grow is None:
+        grow = 1.16 - 0.16 * ease((f - BURST - 12) / 30)
+    if lift is None:
+        lift = 10 * ease((f - BURST - 26) / 20)
+    R = rg["R"] * grow
+    c, s, sp = math.cos(th), math.sin(th), rg["spin"]
+    dx = -s * sp * math.cos(BEND) + c * math.sin(BEND)
+    dz = c * sp * math.cos(BEND) + s * math.sin(BEND)
+    cr, sr = math.cos(rg["roll"]), math.sin(rg["roll"])
+    x, y = R * c, R * s * PITCH
+    vx, vy = dx, dz * PITCH
+    px, py = FOOT[0] + x * cr - y * sr, rg["cy"] - lift + x * sr + y * cr
+    wx, wy = vx * cr - vy * sr, vx * sr + vy * cr
+    return (px, py), math.atan2(wy, wx), max(math.hypot(wx, wy), 0.45), s
+
+
 class Plan:
     """Every seeded choice of the effect, drawn once per seed."""
 
@@ -328,24 +398,30 @@ class Plan:
         order = rng.permutation(NSW)
         self.rise = []
         for i in range(NSW):
-            al = -math.pi + 0.3 + (math.pi - 0.6) * (i + rng.uniform(-0.3, 0.3)) / (NSW - 1)
-            rad = 30 + rng.uniform(0, 24)
-            sp = (FOOT[0] + rad * math.cos(al) * 1.25, FOOT[1] - 36 + rad * math.sin(al))
-            r_i = rng.uniform(55, 160)
-            th_i = rng.uniform(0.18, 0.82) * math.pi
-            ent = (EX + r_i * math.cos(th_i), EY + r_i * math.sin(th_i) * FLAT + TH * 0.6)
-            self.rise.append(dict(sp=sp, al=al, spawn=i * 4.0 / NSW, launch=5 + order[i] * 13.0 / NSW,
-                                  dur=rng.uniform(7, 9.5), ent=ent, r=r_i, th=th_i, sink=56 + rng.uniform(0, 10)))
+            # each sword fans out of the caster into its ring, circles, then peels off and climbs near upright
+            # into the near (left) half of the deck's underside
+            ex_ = rng.uniform(235, 340)
+            dx = ex_ - EX
+            ey_ = EY + math.sqrt(max(RX * RX - dx * dx, 0.0)) * FLAT * 0.85 + TH * 0.6
+            dz = (ey_ - EY - TH * 0.6) / FLAT
+            so = 56 + rng.uniform(0, 10)
+            self.rise.append(dict(a0=TAU * (i // 2) / (NSW // 2) + (i % 2) * 0.13,
+                                  spawn=(i // 2) * 14.0 / (NSW // 2) + (i % 2) * 0.5,
+                                  launch=RISE_LAUNCH + order[i] * 20.0 / NSW, dur=rng.uniform(12, 15),
+                                  ent=(ex_, ey_), r=math.hypot(dx, dz), th=math.atan2(dz, dx),
+                                  sink=T(so), sinkd=T(so + 16) - T(so)))
         P0 = dv.world(BURST_LOCAL, (EX, GROUND + 20 - LS))
         self.ret = []
         for i in range(NSW):
             side = -1 if i % 2 == 0 else 1
             p0 = P0[i]
             c1 = (np.clip(p0[0] + side * rng.uniform(60, 170), 30, 530), np.clip(p0[1] - rng.uniform(60, 170), 30, 300))
-            a0 = TAU * i / NSW
-            c2 = (ORB[0] + math.cos(a0) * ORB[2] * 2.6, ORB[1] - 50 - rng.uniform(0, 50))
-            self.ret.append(dict(p0=p0, c1=c1, c2=c2, arrive=BURST + 18 + rng.uniform(0, 12), a0=a0,
-                                 out=130 + order[i] * 19.0 / (NSW - 1)))
+            a0 = TAU * (i // 2) / (NSW // 2) + (i % 2) * 0.13
+            arrive = BURST + 18 + rng.uniform(0, 12)
+            (ex_, ey_), ang, _, _ = orbit3(i, a0 + RINGS[i % 2]["spin"] * OMEGA * (arrive - BURST), arrive)
+            c2 = (ex_ - math.cos(ang) * 60, ey_ - math.sin(ang) * 60 - 20)   # slide in along the ring
+            self.ret.append(dict(p0=p0, c1=c1, c2=c2, arrive=arrive, a0=a0,
+                                 out=BURST + 28 + order[i] * 19.0 / (NSW - 1)))
         self.rocks = [dict(vx=rng.uniform(-3.2, 3.2), vy=rng.uniform(-7, -2.5), s=int(rng.integers(1, 4)),
                            x0=EX + rng.uniform(-8, 8)) for _ in range(44)]
         self.sparks = [dict(vx=rng.uniform(-8.5, 8.5), vy=rng.uniform(-11, -2), life=int(rng.integers(6, 15)),
@@ -368,61 +444,72 @@ def plan(seed):
     return _plans[seed]
 
 
-def rise_pos(sw, f):
-    """Position and heading of a rising sword at frame f, or None when it is in the clouds or not yet there."""
+def rise_ring(sw, i, f):
+    return orbit3(i, sw["a0"] + RINGS[i % 2]["spin"] * OMEGA * f, f,
+                  grow=0.35 + 0.65 * ease((f - sw["spawn"]) / 10), lift=0.0)
+
+
+def rise_pos(sw, i, f):
+    """Guard point, heading, foreshortening and depth of rising sword i at frame f, or None when it is not yet out
+    or already in the clouds. It circles in its ring until launch, then leaves along the ring's tangent, climbs,
+    and enters the deck straight up."""
     if f < sw["spawn"]:
         return None
     if f < sw["launch"]:
-        bob = 1.5 * math.sin(f * 0.6 + sw["al"] * 3)
-        return (sw["sp"][0], sw["sp"][1] + bob), -math.pi / 2 + (sw["al"] + math.pi / 2) * 0.55
+        return rise_ring(sw, i, f)
     t = (f - sw["launch"]) / sw["dur"]
     if t >= 1:
         return None
-    pts = (sw["sp"], (sw["sp"][0], max(sw["sp"][1] - 130, 150)), sw["ent"])
-    tt = t ** 1.6
+    (x0, y0), a0, fs0, d0 = rise_ring(sw, i, sw["launch"])
+    ex_, ey_ = sw["ent"]
+    pts = ((x0, y0), (x0 + math.cos(a0) * 30, y0 + math.sin(a0) * 30 - 40), (ex_, ey_ + 130), (ex_, ey_))
+    tt = t ** 1.4
     p = bez(pts, tt)
     q = bez(pts, tt + 0.02) if tt < 0.98 else 2 * p - bez(pts, tt - 0.02)
-    return (p[0], p[1]), math.atan2(q[1] - p[1], q[0] - p[0])
+    k = ease((f - sw["launch"]) / 5)
+    return (p[0], p[1]), math.atan2(q[1] - p[1], q[0] - p[0]), fs0 + (1 - fs0) * k, d0 + (1 - d0) * k
 
 
-def orbit(a):
-    return ORB[0] + ORB[2] * math.cos(a), ORB[1] + ORB[3] * math.sin(a)
-
-
-def ret_pos(sw, f):
+def ret_pos(sw, i, f):
+    """Guard point, heading, foreshortening and depth (-1 far side, +1 near side) of return sword i at frame f."""
     if f < BURST or f >= sw["out"]:
         return None
+    rg = RINGS[i % 2]
     if f < sw["arrive"]:
-        pts = (sw["p0"], sw["c1"], sw["c2"], orbit(sw["a0"] + 0.16 * (sw["arrive"] - BURST)))
+        end = orbit3(i, sw["a0"] + rg["spin"] * OMEGA * (sw["arrive"] - BURST), sw["arrive"])
+        pts = (sw["p0"], sw["c1"], sw["c2"], end[0])
         t = (f - BURST) / (sw["arrive"] - BURST)
         tt = 1 - (1 - t) ** 1.7
         p = bez(pts, tt)
         q = bez(pts, tt + 0.02) if tt < 0.98 else 2 * p - bez(pts, tt - 0.02)
-        return (p[0], p[1]), math.atan2(q[1] - p[1], q[0] - p[0])
-    ang = sw["a0"] + 0.16 * (f - BURST)
-    return orbit(ang), math.atan2(ORB[3] * math.cos(ang), -ORB[2] * math.sin(ang))
+        k = ease((f - sw["arrive"] + 6) / 6)                # fold into the ring's depth as it lands
+        return (p[0], p[1]), math.atan2(q[1] - p[1], q[0] - p[0]), 1 + (end[2] - 1) * k, 1 + (end[3] - 1) * k
+    return orbit3(i, sw["a0"] + rg["spin"] * OMEGA * (f - BURST), f)
 
 
-SPIN = np.cumsum([0.006 + 0.075 * ease((f - 10) / 50) + 0.03 * ease((f - 60) / 30) - 0.07 * ease((f - 100) / 40)
-                  for f in range(N)])
+def _spin_rate(t):
+    return 0.006 + 0.075 * ease((t - 10) / 50) + 0.03 * ease((t - 60) / 30) - 0.07 * ease((t - 100) / 40)
+
+
+SPIN = np.cumsum([_spin_rate(T_old(f)[0]) * T_old(f)[1] for f in range(N)])   # the vortex turns slower as it slows
 CY0, CY1, CX0, CX1 = 6, 150, 168, 552
 CYY, CXX = YY[CY0:CY1, CX0:CX1], XX[CY0:CY1, CX0:CX1]
 
 
 def hole_r(f):
-    return 40 * ease((f - HOLE0) / (PLUNGE0 - HOLE0)) + 60 * ease((f - BURST) / 40)
+    return 48 * ease((f - HOLE0) / (PLUNGE0 - HOLE0)) + 60 * ease((f - BURST) / 40)
 
 
 def eye_k(f):
     k = 0.15 + 0.45 * ease((f - SWIRL0) / (HOLE0 - SWIRL0)) + 0.4 * ease((f - HOLE0) / (PLUNGE0 - HOLE0))
-    return k * (1 - ease((f - 104) / 38))
+    return k * (1 - ease((f - BURST - 2) / 38))
 
 
 def deck(f, seed):
     """Cloud deck tone map over its window (CL indices, -1 empty) and the hole as a full-frame mask."""
     sp = SPIN[f]
-    grow = 0.55 + 0.45 * ease(f / 40)
-    brk = 0.75 * ease((f - 104) / 40)
+    grow = 0.55 + 0.45 * ease(f / T(40))
+    brk = 0.75 * ease((f - BURST - 2) / 40)
     P = 600.0
 
     def polar(yoff):
@@ -571,13 +658,13 @@ def render(f, seed=SEED, caster=False):
     hr = hole_r(f)
     if hr > 0.5:
         ys, xs = np.nonzero(hole)
-        cv.over(ys, xs, hexf(HOLE), 0.92 * (1 - ease((f - 102) / 14)))
-        glow(L, EX, EY, hr * 1.25, 0.7 * min(1, hr / 20) * (1 - ease((f - 110) / 30)), flat=FLAT * 1.4)
+        cv.over(ys, xs, hexf(HOLE), 0.92 * (1 - ease((f - BURST) / 14)))
+        glow(L, EX, EY, hr * 1.25, 0.7 * min(1, hr / 20) * (1 - ease((f - BURST - 8) / 30)), flat=FLAT * 1.4)
     glow(L, EX, EY, 70, 0.45 * ek, flat=0.45)              # the eye: the light source
     glow(L, EX, EY + 6, 195, 0.12 * ek, flat=0.33)         # hazy pool over the deck
-    wash = ease(f / 10) * (1 - ease((f - 108) / 34))
+    wash = ease(f / T(10)) * (1 - ease((f - BURST - 6) / 34))
     glow(L, 350, 190, 225, 0.16 * wash, flat=0.9)           # hazy wash under the vortex
-    glow(L, FOOT[0], FOOT[1] - 60, 115, 0.14 * ease(f / 4) * (1 - ease((f - 14) / 16)))   # round the swords at rest
+    glow(L, FOOT[0], FOOT[1] - 50, 115, 0.14 * ease(f / 6) * (1 - ease((f - RISE_LAUNCH - 10) / 20)))
     if HOLE0 <= f < RETURN0 + 6:                           # a soft shaft under the eye
         o = ease((f - HOLE0) / 20) * (1 - ease((f - RETURN0) / 6))
         glow_line(L, (EX, EY + 8), (EX, GROUND - 10), 34, 0.13 * o)
@@ -587,10 +674,10 @@ def render(f, seed=SEED, caster=False):
         if f < e:
             continue
         flash(math.ceil(e) - 1, *sw["ent"], 16, 0.7, 6)
-        s = ease((f - sw["sink"]) / 16)
+        s = ease((f - sw["sink"]) / sw["sinkd"])
         rr = sw["r"] * (1 - s) + max(hr * 0.95, 4) * s
-        if f >= sw["sink"] + 16 or f >= PLUNGE0:
-            flash(int(sw["sink"] + 16), EX + rr * math.cos(sw["th"]), EY, 10, 0.5, 5)
+        if f >= sw["sink"] + sw["sinkd"] or f >= PLUNGE0:
+            flash(int(sw["sink"] + sw["sinkd"]), EX + rr * math.cos(sw["th"]), EY, 10, 0.5, 5)
             continue
         th = sw["th"] + 1.25 * (SPIN[f] - SPIN[int(e)])
         x, y = EX + rr * math.cos(th), EY + rr * math.sin(th) * FLAT
@@ -604,67 +691,84 @@ def render(f, seed=SEED, caster=False):
                     front * (1 - q / 4) * (0.5 + 0.5 * k))
         glow(L, x, y, 6, 0.5 * k * front)
 
-    draw_big(cv, L, f, hole)
-    flash(BURST, EX, GROUND + 20 - LS * 0.45, 60, 0.9, 8)
+    ctone = np.full((H, W), -1)
+    ctone[CY0:CY1, CX0:CX1] = tone
+    draw_big(cv, L, f, hole, ctone)
+    flash(BURST, EX, (CLOUD_LOW + GROUND) / 2, 100, 0.9, 8)
     flash(IMPACT, EX, GROUND - 6, 50, 1.0, 8)
     impact(cv, L, f, pl)
 
+    ring = []
     for i, sw in enumerate(pl.rise):
-        p = rise_pos(sw, f)
-        if p is None:
-            continue
-        (x, y), ang = p
-        a = min(1.0, (f - sw["spawn"]) / 3 + 0.34)
-        if f >= sw["launch"]:
-            trail(cv, [q[0] for q in (rise_pos(sw, f - k * 0.7) for k in range(7)) if q is not None])
-        small(cv, L, x, y, ang, a=a, i=i, f=f, seed=pl.seed)
-        flash(int(math.ceil(sw["spawn"])), x, y, 10, 0.5, 5)
-        flash(int(math.ceil(sw["launch"])), x, y, 12, 0.5, 5)
-
+        p = rise_pos(sw, i, f)
+        if p is not None:
+            ring.append((p[3], i, sw, p, False))
     for i, sw in enumerate(pl.ret):
         if sw["out"] <= f < sw["out"] + 3:
-            q = ret_pos(sw, sw["out"] - 1)
+            q = ret_pos(sw, i, sw["out"] - 1)
             if q:
                 star(cv, *q[0], 3 - int(f - sw["out"]), 1.0)
                 flash(int(math.ceil(sw["out"])), *q[0], 10, 0.6, 4)
-        p = ret_pos(sw, f)
-        if p is None:
-            continue
-        (x, y), ang = p
-        if f < sw["arrive"] + 3:
-            trail(cv, [q[0] for q in (ret_pos(sw, f - k * 0.7) for k in range(7)) if q is not None])
-        small(cv, L, x, y, ang, heat=max(0.0, 1 - (f - BURST) / 6), i=i, f=f, seed=pl.seed)
-        flash(BURST, x, y, 12, 0.6, 5)
+        p = ret_pos(sw, i, f)
+        if p is not None:
+            ring.append((p[3], i, sw, p, True))
+    ring.sort(key=lambda r: r[0])                       # far side first, near side last
 
-    for (x, y, r, k) in events:
-        glow(L, x, y, r, k)
+    def ring_sword(i, sw, p, ret):
+        (x, y), ang, fs, dep = p
+        vis = 0.55 + 0.45 * (dep + 1) / 2                # the far side of a ring is dimmer
+        if ret:
+            flying = f < sw["arrive"] + 3
+            tr = [q[0] for q in (ret_pos(sw, i, f - k * 0.8) for k in range(7 if flying else 5)) if q is not None]
+            trail(cv, tr, (0.8 if flying else 0.45) * vis)
+            small(cv, L, x, y, ang, a=vis, heat=max(0.0, 1 - (f - BURST) / 6), lk=vis, i=i, f=f, seed=pl.seed,
+                  fs=fs)
+            flash(BURST, x, y, 12, 0.6, 5)
+            return
+        flying = f >= sw["launch"]
+        tr = [q[0] for q in (rise_pos(sw, i, f - k * 0.8) for k in range(7 if flying else 5)) if q is not None]
+        trail(cv, tr, (0.8 if flying else 0.45) * vis)
+        a = vis * min(1.0, (f - sw["spawn"]) / 3 + 0.34)
+        small(cv, L, x, y, ang, a=a, lk=a, i=i, f=f, seed=pl.seed, fs=fs)
+        flash(int(math.ceil(sw["spawn"])), x, y, 10, 0.5, 5)
+        flash(int(math.ceil(sw["launch"])), x, y, 12, 0.5, 5)
 
-    if caster:
+    for dep, i, sw, p, ret in ring:
+        if dep < 0:
+            ring_sword(i, sw, p, ret)
+    if caster:                                           # the caster stands between the two halves of the rings
         foot, lift, flut, ghost = caster_state(f)
         g = cs.draw(cv.over, (H, W), foot, 0.52, caster_pose(f, foot, 0.52), f, lift, flut, hair="loose")
         cs.body_light(L, g, 0.4 + 0.6 * min(1, f / 20))
         cs.finger_light(L, g, point_of(f), max(0.0, 1 - abs(f - IMPACT) / 6))
+    for dep, i, sw, p, ret in ring:
+        if dep >= 0:
+            ring_sword(i, sw, p, ret)
+
+    for (x, y, r, k) in events:
+        glow(L, x, y, r, k)
     return cv.rgba(), L
 
 
 def caster_state(f):
     """Mockup caster (preview only): feet, lift, flutter and the avatar's strength at frame f."""
-    up = 6 * ease(f / 16) * (1 - ease((f - 104) / 14))
-    bob = 1.5 * math.sin(f * 0.25) * ease(f / 16) * (1 - ease((f - 104) / 14))
-    act = 0.3 + 0.5 * ease((f - 10) / 30) * (1 - ease((f - 110) / 30))
-    ghost = ease((f - 4) / 26) * (1 - ease((f - 120) / 26))
+    up = 6 * ease(f / T(16)) * (1 - ease((f - BURST - 2) / 14))
+    bob = 1.5 * math.sin(f * 0.25) * ease(f / T(16)) * (1 - ease((f - BURST - 2) / 14))
+    act = 0.3 + 0.5 * ease((f - T(10)) / (T(40) - T(10))) * (1 - ease((f - BURST - 8) / 30))
+    ghost = ease((f - T(4)) / (T(30) - T(4))) * (1 - ease((f - BURST - 18) / 26))
     return (FOOT[0], FOOT[1] - up + bob), act, 0.35 + 0.5 * act, ghost
 
 
 def point_of(f):
-    return ease((f - 86) / 6) * (1 - ease((f - 104) / 8))
+    return ease((f - IMPACT + 10) / 6) * (1 - ease((f - BURST - 2) / 8))
 
 
 def caster_pose(f, foot, sc):
     aim = cs.aim_from(foot, sc, (EX, GROUND - 20))
     jab = 3.0 * max(0.0, 1 - abs(f - IMPACT) / 5)
-    return cs.pose_at(f, [(0, "chest"), (8, "raise"), (80, "raise"), (90, "point"), (108, "point"), (122, "chest")],
-                      [(0, "rest"), (10, "out"), (110, "out"), (124, "behind")], aim, jab)
+    return cs.pose_at(f, [(0, "chest"), (T(8), "raise"), (PLUNGE0 + 2, "raise"), (IMPACT - 6, "point"),
+                          (BURST + 6, "point"), (BURST + 20, "chest")],
+                      [(0, "rest"), (T(10), "out"), (BURST + 8, "out"), (BURST + 22, "behind")], aim, jab)
 
 
 def tint(L):
@@ -687,7 +791,7 @@ def main():
     cols, lights, finals, previews, mids = [], [], [], [], []
     covers, means = [], []
     hits = [ex.hit(IMPACT, FPS, freeze=0.12, shake=4, push=6, react="knockback")]
-    keys = [12, 40, 70, 86, 96, 112, 128, 146]
+    keys = [22, 44, round(T(70)), PLUNGE0 + 8, IMPACT, BURST + 12, BURST + 28, BURST + 44]
     for f in range(N):
         col, L = render(f)
         lt = tint(L)
@@ -708,15 +812,16 @@ def main():
             mids.append(pfx.composite(pc, tint(pL), bg="#5a5866"))
 
     meta = ex.write(OUT, NAME, finals, FPS, PIVOT, False, light=lights, color=cols, states=STATES, hits=hits,
-                    poses=[ex.pose(-0.2, "windup"), ex.pose(0.0, "cast", "snap"), ex.pose(0.8, "channel"),
-                           ex.pose(3.0, "release", "snap"), ex.pose(3.4, "follow"), ex.pose(4.3, "recover")],
+                    poses=[ex.pose(-0.2, "windup"), ex.pose(0.0, "cast", "snap"), ex.pose(SWIRL0 / FPS, "channel"),
+                           ex.pose((IMPACT - 6) / FPS, "release", "snap"), ex.pose((IMPACT + 6) / FPS, "follow"),
+                           ex.pose((IMPACT + 33) / FPS, "recover")],
                     target={"x": EX - FOOT[0], "react": "knockback"},
                     extra=fc.check(dict(fc.meta("side", W, H, PIVOT, target=[EX, GROUND]), glow="strong",
                                         clarity="hazy")))
 
     grid_img([previews[k] for k in keys], 4, 2).save(OUT / "keys_2x_dark.png")
     grid_img(mids, 4, 2).save(OUT / "keys_2x_mid.png")
-    for k in (40, 86, 96, 128):
+    for k in (22, 44, PLUNGE0 + 8, BURST + 28):
         Image.fromarray(previews[k]).resize((W * 4, H * 4), Image.NEAREST).save(OUT / f"f{k:03d}_4x.png")
     grid_img(previews[::5], 6).save(OUT / "strip_1x.png")
     pfx.gif(ex.hitstop(previews, hits, FPS), OUT / f"{NAME}.gif", FPS, scale=2)

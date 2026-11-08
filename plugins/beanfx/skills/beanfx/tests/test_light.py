@@ -37,6 +37,19 @@ ok(all(a > b for a, b in zip(peaks[:6], peaks[1:6])), "a flash dims every frame:
 ok(all(a >= b for a, b in zip(reach[:6], reach[1:6])) and reach[5] < reach[0], "a flash shrinks: %s" % reach)
 ok(peaks[6] == 0 and not fl.list, "a flash is gone after its life")
 
+# flash_at draws the same light as Flashes from the frame alone, so it fits a per-frame render(f, seed)
+fl = light.Flashes()
+same = True
+for f in range(10):
+    if f == 2:
+        fl.add(20.5, 30.5, 9, 0.5, life=5)
+    A = light.buffer(c); fl.draw(A, c); fl.step()
+    B = light.buffer(c); light.flash_at(B, c, f, 2, 20.5, 30.5, 9, 0.5, life=5)
+    same = same and np.allclose(A, B)
+ok(same, "flash_at matches Flashes frame by frame")
+B = light.buffer(c); light.flash_at(B, c, 1, 2, 20.5, 30.5, 9, 0.5, life=5)
+ok(B.max() == 0, "flash_at is dark before its birth frame")
+
 # flicker: seeded, in 0..1, differs between sparks and between frames, steady at rate 0
 a = [light.flicker(i, f, seed=3) for i in range(40) for f in range(30)]
 ok(all(0 <= v <= 1 for v in a), "flicker stays in 0..1")

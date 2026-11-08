@@ -20,6 +20,6 @@ jobs:
         run: |
           S=plugins/beanfx/skills/beanfx
           python $S/tests/test_gate.py
-          for t in facing derive export ref light; do python $S/tests/test_$t.py; done
+          for t in facing derive export ref light impact kit; do python $S/tests/test_$t.py; done
           node $S/tests/test_runtime.mjs
           cmp $S/runtime/beanfx.js docs/beanfx.js

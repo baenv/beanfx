@@ -17,4 +17,11 @@ image shows it. "Sparkling" or "shimmering" is clear.
 - "Balanced: clear shapes, light mist and a small pool round the peak"
 - "Hazy: soft translucent volumes and a wide pool, for fog, dreams and auras; reads muddier at 1x"
 
+**Examples:**
+- Clear: Dead Cells keeps anything that can hurt the player bright and high-contrast against the background. Pick
+  for fast play.
+- Balanced: a little mist round the peak; magic and heat.
+- Hazy: Dead Cells uses drifting particles and foreground clouds for depth, as set dressing and never for threats.
+  On a busy ground a hazy effect needs a dark pad or an outline in the engine.
+
 **Default:** clear.

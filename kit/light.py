@@ -13,6 +13,8 @@ retro look, so that sheet keeps hard alpha and stepped tones.
     fl = Flashes()                         # short lights: a spark landing, a sword entering the cloud, a hit
     fl.add(x, y, r, k, life=6)             # life in frames; it starts at k and r, dims as (life left)^2, shrinks
     fl.draw(L, c); fl.step()               # each frame: draw, then age by one frame
+    flash_at(L, c, f, f0, x, y, r, k, life)  # the same flash born at frame f0, drawn from f alone: pure, so
+                                           # render(f, seed) stays per frame for check_seeds
     k * flicker(i, f, seed)                # 0..1 per spark i at frame f, seeded and out of step: the twinkle
 
 Keep k at 0.2 to 0.5; light the hot core, eyes, bolt heads, the landing flash and embers, never the whole body.
@@ -78,13 +80,24 @@ class Flashes:
 
     def draw(self, L, c):
         for x, y, r, k, left, life in self.list:
-            u = left / life
-            glow(L, c, x, y, r * (0.55 + 0.45 * u), k * u * u)
+            _flash(L, c, x, y, r, k, left / life)
 
     def step(self):
         for fl in self.list:
             fl[4] -= 1
         self.list = [fl for fl in self.list if fl[4] > 0]
+
+
+def _flash(L, c, x, y, r, k, u):
+    glow(L, c, x, y, r * (0.55 + 0.45 * u), k * u * u)
+
+
+def flash_at(L, c, f, f0, x, y, r, k, life=6):
+    """A Flashes light born at frame f0, drawn at frame f with no state: the same k, shrink and life. Use it in a
+    render(f, seed) that computes each frame on its own."""
+    age = f - f0
+    if 0 <= age < life:
+        _flash(L, c, x, y, r, k, (life - age) / life)
 
 
 def _hash01(*n):

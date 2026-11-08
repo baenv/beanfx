@@ -24,4 +24,12 @@ twin-stick, RPG overworld is top-down or 3/4), states a direction count, or a re
 When the effect goes from a caster to a target, say in the question that it ships as cast, travel and impact parts
 so the range is free.
 
+**Examples:**
+- Side view: Celeste, Katana Zero, fighting games. One row drawn facing east, the engine flips it.
+- 8 directions: Celeste's dash goes in 8 directions; a top-down shot uses the same 8 rows.
+- 16 directions: free aim in a top-down shooter like Enter the Gungeon, where 8 rows show a visible step on long,
+  fast shots. Below about 30 px of travel the step does not show, so 8 is enough.
+- An effect that wraps a body (a ring round the waist, a swirl) draws a back and a front layer; say so in the
+  question when the shape does that.
+
 **Default:** side, 1 direction, mirror True; 8 rows for a top-down projectile or cone, 16 when it travels fast or far.

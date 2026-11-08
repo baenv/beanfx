@@ -46,10 +46,38 @@ POSES = ("idle", "guard", "windup", "cast", "channel", "release", "follow", "rec
 REACTS = ("none", "flinch", "stagger", "knockback", "launch")
 
 
-def hit(frame, fps, freeze=0.1, shake=0, push=0, react="flinch"):
+# Weight classes for a contact, after fighting-game and action-game practice (vfx_notes.md, Missing choices 1 to 3):
+# a stronger hit freezes longer, shakes harder and longer, pushes further and flashes the target longer.
+# freeze and shake_time in s, shake and push in px, flash in s the target shows white.
+WEIGHTS = {
+    "light":    dict(freeze=0.05, shake=1, shake_time=0.07, push=1, react="flinch", flash=0.03),
+    "heavy":    dict(freeze=0.13, shake=3, shake_time=0.12, push=4, react="knockback", flash=0.07),
+    "finisher": dict(freeze=0.25, shake=6, shake_time=0.2, push=10, react="launch", flash=0.12),
+    "blast":    dict(freeze=0.08, shake=5, shake_time=0.27, push=8, react="knockback", flash=0.1),
+}
+
+
+def hit(frame, fps, freeze=None, shake=None, push=None, react=None, weight=None, dir=None, shake_time=None,
+        flash=None, sound=None):
     """One contact: the sheet frame it lands on, its time in s, and how long the game freezes everything (hit-stop,
-    0.06 to 0.2 s), how far it shakes the camera (px), pushes the target (px) and how the target reacts (REACTS)."""
-    return dict(frame=frame, t=round(frame / fps, 4), freeze=freeze, shake=shake, push=push, react=react)
+    0.06 to 0.2 s), how far it shakes the camera (px), pushes the target (px) and how the target reacts (REACTS).
+
+    weight (WEIGHTS: light, heavy, finisher, blast) fills every field the call leaves out, so one word sets a hit
+    that feels as heavy as it looks. dir is the way the blow travels in degrees, y down, 0 along the facing (east):
+    the camera shakes along it and the target is pushed along it; a flipped sprite mirrors it to 180 - dir.
+    shake_time is how long the shake lasts, flash how long the target shows white, sound the cue name the game maps
+    to a sound and plays at t (default hit_<weight>)."""
+    w = WEIGHTS[weight] if weight else {}
+    pick = lambda v, k, d: v if v is not None else w.get(k, d)  # noqa: E731
+    h = dict(frame=frame, t=round(frame / fps, 4), freeze=pick(freeze, "freeze", 0.1), shake=pick(shake, "shake", 0),
+             push=pick(push, "push", 0), react=pick(react, "react", "flinch"))
+    if weight:
+        h["weight"] = weight
+    for k, v in (("dir", dir), ("shake_time", pick(shake_time, "shake_time", None)), ("flash", pick(flash, "flash", None)),
+                 ("sound", sound or (f"hit_{weight}" if weight else None))):
+        if v is not None:
+            h[k] = v
+    return h
 
 
 def pose(t, name, how="smooth"):
@@ -83,6 +111,12 @@ def check_act(a, frames, fps, loop=False):
             bad.append(f"act: hit at frame {h['frame']} freezes {h['freeze']} s; past 0.3 s it reads as a stall")
         if h.get("react", "none") not in REACTS:
             bad.append(f"act: hit at frame {h['frame']} react {h['react']!r} not in {REACTS}")
+        if h.get("weight") is not None and h["weight"] not in WEIGHTS:
+            bad.append(f"act: hit at frame {h['frame']} weight {h['weight']!r} not in {tuple(WEIGHTS)}")
+        if not 0 <= h.get("shake_time", 0) <= 0.6:
+            bad.append(f"act: hit at frame {h['frame']} shakes {h['shake_time']} s; keep it within 0.6 s")
+        if h.get("flash", 0) > 0.25:
+            bad.append(f"act: hit at frame {h['frame']} flashes {h['flash']} s; past 0.25 s it reads as a stun")
     keys = a.get("poses", [])
     for i, k in enumerate(keys):
         if k["pose"] not in POSES:
@@ -98,20 +132,37 @@ def check_act(a, frames, fps, loop=False):
 
 
 def hitstop(frames, hits, fps):
-    """Preview frames with each hit's freeze held on its contact frame and the camera shake applied, so a gif
-    shows the hit-stop the game will add. For previews only; the sheet keeps one frame per step."""
+    """Preview frames with each hit's freeze held on its contact frame and the camera shake applied along the blow
+    (`dir`) for `shake_time` (default: the freeze), so a gif shows the hit-stop and shake the game will add. For
+    previews only; the sheet keeps one frame per step."""
     by = {h["frame"]: h for h in hits or []}
-    out = []
+    out, shake = [], []  # shake: (frames left, total, amp, ux, uy) of the running shake
+
+    def shaken(f):
+        if not shake:
+            return f
+        left, total, amp, ux, uy = shake[0]
+        d = amp * left / max(1, total)
+        sgn = 1 if left % 2 else -1
+        dx, dy = round(sgn * d * ux), round(sgn * d * uy)
+        shake[0] = (left - 1, total, amp, ux, uy)
+        if left - 1 <= 0:
+            shake.clear()
+        return np.roll(np.roll(f, dx, axis=1), dy, axis=0) if (dx or dy) else f
+
     for i, f in enumerate(frames):
-        out.append(f)
         h = by.get(i)
-        if not h:
+        if h:
+            hold = max(0, round(h.get("freeze", 0) * fps))
+            amp = h.get("shake", 0)
+            a = math.radians(h.get("dir", 0))
+            n = max(1, round(max(h.get("shake_time", 0), h.get("freeze", 0)) * fps))
+            shake[:] = [(n, n, amp, math.cos(a), math.sin(a))] if amp else []
+            out.append(f)
+            for _ in range(hold):
+                out.append(shaken(f))
             continue
-        hold = max(0, round(h.get("freeze", 0) * fps))
-        amp = int(round(h.get("shake", 0)))
-        for k in range(hold):
-            d = amp - (amp * k) // max(1, hold) if amp else 0
-            out.append(np.roll(f, d if k % 2 == 0 else -d, axis=1) if d else f)
+        out.append(shaken(f))
     return out
 
 

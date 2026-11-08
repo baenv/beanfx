@@ -1,7 +1,7 @@
 """Bring a pixelfx effect into a Python draft: keep its light (the glow pixelfx does well), redraw or recolour its
 colour base, and put them back together. Used by the /beanfx skill.
 
-    node pixelfx/tools/layers.mjs fire/fireball --out <dir>        # writes fireball_color.png, _light.png, .json
+    node <skill>/tools/layers.mjs fire/fireball --out <dir>        # writes fireball_color.png, _light.png, .json
     fx = pfx.load(<dir>, "fireball")    # fx.color (n, h, w, 4) uint8, fx.light (n, h, w, 3) float 0..1, fx.meta
     L = pfx.tint(fx.light, ["#4a1060", "#c040ff", "#ffe0ff"])     # same glow shape, new hue ramp
     L = pfx.gain(L, 0.8)                                            # weaker or stronger
@@ -10,6 +10,7 @@ colour base, and put them back together. Used by the /beanfx skill.
     base = pfx.paint(shades, palette)    # an fxlib-style shade map (h, w) of palette indices, -1 empty, to RGBA
     out = pfx.composite(base, L[i], bg="#101018")                  # one frame; bg None keeps transparency
     pfx.strip(frames, path) / pfx.gif(frames, path, fps, scale=4)  # write the result
+    pfx.contact(path, frames, fps, ref=(ref_frames, ref_fps))       # labelled moments, the draft over a reference
 
 Colour and light keep the pixelfx contract: colour is ordinary RGBA (opaque, dithered or translucent), light is
 added on top. Over transparency the light becomes colour with alpha equal to its brightest channel.
@@ -18,7 +19,7 @@ import json
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 
 
 class Layers:
@@ -128,3 +129,43 @@ def gif(frames, path, fps, scale=4, bg="#101018"):
         im = Image.fromarray(f[..., :3]).resize((f.shape[1] * scale, f.shape[0] * scale), Image.NEAREST)
         ims.append(im)
     ims[0].save(path, save_all=True, append_images=ims[1:], duration=round(1000 / fps), loop=0, disposal=2)
+
+
+def _flat(f, bg):
+    return composite(f, np.zeros((*f.shape[:2], 3)), bg)[..., :3] if f[..., 3].min() < 255 else f[..., :3]
+
+
+def contact(path, frames, fps, n=12, scale=3, bg="#101018", ref=None, by="phase", names=("draft", "ref")):
+    """A contact sheet: n moments of the effect in a row, each labelled with its frame and time, so timing reads
+    without the gif. ref (frames, fps) adds a second row at the same moments for the benchmark: by "phase" the same
+    share of each one's length (0, 1/(n-1), .. 1), by "time" the same seconds (a cell past the end stays empty).
+    Frames are RGBA uint8 (h, w, 4) as composite gives; transparency goes over bg. Returns the frame indices used."""
+    runs = [(names[0], list(frames), fps)] + ([(names[1], list(ref[0]), ref[1])] if ref is not None else [])
+    span = max((len(fr) - 1) / f for _, fr, f in runs)
+    picks = []
+    for _, fr, f in runs:
+        N = len(fr)
+        if by == "time":
+            idx = [round(k / max(1, n - 1) * span * f) for k in range(n)]
+            picks.append([i if i < N else None for i in idx])
+        else:
+            picks.append([round(k / max(1, n - 1) * (N - 1)) for k in range(n)])
+    ch = max(fr[0].shape[0] for _, fr, _ in runs) * scale
+    cw = max(fr[0].shape[1] for _, fr, _ in runs) * scale
+    lab, gap, head = 12, 4, 14
+    im = Image.new("RGB", (n * (cw + gap) + gap, len(runs) * (ch + lab + head + gap) + gap), tuple(_hex(bg).astype(int)))
+    dr = ImageDraw.Draw(im)
+    for r, ((name, fr, f), idx) in enumerate(zip(runs, picks)):
+        y0 = gap + r * (ch + lab + head + gap)
+        dr.text((gap, y0), f"{name}: {len(fr)} frames, {f} fps, {len(fr) / f:.2f} s", fill=(220, 220, 230))
+        for k, i in enumerate(idx):
+            if i is None:
+                continue
+            a = _flat(fr[i], bg)
+            cell = Image.fromarray(a).resize((a.shape[1] * scale, a.shape[0] * scale), Image.NEAREST)
+            x = gap + k * (cw + gap)
+            im.paste(cell, (x + (cw - cell.width) // 2, y0 + head + (ch - cell.height) // 2))
+            dr.text((x, y0 + head + ch + 1), f"f{i} {i / f:.2f}s", fill=(170, 170, 185))
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    im.save(path)
+    return picks

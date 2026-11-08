@@ -65,6 +65,27 @@ def wgrid(cw, ch, px, py, density=1.0):
     return x / density, y / density
 
 
+class Pen:
+    """put and line in the world px of grid and wgrid (relative to the pivot), so a draft writes every position
+    in one frame: pen = Pen(px, py, density); pen.put(m, x, y, s); pen.line(m, x0, y0, x1, y1, s)."""
+
+    def __init__(self, px, py, density=1.0):
+        self.px, self.py, self.density = px, py, density
+
+    def sheet(self, x, y):
+        """World px to the sheet px that put and line take (the pixel whose centre the grid reads as x, y)."""
+        return x * self.density + self.px - 0.5, y * self.density + self.py - 0.5
+
+    def put(self, m, x, y, s):
+        put(m, *self.sheet(x, y), s)
+
+    def put_max(self, m, x, y, s):
+        put_max(m, *self.sheet(x, y), s)
+
+    def line(self, m, x0, y0, x1, y1, s, keep_max=False):
+        line(m, *self.sheet(x0, y0), *self.sheet(x1, y1), s, keep_max)
+
+
 def stroke(x, y, pts, w0, w1=0.0):
     """A tapered polyline over float grids x, y: arrays (d, t, side) where d < 0 is inside (distance past the local
     half width), t runs 0 to 1 from the first point to the last and side is the signed offset (left of travel < 0).

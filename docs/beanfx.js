@@ -9,6 +9,9 @@
 //     fx.draw(ctx);                                          // colour, then the light added on top
 //     if (fx.done) dropIt(fx);
 //   }
+// Hits (meta.beanfx.act.hits) freeze the effect, set fx.shake (px along the blow; translate the scene by it) and
+// fx.flash (0 to 1; tint the struck target white by it), and call onHit with the hit: react, push, dir, weight and
+// sound (the cue to play now).
 //
 // The JSON is the Aseprite array layout; everything beanfx adds sits in meta.beanfx (porting.md, route A).
 
@@ -84,23 +87,41 @@ export function createFx(asset, opts = {}) {
     frame: a,           // the sheet frame within the row (0 to frames - 1)
     done: false,
     frozen: 0,          // s of hit-stop left
-    shake: [0, 0],      // px to throw the camera this frame
+    shake: [0, 0],      // px to throw the camera this frame, along the blow
+    flash: 0,           // 0 to 1: how white to tint the target this frame (the hit's flash, then half for a frame)
     _abs: 0,            // frames played since the start
     _shakeAmp: 0,
     _shakeLeft: 0,
     _shakeTotal: 0,
+    _dir: [1, 0],
+    _flashLeft: 0,
+    _flashTotal: 0,
   };
+
+  // a hit starts its freeze, its shake along the blow (mirrored when flipped) and the target flash
+  function strike(h) {
+    fx.frozen = h.freeze || 0;
+    fx._shakeAmp = h.shake || 0;
+    fx._shakeTotal = fx._shakeLeft = h.shake_time ?? (h.freeze || 0) + 0.1;
+    const a = ((h.dir || 0) * Math.PI) / 180;
+    fx._dir = [Math.cos(a) * (fx.flip ? -1 : 1), Math.sin(a)];
+    fx._flashTotal = fx._flashLeft = (h.flash ?? 1 / fps) + 1 / fps;
+    fx.flash = 1;
+  }
 
   fx.update = function (dt) {
     if (fx.done) return fx;
     dt *= fx.speed;
     if (fx._shakeLeft > 0) {
       fx._shakeLeft = Math.max(0, fx._shakeLeft - dt);
-      const k = fx._shakeLeft / fx._shakeTotal;
-      const amp = Math.round(fx._shakeAmp * k);
+      const d = fx._shakeAmp * (fx._shakeLeft / fx._shakeTotal);
       const odd = Math.floor(fx._shakeLeft * 60) % 2 ? 1 : -1;
-      fx.shake = [amp * odd, Math.round(amp * 0.5) * -odd];
+      fx.shake = [Math.round(d * fx._dir[0]) * odd, Math.round(d * fx._dir[1]) * odd];
     } else fx.shake = [0, 0];
+    if (fx._flashLeft > 0) {
+      fx._flashLeft = Math.max(0, fx._flashLeft - dt);
+      fx.flash = fx._flashLeft <= 0 ? 0 : fx._flashLeft < 1 / fps ? 0.5 : 1;
+    } else fx.flash = 0;
     if (fx.frozen > 0) {
       const used = Math.min(fx.frozen, dt);
       fx.frozen -= used;
@@ -116,9 +137,7 @@ export function createFx(asset, opts = {}) {
       if (h) {
         abs = f;
         fx.t = f / fps;
-        fx.frozen = h.freeze || 0;
-        fx._shakeAmp = h.shake || 0;
-        fx._shakeTotal = fx._shakeLeft = (h.freeze || 0) + 0.1;
+        strike(h);
         if (opts.onHit) opts.onHit(h, fx);
         dt = 0;
         break;
@@ -139,9 +158,7 @@ export function createFx(asset, opts = {}) {
   // the first hit can sit on the range's first frame
   const h0 = hits.find((x) => x.at === 0);
   if (h0) {
-    fx.frozen = h0.freeze || 0;
-    fx._shakeAmp = h0.shake || 0;
-    fx._shakeTotal = fx._shakeLeft = (h0.freeze || 0) + 0.1;
+    strike(h0);
     if (opts.onHit) queueMicrotask(() => opts.onHit(h0, fx));
   }
 

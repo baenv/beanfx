@@ -16,11 +16,11 @@ skills, kits and drafts stay local and are gitignored until they are ready.
 ## Layout
 
 - `plugins/beanfx/`: the plugin (`.claude-plugin/plugin.json`, `skills/beanfx/` with `SKILL.md`, `gate.py`,
-  `knobs/`, `tests/`, `setup.sh` and the kit source in `kit/`). `.claude/skills/beanfx` is a symlink to its skill
-  folder so /beanfx runs here without an install. `setup.sh` builds `.venv/` and `kit/` in the project it runs in
-  (git root, else cwd, or `BEANFX_PROJECT`).
-- `kit/`: the Python drawing kit. All ten files have their source of truth in the skill's `kit/`, and `setup.sh`
-  copies them here when they differ: `fxkit.py` (shapes: lumpy, puff, streaks, facets, kite, leaf, claws, hits),
+  `knobs/`, `tests/`, `setup.sh`, `tools/layers.mjs` (pixelfx colour and light layers) and the kit source in `kit/`). `.claude/skills/beanfx` is a symlink to its skill
+  folder so /beanfx runs here without an install. `setup.sh` builds `.venv/` in the project it runs in
+  (git root, else cwd, or `BEANFX_PROJECT`), and `--draft <name>` copies the kit into `drafts/<name>/kit/` once.
+- `kit/`: the Python drawing kit as the older drafts import it (`../../kit`), frozen; `setup.sh` no longer writes it.
+  The source of truth is the skill's `kit/`, and new drafts carry their own copy in `drafts/<name>/kit/`. Files: `fxkit.py` (shapes: lumpy, puff, streaks, facets, kite, leaf, claws, hits),
   `fxlib.py` (ramps, shade maps, strokes, noise, impact frames), `light.py` (additive glow), `pfx.py` (pixelfx
   layers, tint, composite, strip, gif), `caster.py` (the optional glowing mockup caster and avatar), `target.py` (a
   preview target dummy that reacts to hits), `ref.py` (an object traced from a reference image: derivative
@@ -47,7 +47,7 @@ cd drafts/<name> && ../../.venv/bin/python <name>.py     # writes out/, exits 1 
 
 ```
 cd pixelfx && node tools/render.mjs <id> --gif
-cd pixelfx && node tools/layers.mjs <id> --out <draft>/src
+node plugins/beanfx/skills/beanfx/tools/layers.mjs <id> --out <draft>/src --pixelfx pixelfx   # pixelfx 0.3 dropped its own
 ```
 
 ## How the skill works
@@ -68,7 +68,7 @@ cd pixelfx && node tools/layers.mjs <id> --out <draft>/src
   is installed) in one call which knobs the prompt leaves open; without it the model decides from the files. Each open knob is one
   AskUserQuestion question, and no draft file is written before the brief is in the reply.
   Tests (`S=plugins/beanfx/skills/beanfx`): `python3 $S/tests/test_gate.py`, `.venv/bin/python $S/tests/test_facing.py`,
-  `test_derive.py`, `test_export.py`, `test_ref.py` and `test_light.py`. Plugin check: `claude plugin validate plugins/beanfx` and `claude plugin validate .`.
+  `test_derive.py`, `test_export.py`, `test_ref.py`, `test_light.py`, `test_impact.py` and `test_kit.py`; `node $S/tests/test_runtime.mjs`. Plugin check: `claude plugin validate plugins/beanfx` and `claude plugin validate .`.
 - Glow levels are subtle, medium and strong. Clarity is clear (default), balanced or hazy: how far light and
   translucent colour spread.
 - All text in this repo is English: docs, skill, comments, printed output and JSON values. Effect ids and file

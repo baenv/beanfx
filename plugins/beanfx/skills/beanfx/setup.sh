@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Checks the tools /beanfx needs and installs the missing ones into the project (.venv/, kit/, drafts/); --pixelfx adds node and pixelfx for reuse.
-# Prints PIXELFX=<dir> when pixelfx is ready; exits 1 when something cannot be installed here.
+# Checks the tools /beanfx needs and installs the missing ones into the project (.venv/); --draft <name> gives drafts/<name>/ its own copy of the kit; --pixelfx adds node and pixelfx for the benchmark and reuse.
+# Prints PIXELFX=<dir> when the benchmark tools are there and LAYERS=<script> when reuse works; exits 1 when something cannot be installed here.
 set -u
 
 SKILL="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"  # this skill (plugin install or the beanfx repo)
@@ -8,7 +8,15 @@ SKILL="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"  # this skill (plugin inst
 ROOT="${BEANFX_PROJECT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 PIXELFX_URL="https://github.com/patch-gg/pixelfx"
 want_pixelfx=0
-[ "${1:-}" = "--pixelfx" ] && want_pixelfx=1
+draft=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --pixelfx) want_pixelfx=1 ;;
+    --draft) draft="${2:-}"; shift ;;
+    *) printf 'unknown option: %s\n' "$1"; exit 1 ;;
+  esac
+  shift
+done
 fail=0
 
 say() { printf '%s\n' "$*"; }
@@ -35,17 +43,24 @@ else
   "$PY" -c "import numpy, PIL" 2>/dev/null && say "venv: ok" || { say "venv: install failed"; fail=1; }
 fi
 
-# 2. The drawing kit: source of truth is this skill's kit/, copied into the project's kit/ when a file differs
-mkdir -p "$ROOT/kit"
-for src in "$SKILL"/kit/*.py; do
-  [ -f "$src" ] || continue
-  dst="$ROOT/kit/$(basename "$src")"
-  cmp -s "$src" "$dst" || { cp "$src" "$dst"; say "kit: copied $(basename "$src") from the skill kit"; }
-done
-if [ $fail -eq 0 ] && (cd "$ROOT/kit" && "$PY" -c "import fxkit, fxlib, light, pfx, caster, facing, derive, export, target, ref" 2>/dev/null); then
+# 2. The drawing kit: source of truth is this skill's kit/. Each draft gets its own copy in drafts/<name>/kit/,
+# made once and never overwritten, so a plugin update leaves the kit of an existing draft as it was drawn with
+if [ $fail -eq 0 ] && (cd "$SKILL/kit" && "$PY" -B -c "import fxkit, fxlib, light, pfx, caster, facing, derive, export, target, ref" 2>/dev/null); then
   say "kit: ok"
 else
   say "kit: does not import"; fail=1
+fi
+if [ -n "$draft" ]; then
+  case "$draft" in
+    */*|.*|"") say "draft: bad name '$draft'"; exit 1 ;;
+  esac
+  DKIT="$ROOT/drafts/$draft/kit"
+  if [ -d "$DKIT" ]; then
+    say "draft: drafts/$draft/kit kept as it is"
+  else
+    mkdir -p "$DKIT" && cp "$SKILL"/kit/*.py "$DKIT"/ && say "draft: copied the kit into drafts/$draft/kit" \
+      || { say "draft: copying the kit failed"; fail=1; }
+  fi
 fi
 
 # 3. pixelfx, only for reuse and the benchmark: a clone in the project
@@ -63,12 +78,19 @@ if [ $want_pixelfx -eq 1 ]; then
     say "pixelfx: missing, cloning $PIXELFX_URL into $PIXELFX"
     git clone --depth 1 "$PIXELFX_URL" "$PIXELFX" >/dev/null 2>&1 || { say "pixelfx: clone failed"; fail=1; }
   fi
-  if [ -f "$PIXELFX/tools/render.mjs" ] && [ -f "$PIXELFX/tools/layers.mjs" ]; then
-    say "pixelfx: ok"
+  # each use needs its own tools: the benchmark render.mjs and list.mjs, reuse (2b) the skill's tools/layers.mjs,
+  # which runs on pixelfx's tools/lib/fxlib.mjs (pixelfx 0.3 dropped its own layers.mjs)
+  if [ -f "$PIXELFX/tools/render.mjs" ] && [ -f "$PIXELFX/tools/list.mjs" ]; then
+    say "pixelfx: benchmark ok ($(git -C "$PIXELFX" log -1 --format='%h %s' 2>/dev/null | cut -c1-60))"
     say "PIXELFX=$PIXELFX"
   else
-    say "pixelfx: not usable at $PIXELFX"; fail=1
+    say "pixelfx: not usable at $PIXELFX (no tools/render.mjs or tools/list.mjs)"; fail=1
+  fi
+  if [ -f "$PIXELFX/tools/lib/fxlib.mjs" ]; then
+    say "pixelfx: reuse ok"
+    say "LAYERS=$SKILL/tools/layers.mjs"
+  else
+    say "pixelfx: reuse unavailable (no tools/lib/fxlib.mjs); the benchmark still works"
   fi
 fi
-
 exit $fail

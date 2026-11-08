@@ -25,3 +25,8 @@ when the owner adds a state or changes how one plays.
 
 Learnt on `drafts/van_kiem_quy_tong`: a gather of 0.45 s per sword read as a jump, and "strike" was drawn as four
 clusters when the owner meant a rain. Neither state had been asked about.
+
+**Examples** (name one when explaining what a state is):
+- Freeze then release: Celeste's dash, 15 frames with 3 frozen at the start.
+- Trigger then payload: Noita's double trigger bolt releases its second spell only when it hits something.
+- Key states first: block the start, the peak and the end with as few frames as read, then add frames between.

@@ -13,4 +13,13 @@ leaves both readings (a beam can be a held loop or a one-shot blast).
 **Ask:** "Does it loop or play once?" Options "Loop, seamless" and "One-shot: anticipation, peak, dissolve", plus
 "Start, loop, end" for a held effect (a beam, a channel), which records its states in the JSON.
 
+**Examples:**
+- Loop: runs until the game stops it, first and last frame join with no jump, like a torch or burning wood in
+  Noita. Pick for auras, torches, idle effects. Two copies side by side should start on different frames so they do
+  not pulse together.
+- One-shot: builds, peaks and ends empty, like the Dead Cells grenade blast. Pick for hits and explosions.
+- Start, loop, end: a start flare, a middle that repeats while the player holds, a fade, like Dead Cells' ground fire
+  that burns for 7 s after the grenade. Pick for beams, channels and ground zones.
+A flicker loop shorter than 8 frames looks mechanical; an idle loop needs at least 2 to 4 frames.
+
 **Default:** from the role: aura, ambient and a held beam loop; hit, explosion and a cast play once.

@@ -21,4 +21,9 @@ them open, the follow-ups: height against the carrier (default shorter than the 
 beside a 47 px sword, so the effect stays the hero), hair (`loose`, a wild mane; `bun`, pinned with nape locks),
 and what it does in each state (charge, rise, point, land).
 
+**Examples:**
+- Effect starting from a held object: the flame at the tip of a Noita wand, the sword of light in Hyper Light
+  Drifter. Draw the object as the caster when the effect comes out of it.
+- A glowing silhouette is a stand-in for scale in the preview only; the sheet ships without it.
+
 **Default:** no caster.

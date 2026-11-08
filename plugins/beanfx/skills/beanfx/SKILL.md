@@ -12,24 +12,29 @@ scratch. pixelfx and earlier drafts in `drafts/<name>/` are reused only when the
 take pixelfx's light (it reads well) and redraw its base (often weak: blobs, flat fills, smooth teardrops).
 
 Paths: the skill is self-contained in the project you run in (its git root, else the current folder). This
-skill's folder is `${CLAUDE_SKILL_DIR}` and holds `setup.sh`, `gate.py`, `knobs/`, `research.md`, `porting.md`, `runtime/beanfx.js` and the source of the drawing
-kit. `setup.sh` copies the kit into the project's `kit/` (`fxkit.py`, `fxlib.py`, `light.py`, `pfx.py`, `caster.py`
+skill's folder is `${CLAUDE_SKILL_DIR}` and holds `setup.sh`, `gate.py`, `knobs/`, `research.md`, `vfx_notes.md`, `porting.md`, `runtime/beanfx.js`, `tools/layers.mjs` and the source of the drawing
+kit. `setup.sh --draft <name>` copies the kit into the draft's own `drafts/<name>/kit/` (`fxkit.py`, `fxlib.py`, `light.py`, `pfx.py`, `caster.py`
 the mockup caster, `target.py` the preview target dummy, `ref.py` an object traced from a reference image, `facing.py` the direction fields for the JSON, `derive.py` points taken from a finished
-drawing, `export.py` the sheet, its Aseprite-style JSON and the checks), so a kit fix goes back to the skill copy. Drafts are `drafts/<name>/` in the project, Python is
-`.venv/bin/python` there.
+drawing, `export.py` the sheet, its Aseprite-style JSON and the checks). The copy is made once and never overwritten, so a plugin update leaves each existing draft on the kit
+it was drawn with. A kit fix goes into the skill copy first, then into the current draft's `kit/` by hand; other
+drafts get it only when the owner names them. Drafts are `drafts/<name>/` in the project, Python is
+`.venv/bin/python` there. Older drafts without their own `kit/` import the project's root `kit/`; leave it as it is.
 
 ## Setup (first, every run)
 
 ```
-bash ${CLAUDE_SKILL_DIR}/setup.sh             # .venv with numpy and pillow, kit/
+bash ${CLAUDE_SKILL_DIR}/setup.sh             # .venv with numpy and pillow, checks the kit imports
+bash ${CLAUDE_SKILL_DIR}/setup.sh --draft <name>   # once the draft is named, before its first file: drafts/<name>/kit/
 bash ${CLAUDE_SKILL_DIR}/setup.sh --pixelfx   # reuse (2b) and the benchmark: also node 18+ and pixelfx
 ```
 
 It checks each tool and installs only what is missing, in the project: the venv (uv, else `python3 -m venv`),
-`kit/` copied from this skill's `kit/` (refreshed when a file differs), and pixelfx, a clone of
-`https://github.com/patch-gg/pixelfx` into the project's `pixelfx/`. With `--pixelfx` it prints `PIXELFX=<dir>`:
-run `render.mjs`, `layers.mjs` and `list.mjs` from that dir. `BEANFX_PROJECT` overrides the project folder. On
-exit 1, report the line it printed and stop; node itself is never installed by the script.
+with `--draft <name>` the draft's `kit/` copied from this skill's `kit/` (only when that folder is missing), and pixelfx, a clone of
+`https://github.com/patch-gg/pixelfx` into the project's `pixelfx/`. With `--pixelfx` it checks each use apart:
+the benchmark needs `render.mjs` and `list.mjs` and prints `PIXELFX=<dir>` (run them from that dir); reuse needs
+this skill's `tools/layers.mjs`, which runs on pixelfx's `tools/lib/fxlib.mjs`, and prints `LAYERS=<script>`.
+`BEANFX_PROJECT` overrides the project folder. On exit 1, report the line it printed and stop; node itself is
+never installed by the script.
 
 An effect is for any game, engine or video. Size, palette, view, density, alpha and style come from the brief;
 no house style applies unless the owner gives one.
@@ -60,7 +65,15 @@ PROMPT
 2 to 4 concrete values, the recommended one first and marked "(Recommended)", each saying what it does to the
 result. Send them with AskUserQuestion, at most 4 per call, in the gate's order; the next call goes after the
 answers when its options depend on them (a top-down view changes which shapes read). `states` may take more
-than one question. Research the subject (section 2a) before the `shape` question, so its options come from how
+than one question.
+
+**Explain for an owner new to VFX.** A thin prompt (a subject only, no words like fps, loop, glow or palette)
+means the owner may not know the terms. Then each question gets one plain line saying why it matters, each
+option's description gets its "Examples" line from the knob file (what it looks like in a known game and when to
+pick it), and size, timing and shape options carry an ASCII `preview`. Use plain words in the text the owner reads
+("how long the hit freezes the screen", not "hit-stop"). `vfx_notes.md` holds the sources and more examples.
+
+Research the subject (section 2a) before the `shape` question, so its options come from how
 the subject is known. When the owner says "just do it", "go ahead" or answers "Other" with free text, take the
 recommended values for the rest and go.
 
@@ -88,6 +101,11 @@ a. **Research, then from scratch (default).** Before the brief's beats and carri
    parts it is known by. For a plain effect (fire, lightning, ice, smoke): how the real thing moves, breaks up and
    changes colour. Put 3 to 5 findings with links in the reply and build the brief from them.
 
+   **Find the reference in the same pass** (when `setup.sh --pixelfx` is set up), per "Benchmark" in section 3:
+   the pixelfx effect nearest the prompt. When the prompt matches one closely (its words or its description in
+   `docs/CATALOG.md`), say so in the reply before the questions: "This reads like pixelfx `<id>`; I will
+   benchmark against it." Its size and length are data for the size and timing options, never a shape to copy.
+
    **Objects get their true shape.** When the prompt names an object or creature (a dragon, a sword, a phoenix,
    a lotus, a tiger), research its structure before drawing, per "Objects" in `research.md`: the parts in order,
    their proportions, how they join, and the silhouette that makes it read. Write that part list with
@@ -108,20 +126,25 @@ a. **Research, then from scratch (default).** Before the brief's beats and carri
    Then shapes come from
    `kit/fxkit.py` (`lumpy`, `ball`, `trail_puffs`, `streaks`, `puff`, `facets`, `kite`, `leaf`, `drop`,
    `twinkle`, `hit_burst`, `claw_tracks`) and `kit/fxlib.py` (`stroke`, `outline`, `checker`,
-   `ground_ring`, `ramp`, `wgrid`, `noise`); light from `kit/light.py` (`glow`, `glow_line`, `glow_ring`,
-   falloff `(1 - d)^2 * k`); output with `kit/pfx.py` (`paint`, `composite`, `strip`, `gif`). A draft puts `kit/`
-   on `sys.path`. These are generic; use your own palette and size. Leave other drafts in `drafts/` unread.
+   `ground_ring`, `ramp`, `wgrid`, `noise`, and `Pen(px, py, density)`, whose `put` and `line` take the same
+   world px as `grid` and `wgrid`, so no draft converts to sheet px by hand); light from `kit/light.py` (`glow`, `glow_line`, `glow_ring`,
+   falloff `(1 - d)^2 * k`); output with `kit/pfx.py` (`paint`, `composite`, `strip`, `gif`, `contact`). A draft puts its own
+   `kit/` on `sys.path` (`sys.path.insert(0, str(HERE / "kit"))`). These are generic; use your own palette and size. Leave other drafts in `drafts/` unread.
 
-   **Light stays smooth.** Sum the glows into one float map `L`, then colour it with
+   **Light stays smooth in every style.** Sum the glows into one float map `L`, then colour it with
    `pfx.tint(np.repeat(np.clip(L, 0, 1)[..., None], 3, -1), [deep, hue, pale, "#ffffff"])` and pass that to
-   `pfx.composite` as is. `light.bands`, `light.palette` and hand-made step cuts are for the hard retro style
-   only: cut into 3 steps the glow turns into a flat outlined halo and loses its clear look. Light only what
+   `pfx.composite` as is. The style knob sets the colour pixels (outline, dither, opaque); it never sets the
+   light. `light.bands`, `light.palette` and hand-made step cuts are only for an owner who asks for stepped light
+   in words ("NES authentic", "no smooth glow"): cut into 3 steps the glow turns into a flat outlined halo, and
+   the bloom at a pop or a flash, the part that makes the moment read as bright, is lost. Light only what
    emits: hot cores, eyes, bolt heads, blade edges, the landing flash, sparks and embers. Stack two lights on
    each of those, the way pixelfx does: a tight core (r 4 to 15) and a pool along it. Dark space between the
    lit parts is what makes the light read; a glow over the whole cell reads as haze.
 
    **Sparkle is light that lives a few frames.** Give every spark, glint, sword entry and hit a `light.Flashes`
-   light that starts at its k and dies in 3 to 8 frames, and multiply the k of lasting glints by
+   light that starts at its k and dies in 3 to 8 frames (`light.flash_at(L, c, f, f0, x, y, r, k, life)` draws it
+   from the frame alone, so `render(f, seed)` stays per frame for `check_seeds`; `Flashes` keeps state between
+   frames and suits only a loop that draws frames in order), and multiply the k of lasting glints by
    `light.flicker(i, f, seed)` so they blink out of step. Draw the glint itself as opaque pixels (`fxkit.twinkle`,
    a white heart). A big move wants dozens of these at its peak; pixelfx myriad-swords carries 400 to 800 bright
    points a frame and its light changes about three times as much between frames as a draft lit by still pools.
@@ -159,13 +182,13 @@ b. **Reuse (only when the owner asks):** the owner says reuse or pixelfx, names 
    it into layers:
 
    ```
-   cd $PIXELFX && node tools/layers.mjs <id> --out <draft>/src [--opts JSON] [--seed N] [--fps N]
+   node $LAYERS <id> --out <draft>/src --pixelfx $PIXELFX [--opts JSON] [--seed N] [--fps N]
    ```
 
    It writes `<name>_color.png` and `<name>_light.png` (frames left to right) and `<name>.json` (w, h, fps,
    frames, loop, pivot). In the draft, `kit/pfx.py` loads them (`pfx.load`) and gives `tint` (same glow,
    new hue ramp), `gain`, `keep` (light only under a mask, such as your own shape grown by a few px), `bands`
-   (stepped light for a hard pixel look), `paint` (shade map to RGBA), `composite`, `strip` and `gif`. Usual use:
+   (stepped light, only when the owner asks for it), `paint` (shade map to RGBA), `composite`, `strip` and `gif`. Usual use:
    keep the light, redraw the colour base yourself on the same frames and pivot, follow pixelfx's motion
    (positions, timing) where it is good. Recolour only (`tint` plus `--opts palette`) when the base already reads.
 
@@ -174,7 +197,7 @@ Drafts live in `drafts/<name>/` of the project (`<name>.py`, output in `out/`, r
 nearest, and rim each part where it meets empty space or a part behind it, so the crossing reads at 1x.
 
 **Peak first, then derive.** Draw the carrier whole at its peak pose before any other state, and judge that frame
-at 1x and 4x until it reads. Give its draw function a `trace=True` mode that returns the shade map and a part-id
+at 1x and 4x until it reads, then run benchmark pass 1 (section 3) on it before drawing any other frame. Give its draw function a `trace=True` mode that returns the shade map and a part-id
 map (skull 0, jaw 1, horn 2, and so on; -1 empty) in the carrier's own frame. Every state that builds up to that
 shape or breaks down from it then takes its points from those maps with `kit/derive.py`, never from hand-placed
 points, so a change to the drawing moves every state with it:
@@ -227,8 +250,10 @@ read, learnt on `drafts/van_kiem_quy_tong_v2` and `v3` (v3 is the reference draf
 
 ## 3. Draft loop
 
-The draft script writes, each run: the sheet and JSON (section 5), a 4x strip on a dark and on a mid ground and a
-4x gif at its fps (`pfx.gif`, through `ex.hitstop` when there are hits), and runs the checks on the effect
+The draft script writes, each run: the sheet and JSON (section 5), a 4x strip on a dark and on a mid ground, a
+4x gif at its fps (`pfx.gif`, through `ex.hitstop` when there are hits) and `out/contact.png`
+(`pfx.contact(path, frames, fps)`: 12 moments labelled with frame and time, so timing reads without the gif),
+and runs the checks on the effect
 frames, printing every line and exiting 1 when there is one:
 
 - `ex.check(frames, lights, loop, src=__file__, hold=HOLD)`: colour on the cell edge, light above 0.02 on the edge
@@ -250,13 +275,30 @@ ys, xs = np.nonzero(col[..., 3]); box = np.clip(L[ys.min():ys.max() + 1, xs.min(
 cover = (box > 0.03).mean(); mean = box[box > 0.03].mean()     # median of each over frames, printed
 ```
 
-When mean falls outside the glow row or cover outside the clarity row, retune the pools before calling the draft
-done.
+When mean falls outside the glow row or cover outside the clarity row, retune the pools. These numbers are a
+floor: a draft inside both rows can still lose by eye (void_pop had cover 19 % and mean 0.118 and lost to pixelfx
+implosion). The draft is done when it passes the benchmark below, and every other number in this skill (the
+5 % last frame, the edge margin) works the same way.
 
-Benchmark against pixelfx once per draft when node is set up (`setup.sh --pixelfx`): in `$PIXELFX`, find the nearest effect with
-`node tools/list.mjs <words>`, render it with `node tools/render.mjs <id> --gif`, and put one peak frame of each
-side by side at the same zoom on the same dark ground. This is a quality check only: take nothing from its code,
-shapes or motion. If pixelfx shows more detail, clearer light or more life, the draft is not done.
+**Benchmark** (when `setup.sh --pixelfx` is set up). A quality check only: take nothing from its code, shapes or
+motion.
+
+- Find the reference with more than one search: `list.mjs` matches plain substrings, so `implode` misses
+  `implosion`. In `$PIXELFX`, run `node tools/list.mjs <w>` for each form of the key words (the stem, `implo`;
+  the noun and the verb, implosion and implode; synonyms, collapse and suck), then two or three distinctive words
+  from the owner's prompt as it stands, and read the matching category table in `docs/CATALOG.md` (explosions,
+  impacts, arcane, and so on). Take the one or two closest; say which and why in the reply.
+- Pass 1, the peak, before any other frame is drawn: render the reference (`node tools/render.mjs <id> --gif`),
+  and put its peak frame and the draft's side by side at the same zoom on the same dark ground. Fix the base,
+  size and light of the peak here, while it costs one frame.
+- Pass 2, the timeline, before calling the draft done: load the reference with `node $LAYERS <id> --out
+  <draft>/ref --pixelfx $PIXELFX` and `pfx.load`, composite its frames, and write `pfx.contact(out /
+  "bench.png", draft_frames, FPS, ref=(ref_frames, ref_fps))`: the same moments of both, row over row (`by="phase"`,
+  the default, lines up the same share of each length; `by="time"` the same seconds). Read it column by column:
+  the focal point in every phase, the anticipation, the peak frame count, the dissolve. A peak frame alone hides
+  timeline faults, such as a dark centre for 25 frames before the pop.
+- If the reference shows more detail, clearer light or more life at any column, the draft is not done. Note what
+  beanfx does better too (a one-shot that ends on a near-empty frame, where pixelfx can waste blank frames).
 
 Usual fixes: mush at 1x, then fewer tones, one focal point, bigger shapes; floaty, then fast in and slow out with
 a 1 to 2 frame white-hot peak; stiff, then vary each particle's size, speed and delay and add secondary motion
@@ -276,7 +318,13 @@ near the eye), lit from the source inside or behind it (brightest at the inner r
 than the top), 5 to 7 hard tone steps, solid pixels, a 1 px pale rim where it meets the light;
 a bolt has a bright tip and a ribbon trail with sparkles; rock and ice are faceted with a hard highlight;
 lightning is jagged with a white core, short branches and a spark star where it lands; a fire body is shaded by
-heat (palest at the core toward the top left, dark flame tone at a ragged edge, no near-black outline).
+heat (palest at the core toward the top left, dark flame tone at a ragged edge, no near-black outline);
+an implosion, a charge or anything that builds up shows its hot core from frame 0, small and dim, and brightens it
+as the inflow pours in, so the eye has a point to hold through the whole anticipation and not only at the peak;
+a dark mass on a dark ground (a void sphere, a black hole, a shadow orb) is a filled volume darker than the
+ground with a hot rim, and the other parts (streaks, a core, sparks) sit inside or across it: a ring of outline
+over an empty middle does not read as a sphere. The same holds for any part close to the ground's value (a white
+flash over snow): fill it, rim it in a contrasting tone, and judge it on the ground the game uses.
 
 A loop that flies (a dragon, a serpent) follows a helix or wave that stands still on the ground: phase
 `s * tau / lam + tau * f / frames`, the head on the same curve, and the node moves at lam / frames * fps per
@@ -285,6 +333,10 @@ second. Judge it in a travel gif; in place it reads as a pole that spins.
 ## 4. Craft gates
 
 - Clean silhouette that reads at 1x; one focal point; a rim or outline where the style uses one.
+- The focal point is on screen in every phase, the anticipation included: a build-up shows its core from its
+  first frame, and no stretch of frames leaves the eye without a point to hold.
+- Every main part separates from the ground by value: a part near the ground's value (dark on dark, white on a
+  light ground) is a filled volume with a contrasting rim.
 - A named object or creature matches its researched part list and proportions (or its traced reference).
 - 3 to 5 hue-shifted tones per material; the base reads without the light.
 - Anticipation, peak, dissolve. A one-shot dissolves to wisps: no empty frame, and its last frame keeps at most 5 %
@@ -295,7 +347,8 @@ second. Judge it in a travel gif; in place it reads as a pole that spins.
 - Build-up and break-down states land on the peak drawing: their points come from `kit/derive.py` on the peak's
   maps, and the frame where a build-up hands over to the solid carrier shows no jump.
 - Light on every hot part (core, heads, landing flash, sparks, embers), each with a wide soft pool and a tight
-  core, smooth unless the style is hard retro; white only at the hottest core.
+  core, smooth in every style unless the owner asked for stepped light; white only at the hottest core.
+- Benchmark pass 2 (section 3) shows no column where the reference reads better.
 - Nothing cut by the cell edge in any frame or direction; the pivot is the drawing's origin.
 - The style picked in the brief holds in every frame (dither or translucency, glow strength).
 - Every heading row reads as the same effect: draw the shape in the rotated frame (`fxkit.rot`, u along travel)
@@ -310,7 +363,7 @@ Write the sheets with `kit/export.py` (`import export as ex`):
 
 ```
 meta = ex.write(OUT, NAME, finals, FPS, PIVOT, LOOP, light=lights, color=cols, states=STATES,
-                hits=[ex.hit(PEAK, FPS, freeze=0.12, shake=3, push=4, react="knockback")],
+                hits=[ex.hit(PEAK, FPS, weight="heavy", dir=0)],
                 poses=[ex.pose(-0.3, "windup"), ex.pose(0.0, "release", "snap"), ex.pose(0.6, "recover")],
                 target={"x": 72, "react": "knockback"}, hold=False,
                 extra=dict(fc.meta("side", W, H, PIVOT), glow="medium"))
@@ -330,15 +383,25 @@ meta = ex.write(OUT, NAME, finals, FPS, PIVOT, LOOP, light=lights, color=cols, s
   import for each engine, and `runtime/beanfx.js` plays it in a browser game with no engine.
 - **The act** for a blow, a strike, a cast or an impact: plain data in `meta.beanfx.act` that the game's own
   character and target follow.
-  - `hits`: one `ex.hit(frame, fps, freeze, shake, push, react)` per contact. freeze 0.06 to 0.2 s of hit-stop
-    (past 0.3 s it reads as a stall); react one of none, flinch, stagger, knockback, launch.
+  - `hits`: one `ex.hit(frame, fps, weight=..., dir=...)` per contact. **Weight sells the hit**: pick it from
+    `ex.WEIGHTS` (light, heavy, finisher, blast) to match how hard the blow looks, and it sets the freeze (hit-stop,
+    past 0.3 s it reads as a stall), the shake and how long it lasts, the push, the react (none, flinch, stagger,
+    knockback, launch), how long the target flashes white and the sound cue `hit_<weight>`; any field given
+    explicitly wins. `dir` is the way the blow travels (degrees, y down, 0 along the facing): the shake and the push
+    follow it, so a downward smash shakes up and down and a rising uppercut lifts. A combo escalates: light, light,
+    heavy, finisher.
   - `poses`: keys `ex.pose(t, name, how)` from `ex.POSES` (idle, guard, windup, cast, channel, release, follow,
     recover), t in s from frame 0, negative before it; "snap" jumps on the key. The game maps each name to its own
     animation. A wind-up the opposite way to the blow, the release on the contact frame or just before, a recovery.
   - `windup`: the seconds the character starts before frame 0; taken from the first pose key when that is earlier.
   - `target`: {x: px from the pivot along the facing, react}.
   The game starts the character `windup` s early, plays the poses, and at each hit freezes everything for
-  `freeze` s, shakes, pushes and plays the react.
+  `freeze` s, shakes along `dir` for `shake_time`, flashes the target for `flash` s, pushes, plays the react and
+  the `sound` cue on the contact frame (sound, freeze, flash and shake within one frame of each other).
+- **The ground answers a blow that lands on it.** `fk.ground_impact(m, X, Y, f - contact, FPS, tones, dust, cx, cy,
+  r, weight)` adds dust kicked out along the ground, debris that arcs, bounces once and rests where it lands, and
+  cracks for heavy, finisher and blast weights; use the same weight as the hit. Put it under the blow for a ground
+  strike, a slam, a landing or an explosion; leave it out for a hit in the air or on a body.
 - **The sheet is the effect alone.** The game draws its own character, so the mockup caster and the target dummy
   go into the previews only (the 4x strips and the gif). `render(f, seed, caster)` draws with or without the
   caster; export and check the frames without it. For a hit, put `kit/target.py` under the preview at the

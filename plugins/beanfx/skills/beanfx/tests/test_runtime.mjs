@@ -78,6 +78,26 @@ ok(fx.frozen === 0 && fx.frame === 3, "a hit outside the state does not play");
 fx = run(createFx(fromJson(sheet({ hits: [hit] })), { speed: 2 }), 0.25);
 ok(fx.frame === 5, "speed 2 reaches the hit in half the time: " + fx.frame);
 
+// the shake runs along the blow (mirrored when flipped) for shake_time; the target flash is 1, then 0.5, then 0
+const down = { frame: 2, t: 0.2, freeze: 0.1, shake: 4, dir: 90, shake_time: 0.3, flash: 0.1, sound: "hit_heavy" };
+let cue = null;
+fx = createFx(fromJson(sheet({ hits: [down] })), { onHit: (h) => (cue = h.sound) });
+run(fx, 0.25, 0.01);
+ok(cue === "hit_heavy", "onHit carries the sound cue");
+ok(fx.shake[0] === 0 && fx.shake[1] !== 0, "a 90 degree blow shakes up and down: " + fx.shake);
+const side = { ...down, dir: 0 };
+const sx = (flip) => { const f = createFx(fromJson(sheet({ hits: [side] })), { flip }); run(f, 0.25, 0.01); return f.shake[0]; };
+ok(sx(false) !== 0 && Math.sign(sx(false)) === -Math.sign(sx(true)), "flip mirrors the shake: " + sx(false) + " " + sx(true));
+fx = createFx(fromJson(sheet({ hits: [down] })));
+run(fx, 0.21, 0.01);
+ok(fx.flash === 1, "flash on contact: " + fx.flash);
+run(fx, 0.1, 0.01);
+ok(fx.flash === 0.5, "half flash for the last frame: " + fx.flash);
+run(fx, 0.1, 0.01);
+ok(fx.flash === 0, "flash ends");
+run(fx, 0.2, 0.01);
+ok(fx.shake[0] === 0 && fx.shake[1] === 0, "shake ends after shake_time");
+
 // heading rows: row k faces tau * k / n, y down
 ok(rowOf(0, 8) === 0 && rowOf(Math.PI / 2, 8) === 2 && rowOf(Math.PI, 8) === 4 && rowOf(-Math.PI / 2, 8) === 6, "rowOf");
 ok(rowOf(2 * Math.PI - 0.1, 8) === 0, "rowOf wraps near tau");

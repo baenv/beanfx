@@ -135,6 +135,41 @@ ok(d5[..., :3][d5[..., 3] > 0].mean() > d0[..., :3][d0[..., 3] > 0].mean() + 30,
 ok(xs(d9) > xs(d0) + 2, f"knockback pushes right: {xs(d0):.1f} to {xs(d9):.1f}")
 ok(tg.under(disc(3), np.zeros((H, W, 4), np.uint8)).shape == (H, W, 4), "under")
 
+# weight presets: one word fills the hit, explicit values win, the cue and the direction ride along
+hv = ex.hit(6, FPS, weight="heavy", dir=30)
+ok(hv["freeze"] == ex.WEIGHTS["heavy"]["freeze"] and hv["react"] == "knockback" and hv["sound"] == "hit_heavy"
+   and hv["dir"] == 30 and hv["flash"] == ex.WEIGHTS["heavy"]["flash"] and hv["weight"] == "heavy", f"heavy {hv}")
+ok(ex.hit(6, FPS, weight="heavy", push=9, sound="clang")["push"] == 9, "explicit push beats the preset")
+ok(ex.hit(6, FPS, weight="heavy", sound="clang")["sound"] == "clang", "explicit sound")
+old = ex.hit(6, FPS)
+ok(set(old) == {"frame", "t", "freeze", "shake", "push", "react"} and old["freeze"] == 0.1, f"no weight keeps the old hit {old}")
+order = [ex.WEIGHTS[k] for k in ("light", "heavy", "finisher")]
+ok(all(a[k] < b[k] for a, b in zip(order, order[1:]) for k in ("freeze", "shake", "push", "flash", "shake_time")),
+   "each weight is heavier than the last")
+ok(all(ex.check_act(ex.act([ex.hit(3, FPS, weight=k)]), N, FPS) == [] for k in ex.WEIGHTS), "presets pass check_act")
+bad = ex.check_act(ex.act([dict(ex.hit(3, FPS), weight="huge", flash=0.4, shake_time=0.9)]), N, FPS)
+ok(len(bad) == 3, f"check_act flags weight, flash and shake time: {bad}")
+
+# the preview shake follows the blow: a downward blow shakes rows, not columns, and lasts shake_time
+down = ex.hitstop(shot, [ex.hit(3, FPS, freeze=0.0, shake=2, dir=90, shake_time=0.125)], FPS)
+ok(len(down) == N, "no freeze adds no frames")
+moved = [i for i in range(N) if not (down[i] == shot[i]).all()]
+ok(moved and all(not (np.roll(shot[i], 0, axis=1) == down[i]).all() for i in moved), "shake moves frames")
+col = lambda im: np.nonzero(im[..., 3].any(0))[0].mean()  # noqa: E731
+row = lambda im: np.nonzero(im[..., 3].any(1))[0].mean()  # noqa: E731
+ok(all(col(down[i]) == col(shot[i]) and row(down[i]) != row(shot[i]) for i in moved), "a 90 degree blow shakes up and down")
+ok(len(moved) >= 2, f"shake_time carries the shake past the contact frame: {moved}")
+
+# the dummy flashes for the hit's flash time and a rising blow lifts it
+fl = [ex.hit(5, FPS, flash=0.125, push=6, react="knockback")]
+lum = lambda im: im[..., :3][im[..., 3] > 0].mean()  # noqa: E731
+base = lum(tg.draw((64, 64), (32, 60), 0, fl, FPS))
+lit = [lum(tg.draw((64, 64), (32, 60), f, fl, FPS)) > base + 30 for f in range(5, 11)]
+ok(lit == [True, True, True, True, False, False], f"flash lasts 3 frames, then a half frame: {lit}")
+up = [ex.hit(5, FPS, push=6, react="knockback", dir=-60)]
+ys = lambda im: np.nonzero(im[..., 3])[0].mean()  # noqa: E731
+ok(ys(tg.draw((64, 64), (32, 60), 9, up, FPS)) < ys(tg.draw((64, 64), (32, 60), 0, up, FPS)) - 1, "a rising blow lifts")
+
 with tempfile.TemporaryDirectory() as d:
     src = Path(d) / "draft.py"
     src.write_text("import numpy as np\nrng = np.random.default_rng(3)\nx = rng.random(4)\n")

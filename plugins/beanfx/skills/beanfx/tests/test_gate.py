@@ -68,12 +68,24 @@ want = ["role", "view", "size", "timing", "loop", "shape", "style", "palette", "
 ok(names == want, "knob order %s" % names)
 for k in knobs:
     ok(Path(k["file"]).stem == k["name"], "%s: file name" % k["name"])
-    ok(k["stated"].endswith("?"), "%s: stated is a question" % k["name"])
+    ok(k["stated"].startswith(("Does", "Is")) and "?" in k["stated"], "%s: stated is a question" % k["name"])
     ok(not k.get("applies") or k["applies"].endswith("?"), "%s: applies is a question" % k["name"])
     body = Path(k["file"]).read_text()
     ok("**Fixed when**" in body or "1. " in body, "%s: body says when it is fixed" % k["name"])
     ok("**Ask" in body or "2. Ask" in body, "%s: body has the question" % k["name"])
 ok({k["name"] for k in knobs if k.get("applies")} == {"view", "density", "states", "caster"}, "applies set")
+
+# Jev reads only the stated line, so an exclusion in a knob's "Fixed when" must be in that line too
+by = {k["name"]: k for k in knobs}
+for n, words in {"palette": "subject", "size": "256", "timing": "Fast", "glow": "Sparkling", "shape": "subject name",
+                 "role": "two readings"}.items():
+    ok(words in by[n]["stated"] and "not count" in by[n]["stated"], "%s: stated carries its exclusion" % n)
+
+# every role in role.md has a row in the size table
+roles = by["role"]["stated"].split("(")[1].split(")")[0].split(", ")
+size_rows = [ln.split("|")[1].strip() for ln in Path(by["size"]["file"]).read_text().splitlines()
+             if ln.startswith("| ") and not ln.startswith("| role")]
+ok(sorted(roles) == sorted(size_rows), "size rows %s match the roles %s" % (size_rows, roles))
 
 # the Jev client is optional; without it (a fresh clone, CI) only the model path is checked
 JEV_PY = Path(os.environ.get("BEANFX_JEV_PY", "~/.claude/hooks/jev.py")).expanduser()

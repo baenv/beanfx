@@ -7,8 +7,8 @@ be judged with a body taking it. Preview only; the exported sheet stays the effe
 
 foot is the dummy's base in px (x, y). facing -1 means the blow comes from the left and pushes it right. hits
 are export.hit dicts; each reacts by its `react`: flinch (a short tilt), stagger (a wobble that rings down),
-knockback (a slide back by `push` px with a tilt) or launch (lifted and dropped back). The contact frame and the
-next flash it pale.
+knockback (a slide back by `push` px with a tilt) or launch (lifted and dropped back). The contact frame flashes
+it white for the hit's `flash` s (one frame without it), then one frame at half; `dir` turns the knockback.
 """
 import math
 
@@ -34,14 +34,19 @@ def reaction(f, hits, fps):
             continue
         push = h.get("push", 0) or 3.0
         kind = h.get("react", "flinch")
-        if f - h["frame"] < 2:
-            flash = max(flash, 1.0 if f == h["frame"] else 0.5)
+        lit = max(1, round(h["flash"] * fps)) if "flash" in h else 1  # frames fully white, then one at half
+        k = f - h["frame"]
+        if k <= lit:
+            flash = max(flash, 1.0 if k < lit else 0.5)
+        a = math.radians(h.get("dir", 0))
+        ux, uy = abs(math.cos(a)), math.sin(a)  # away from the blow, and down (+) or up (-) along it
         if kind == "flinch":
             tilt += 0.18 * math.exp(-dt * 10)
         elif kind == "stagger":
             tilt += 0.25 * math.exp(-dt * 4) * math.cos(dt * 22)
         elif kind == "knockback":
-            dx += push * (1 - math.exp(-dt * 12))
+            dx += push * ux * (1 - math.exp(-dt * 12))
+            dy += min(0.0, push * uy * (1 - math.exp(-dt * 12)))  # a rising blow lifts; the ground stops a falling one
             tilt += 0.3 * math.exp(-dt * 6) * math.cos(dt * 14)
         elif kind == "launch":
             up = min(dt / 0.35, 1.0)

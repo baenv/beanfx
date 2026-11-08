@@ -1,18 +1,20 @@
 """The light pass of an effect: an additive glow drawn on its own sheet `<name>_light`, which the engine adds over
 the colour sheet at the same frame and row (or drops). Learnt from the pixelfx light buffer (a falloff
-(1 - d)^2 * k summed per pixel). Smooth light is the default; `bands` cuts it into three hard steps for a hard
-retro look, so that sheet keeps hard alpha and stepped tones.
+(1 - d)^2 * k summed per pixel). Smooth light is the default in every style; `bands` cuts it into three hard steps only when the owner
+asks for stepped light ("NES authentic", "no smooth glow"), so that sheet keeps hard alpha and stepped tones.
 
     L = buffer(c)                          # c: a canvas with world px grids x, y (wgrid)
     glow(L, c, x, y, r, k)                 # a round light, k at the centre
     glow_line(L, c, (x0, y0), (x1, y1), r, k)   # light round a segment: beams, bolts, trails
     glow_ring(L, c, x, y, R, r, k, flat)   # light hugging a ring: shock waves, ground seals
-    m = bands(L, phase)                    # hard retro only: shade map 0 outer (dithered), 1 middle, 2 inner, -1 none
+    m = bands(L, phase)                    # stepped light on request only: shade map 0 outer (dithered), 1 middle, 2 inner, -1 none
     cols = palette("#ff9a40")              # the three colours of those bands
 
     fl = Flashes()                         # short lights: a spark landing, a sword entering the cloud, a hit
     fl.add(x, y, r, k, life=6)             # life in frames; it starts at k and r, dims as (life left)^2, shrinks
     fl.draw(L, c); fl.step()               # each frame: draw, then age by one frame
+    flash_at(L, c, f, f0, x, y, r, k, life)  # the same flash born at frame f0, drawn from f alone: pure, so
+                                           # render(f, seed) stays per frame for check_seeds
     k * flicker(i, f, seed)                # 0..1 per spark i at frame f, seeded and out of step: the twinkle
 
 Keep k at 0.2 to 0.5; light the hot core, eyes, bolt heads, the landing flash and embers, never the whole body.
@@ -78,13 +80,24 @@ class Flashes:
 
     def draw(self, L, c):
         for x, y, r, k, left, life in self.list:
-            u = left / life
-            glow(L, c, x, y, r * (0.55 + 0.45 * u), k * u * u)
+            _flash(L, c, x, y, r, k, left / life)
 
     def step(self):
         for fl in self.list:
             fl[4] -= 1
         self.list = [fl for fl in self.list if fl[4] > 0]
+
+
+def _flash(L, c, x, y, r, k, u):
+    glow(L, c, x, y, r * (0.55 + 0.45 * u), k * u * u)
+
+
+def flash_at(L, c, f, f0, x, y, r, k, life=6):
+    """A Flashes light born at frame f0, drawn at frame f with no state: the same k, shrink and life. Use it in a
+    render(f, seed) that computes each frame on its own."""
+    age = f - f0
+    if 0 <= age < life:
+        _flash(L, c, x, y, r, k, (life - age) / life)
 
 
 def _hash01(*n):

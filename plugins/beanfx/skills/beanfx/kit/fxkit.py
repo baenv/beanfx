@@ -9,6 +9,8 @@ the cell.
   puffs          clumped round smoke or spirit puffs in 3 tones, lit top left, edges that break into dots (puff)
   facets         a faceted rock or crystal: lit faces, a shadow face, a hard highlight on the lit rim (facets)
   twinkle        a 4-point star (twinkle)
+  ground impact  dust that slides out along the ground, debris that arcs, bounces and rests, cracks for heavy hits
+                 (ground_impact, sized by the hit's weight)
 """
 import math
 
@@ -457,6 +459,82 @@ def hit_burst(m, X, Y, f, tones, smoke, rim, cx=0.0, cy=0.0, r=12.0, flat=1.0, s
             kite(m, X, Y, cx + rr * math.cos(aj), cy + rr * flat * math.sin(aj) + 0.6 * (f - 1) ** 2, aj,
                  r * 0.26 * (1.0 - 0.12 * (f - 1)), r * 0.13, shards, tail=0.35)
     return rim_if(m, rim, f <= 3)
+
+
+# ----- ground reaction: what the ground does when a blow lands on it -----
+# A hit sells its weight through what it leaves: dust kicked out along the ground, debris thrown up that falls,
+# bounces once and stays where it lands (permanence), and for heavy blows cracks that stay too. Counts follow the hit's
+# weight (export.WEIGHTS): a light hit throws a few pixels, a finisher a spray.
+
+GROUND = {
+    "light":    dict(debris=4, dust=2, crack=0, fly=1.0),
+    "heavy":    dict(debris=10, dust=4, crack=3, fly=1.4),
+    "finisher": dict(debris=18, dust=6, crack=6, fly=1.9),
+    "blast":    dict(debris=16, dust=6, crack=5, fly=1.7),
+}
+
+
+def debris_at(j, t, cx, cy, r, fly, flat, seed):
+    """World (x, y) and resting flag of debris chunk j at t s after contact: an arc up and out under gravity, one
+    bounce at a third of the height, then at rest on its own spot of the ground plane."""
+    h0, h1, h2 = hsh(j, seed + 11), hsh(j, seed + 12), hsh(j, seed + 13)
+    side = -1 if j % 2 else 1
+    spread = 0.25 + 0.95 * h0                       # radians off vertical
+    v0 = r * fly * (2.6 + 2.2 * h1)                 # px/s
+    g = r * 18.0 * fly                              # px/s^2: a harder blow throws higher, never longer
+    vx, vy = side * v0 * math.sin(spread), v0 * math.cos(spread)
+    gy = cy + flat * r * 0.5 * (h2 - 0.5)           # its own depth on the ground plane
+    t1 = 2 * vy / g
+    if t < t1:
+        return cx + vx * t, gy - (vy * t - 0.5 * g * t * t), False
+    x1, vx2, vy2 = cx + vx * t1, 0.45 * vx, 0.3 * vy
+    t2 = 2 * vy2 / g
+    u = t - t1
+    if u < t2:
+        return x1 + vx2 * u, gy - (vy2 * u - 0.5 * g * u * u), False
+    return x1 + vx2 * t2, gy, True
+
+
+def ground_impact(m, X, Y, f, fps, tones, dust, cx=0.0, cy=0.0, r=12.0, weight="heavy", flat=0.35, life=1.2, seed=0):
+    """The ground's reaction to a blow landing at (cx, cy) on it, frame f counted from the contact frame (nothing
+    before it): dust puffs that slide out both ways, rise a little and break into dots; debris chunks (tones deep,
+    mid, light) that arc, bounce once and rest; and for heavy, finisher and blast weights cracks in tones[0] that
+    grow over two frames and stay. What rests on the ground dissolves over the last 40 % of life s, so the one-shot
+    ends empty. flat squashes the ground plane (1 top-down, 0.35 side or 3/4). Paints into m, returns m."""
+    if f < 0:
+        return m
+    g = GROUND[weight]
+    t = f / fps
+    piece = np.full(m.shape, -1, np.int8)
+    for j in range(g["crack"]):                     # cracks under everything else
+        a = TAU * (j + 0.5 * hsh(j, seed + 21)) / g["crack"]
+        ln = r * (0.6 + 0.6 * hsh(j, seed + 22)) * min(1.0, (f + 1) / 2)
+        pts, px, py = [(cx, cy)], cx, cy
+        for k in range(3):
+            aj = a + 0.6 * (hsh(j * 3 + k, seed + 23) - 0.5)
+            px, py = px + ln / 3 * math.cos(aj), py + ln / 3 * flat * math.sin(aj)
+            pts.append((px, py))
+        d, _, _ = stroke(X, Y, pts, 1.1, 0.4)
+        piece[d < 0] = tones[0]
+    for j in range(g["dust"]):
+        side = -1 if j % 2 else 1
+        out = r * (0.35 + 0.25 * (j // 2)) + r * 1.4 * (1 - math.exp(-t * 6)) * (0.7 + 0.5 * hsh(j, seed + 31))
+        rr = r * (0.16 + 0.05 * (j // 2)) * (1 + 1.2 * (1 - math.exp(-t * 5))) * g["fly"] ** 0.5
+        brk = min(1.0, t / (0.5 * life))
+        if brk < 1.0:
+            puff(piece, X, Y, cx + side * out, cy - r * 0.15 - r * 0.5 * t - rr * 0.4, rr, dust, brk=brk, seed=j + seed,
+                 ph=f * 0.3)
+    for j in range(g["debris"]):
+        x, y, rest = debris_at(j, t, cx, cy, r, g["fly"], flat, seed)
+        size = 0.6 if j % 3 else 1.1
+        on = (np.abs(X - x) < size) & (np.abs(Y - y) < size)
+        piece[on] = tones[1]
+        if not rest:
+            piece[on & (Y < y)] = tones[2]           # lit top while it flies
+    if t > 0.6 * life:
+        piece = fade(piece, min(1.0, (t - 0.6 * life) / (0.4 * life)))
+    blit(m, piece)
+    return m
 
 
 def rim_if(m, s, on):
