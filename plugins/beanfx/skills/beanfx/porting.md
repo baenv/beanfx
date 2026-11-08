@@ -35,6 +35,30 @@ The rest, when the JSON has it:
   frame with its `page`, and `meta.beanfx.pages` lists the files. Load every page and build one animation whose
   frames come from the page each frame names.
 
+- **Budget.** A sheet costs its decoded size in texture memory: frames x w x h x 4 bytes, twice that with the
+  colour and light pair. `export.write` prints a note above 64 MB. Over it on phones: load the effect only when it
+  plays and free it after, drop the light sheet and play `<name>.png`, or for a full-screen cutscene play a video.
+
+### Browser, no engine
+
+`runtime/beanfx.js` in this skill plays the export on a 2D canvas: one ES module, no dependencies. Copy it into the
+game next to the exported files.
+
+```js
+import { loadFx, createFx } from "./beanfx.js";
+const blast = await loadFx("fx/blast.json");          // loads the colour and light sheets (every page)
+const fx = createFx(blast, { x: 160, y: 140, flip: false, state: "strike", heading: angle,
+  lightGain: 1, onHit: (h) => target.react(h.react, h.push), onEnd: () => remove(fx) });
+// each frame, dt in s
+fx.update(dt);                                         // holds still by itself during a hit-stop
+ctx.imageSmoothingEnabled = false;
+ctx.save(); ctx.translate(...fx.shake); drawScene(); fx.draw(ctx); ctx.restore();
+```
+
+It follows the rules above: pivot on (x, y), flip about the pivot, `end` (remove sets `fx.done`, hold keeps the
+last frame), states by tag, heading rows by `round(atan2(dy, dx) / tau * n) mod n`, pages, and each `act.hits`
+entry as a freeze with a decaying shake. `docs/index.html` in the beanfx repo is a working page.
+
 ### Phaser 3 and 4
 
 The JSON is the Aseprite array layout, so `load.aseprite` reads it and `createFromAseprite` makes one animation per

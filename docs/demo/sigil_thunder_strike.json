@@ -1,0 +1,2178 @@
+{
+ "frames": [
+  {
+   "filename": "sigil_thunder_strike 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 1",
+   "frame": {
+    "x": 160,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 2",
+   "frame": {
+    "x": 320,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 3",
+   "frame": {
+    "x": 480,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 4",
+   "frame": {
+    "x": 640,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 5",
+   "frame": {
+    "x": 800,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 6",
+   "frame": {
+    "x": 960,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 7",
+   "frame": {
+    "x": 1120,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 8",
+   "frame": {
+    "x": 1280,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 9",
+   "frame": {
+    "x": 1440,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 10",
+   "frame": {
+    "x": 1600,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 11",
+   "frame": {
+    "x": 1760,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 12",
+   "frame": {
+    "x": 0,
+    "y": 240,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 13",
+   "frame": {
+    "x": 160,
+    "y": 240,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 14",
+   "frame": {
+    "x": 320,
+    "y": 240,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 15",
+   "frame": {
+    "x": 480,
+    "y": 240,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 16",
+   "frame": {
+    "x": 640,
+    "y": 240,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 17",
+   "frame": {
+    "x": 800,
+    "y": 240,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 18",
+   "frame": {
+    "x": 960,
+    "y": 240,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 19",
+   "frame": {
+    "x": 1120,
+    "y": 240,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 20",
+   "frame": {
+    "x": 1280,
+    "y": 240,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 21",
+   "frame": {
+    "x": 1440,
+    "y": 240,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 22",
+   "frame": {
+    "x": 1600,
+    "y": 240,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 23",
+   "frame": {
+    "x": 1760,
+    "y": 240,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 24",
+   "frame": {
+    "x": 0,
+    "y": 480,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 25",
+   "frame": {
+    "x": 160,
+    "y": 480,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 26",
+   "frame": {
+    "x": 320,
+    "y": 480,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 27",
+   "frame": {
+    "x": 480,
+    "y": 480,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 28",
+   "frame": {
+    "x": 640,
+    "y": 480,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 29",
+   "frame": {
+    "x": 800,
+    "y": 480,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 30",
+   "frame": {
+    "x": 960,
+    "y": 480,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 31",
+   "frame": {
+    "x": 1120,
+    "y": 480,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 32",
+   "frame": {
+    "x": 1280,
+    "y": 480,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 33",
+   "frame": {
+    "x": 1440,
+    "y": 480,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 34",
+   "frame": {
+    "x": 1600,
+    "y": 480,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 35",
+   "frame": {
+    "x": 1760,
+    "y": 480,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 36",
+   "frame": {
+    "x": 0,
+    "y": 720,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 37",
+   "frame": {
+    "x": 160,
+    "y": 720,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 38",
+   "frame": {
+    "x": 320,
+    "y": 720,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 39",
+   "frame": {
+    "x": 480,
+    "y": 720,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 40",
+   "frame": {
+    "x": 640,
+    "y": 720,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 41",
+   "frame": {
+    "x": 800,
+    "y": 720,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 42",
+   "frame": {
+    "x": 960,
+    "y": 720,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 43",
+   "frame": {
+    "x": 1120,
+    "y": 720,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 44",
+   "frame": {
+    "x": 1280,
+    "y": 720,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 45",
+   "frame": {
+    "x": 1440,
+    "y": 720,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 46",
+   "frame": {
+    "x": 1600,
+    "y": 720,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 47",
+   "frame": {
+    "x": 1760,
+    "y": 720,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 48",
+   "frame": {
+    "x": 0,
+    "y": 960,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 49",
+   "frame": {
+    "x": 160,
+    "y": 960,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 50",
+   "frame": {
+    "x": 320,
+    "y": 960,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 51",
+   "frame": {
+    "x": 480,
+    "y": 960,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 52",
+   "frame": {
+    "x": 640,
+    "y": 960,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 53",
+   "frame": {
+    "x": 800,
+    "y": 960,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 54",
+   "frame": {
+    "x": 960,
+    "y": 960,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 55",
+   "frame": {
+    "x": 1120,
+    "y": 960,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 56",
+   "frame": {
+    "x": 1280,
+    "y": 960,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 57",
+   "frame": {
+    "x": 1440,
+    "y": 960,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 58",
+   "frame": {
+    "x": 1600,
+    "y": 960,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 59",
+   "frame": {
+    "x": 1760,
+    "y": 960,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 60",
+   "frame": {
+    "x": 0,
+    "y": 1200,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 61",
+   "frame": {
+    "x": 160,
+    "y": 1200,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 62",
+   "frame": {
+    "x": 320,
+    "y": 1200,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 63",
+   "frame": {
+    "x": 480,
+    "y": 1200,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 64",
+   "frame": {
+    "x": 640,
+    "y": 1200,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 65",
+   "frame": {
+    "x": 800,
+    "y": 1200,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 66",
+   "frame": {
+    "x": 960,
+    "y": 1200,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 67",
+   "frame": {
+    "x": 1120,
+    "y": 1200,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 68",
+   "frame": {
+    "x": 1280,
+    "y": 1200,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 69",
+   "frame": {
+    "x": 1440,
+    "y": 1200,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 70",
+   "frame": {
+    "x": 1600,
+    "y": 1200,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 71",
+   "frame": {
+    "x": 1760,
+    "y": 1200,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 72",
+   "frame": {
+    "x": 0,
+    "y": 1440,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 73",
+   "frame": {
+    "x": 160,
+    "y": 1440,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 74",
+   "frame": {
+    "x": 320,
+    "y": 1440,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 75",
+   "frame": {
+    "x": 480,
+    "y": 1440,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 76",
+   "frame": {
+    "x": 640,
+    "y": 1440,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 77",
+   "frame": {
+    "x": 800,
+    "y": 1440,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 78",
+   "frame": {
+    "x": 960,
+    "y": 1440,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 79",
+   "frame": {
+    "x": 1120,
+    "y": 1440,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 80",
+   "frame": {
+    "x": 1280,
+    "y": 1440,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 81",
+   "frame": {
+    "x": 1440,
+    "y": 1440,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 82",
+   "frame": {
+    "x": 1600,
+    "y": 1440,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 83",
+   "frame": {
+    "x": 1760,
+    "y": 1440,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 84",
+   "frame": {
+    "x": 0,
+    "y": 1680,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 85",
+   "frame": {
+    "x": 160,
+    "y": 1680,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 86",
+   "frame": {
+    "x": 320,
+    "y": 1680,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 87",
+   "frame": {
+    "x": 480,
+    "y": 1680,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 88",
+   "frame": {
+    "x": 640,
+    "y": 1680,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  },
+  {
+   "filename": "sigil_thunder_strike 89",
+   "frame": {
+    "x": 800,
+    "y": 1680,
+    "w": 160,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 160,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 160,
+    "h": 240
+   },
+   "duration": 33
+  }
+ ],
+ "meta": {
+  "app": "beanfx",
+  "version": "1",
+  "image": "sigil_thunder_strike.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1920,
+   "h": 1920
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "raise",
+    "from": 0,
+    "to": 35,
+    "direction": "forward"
+   },
+   {
+    "name": "hold",
+    "from": 36,
+    "to": 40,
+    "direction": "forward"
+   },
+   {
+    "name": "strike",
+    "from": 41,
+    "to": 48,
+    "direction": "forward"
+   },
+   {
+    "name": "aftershocks",
+    "from": 49,
+    "to": 74,
+    "direction": "forward"
+   },
+   {
+    "name": "fade",
+    "from": 75,
+    "to": 89,
+    "direction": "forward"
+   }
+  ],
+  "beanfx": {
+   "name": "sigil_thunder_strike",
+   "fps": 30,
+   "loop": false,
+   "end": "remove",
+   "frames": 90,
+   "rows": 1,
+   "frameSize": [
+    160,
+    240
+   ],
+   "pivot": [
+    80,
+    214
+   ],
+   "columns": 12,
+   "blend_light": "add",
+   "light_gain": 1.0,
+   "states": {
+    "raise": [
+     0,
+     35
+    ],
+    "hold": [
+     36,
+     40
+    ],
+    "strike": [
+     41,
+     48
+    ],
+    "aftershocks": [
+     49,
+     74
+    ],
+    "fade": [
+     75,
+     89
+    ]
+   },
+   "act": {
+    "windup": 0.0,
+    "hits": [
+     {
+      "frame": 42,
+      "t": 1.4,
+      "freeze": 0.12,
+      "shake": 4,
+      "push": 3,
+      "react": "stagger"
+     },
+     {
+      "frame": 51,
+      "t": 1.7,
+      "freeze": 0.06,
+      "shake": 2,
+      "push": 2,
+      "react": "flinch"
+     },
+     {
+      "frame": 59,
+      "t": 1.9667,
+      "freeze": 0.06,
+      "shake": 2,
+      "push": 2,
+      "react": "flinch"
+     },
+     {
+      "frame": 67,
+      "t": 2.2333,
+      "freeze": 0.06,
+      "shake": 1,
+      "push": 2,
+      "react": "flinch"
+     }
+    ],
+    "poses": [
+     {
+      "t": 0.0,
+      "pose": "windup",
+      "how": "smooth"
+     },
+     {
+      "t": 1.0,
+      "pose": "channel",
+      "how": "smooth"
+     },
+     {
+      "t": 1.3666666666666667,
+      "pose": "release",
+      "how": "snap"
+     },
+     {
+      "t": 1.6,
+      "pose": "follow",
+      "how": "smooth"
+     },
+     {
+      "t": 2.6,
+      "pose": "recover",
+      "how": "smooth"
+     }
+    ],
+    "target": {
+     "x": 0,
+     "react": "stagger"
+    }
+   },
+   "view": "side",
+   "directions": 1,
+   "facing": "east",
+   "mirror": true,
+   "mirror_pivot": [
+    80,
+    214
+   ],
+   "glow": "strong",
+   "parts": {
+    "cast": {
+     "sheet": "sigil_thunder_strike_cast.png",
+     "w": 48,
+     "h": 48,
+     "frames": 47,
+     "fps": 30,
+     "pivot": [
+      24,
+      24
+     ],
+     "loop": false,
+     "anchor": "caster",
+     "note": "pivot on the caster's sword-sign fingertip; starts with the effect at frame 0"
+    },
+    "impact": {
+     "sheet": "sigil_thunder_strike.png",
+     "w": 160,
+     "h": 240,
+     "frames": 90,
+     "fps": 30,
+     "pivot": [
+      80,
+      214
+     ],
+     "loop": false,
+     "anchor": "target",
+     "note": "pivot on the target's foot; the bolt falls straight down, so there is no travel part and the caster to target range is free"
+    }
+   },
+   "sheet": "sigil_thunder_strike.png",
+   "light": "sigil_thunder_strike_light.png",
+   "color": "sigil_thunder_strike_color.png"
+  }
+ }
+}

@@ -1,0 +1,4170 @@
+{
+ "frames": [
+  {
+   "filename": "meteor_rite 0",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 1",
+   "frame": {
+    "x": 320,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 2",
+   "frame": {
+    "x": 640,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 3",
+   "frame": {
+    "x": 960,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 4",
+   "frame": {
+    "x": 1280,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 5",
+   "frame": {
+    "x": 1600,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 6",
+   "frame": {
+    "x": 1920,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 7",
+   "frame": {
+    "x": 2240,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 8",
+   "frame": {
+    "x": 2560,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 9",
+   "frame": {
+    "x": 2880,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 10",
+   "frame": {
+    "x": 3200,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 11",
+   "frame": {
+    "x": 0,
+    "y": 200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 12",
+   "frame": {
+    "x": 320,
+    "y": 200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 13",
+   "frame": {
+    "x": 640,
+    "y": 200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 14",
+   "frame": {
+    "x": 960,
+    "y": 200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 15",
+   "frame": {
+    "x": 1280,
+    "y": 200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 16",
+   "frame": {
+    "x": 1600,
+    "y": 200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 17",
+   "frame": {
+    "x": 1920,
+    "y": 200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 18",
+   "frame": {
+    "x": 2240,
+    "y": 200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 19",
+   "frame": {
+    "x": 2560,
+    "y": 200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 20",
+   "frame": {
+    "x": 2880,
+    "y": 200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 21",
+   "frame": {
+    "x": 3200,
+    "y": 200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 22",
+   "frame": {
+    "x": 0,
+    "y": 400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 23",
+   "frame": {
+    "x": 320,
+    "y": 400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 24",
+   "frame": {
+    "x": 640,
+    "y": 400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 25",
+   "frame": {
+    "x": 960,
+    "y": 400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 26",
+   "frame": {
+    "x": 1280,
+    "y": 400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 27",
+   "frame": {
+    "x": 1600,
+    "y": 400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 28",
+   "frame": {
+    "x": 1920,
+    "y": 400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 29",
+   "frame": {
+    "x": 2240,
+    "y": 400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 30",
+   "frame": {
+    "x": 2560,
+    "y": 400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 31",
+   "frame": {
+    "x": 2880,
+    "y": 400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 32",
+   "frame": {
+    "x": 3200,
+    "y": 400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 33",
+   "frame": {
+    "x": 0,
+    "y": 600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 34",
+   "frame": {
+    "x": 320,
+    "y": 600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 35",
+   "frame": {
+    "x": 640,
+    "y": 600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 36",
+   "frame": {
+    "x": 960,
+    "y": 600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 37",
+   "frame": {
+    "x": 1280,
+    "y": 600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 38",
+   "frame": {
+    "x": 1600,
+    "y": 600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 39",
+   "frame": {
+    "x": 1920,
+    "y": 600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 40",
+   "frame": {
+    "x": 2240,
+    "y": 600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 41",
+   "frame": {
+    "x": 2560,
+    "y": 600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 42",
+   "frame": {
+    "x": 2880,
+    "y": 600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 43",
+   "frame": {
+    "x": 3200,
+    "y": 600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 44",
+   "frame": {
+    "x": 0,
+    "y": 800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 45",
+   "frame": {
+    "x": 320,
+    "y": 800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 46",
+   "frame": {
+    "x": 640,
+    "y": 800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 47",
+   "frame": {
+    "x": 960,
+    "y": 800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 48",
+   "frame": {
+    "x": 1280,
+    "y": 800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 49",
+   "frame": {
+    "x": 1600,
+    "y": 800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 50",
+   "frame": {
+    "x": 1920,
+    "y": 800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 51",
+   "frame": {
+    "x": 2240,
+    "y": 800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 52",
+   "frame": {
+    "x": 2560,
+    "y": 800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 53",
+   "frame": {
+    "x": 2880,
+    "y": 800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 54",
+   "frame": {
+    "x": 3200,
+    "y": 800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 55",
+   "frame": {
+    "x": 0,
+    "y": 1000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 56",
+   "frame": {
+    "x": 320,
+    "y": 1000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 57",
+   "frame": {
+    "x": 640,
+    "y": 1000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 58",
+   "frame": {
+    "x": 960,
+    "y": 1000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 59",
+   "frame": {
+    "x": 1280,
+    "y": 1000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 60",
+   "frame": {
+    "x": 1600,
+    "y": 1000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 61",
+   "frame": {
+    "x": 1920,
+    "y": 1000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 62",
+   "frame": {
+    "x": 2240,
+    "y": 1000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 63",
+   "frame": {
+    "x": 2560,
+    "y": 1000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 64",
+   "frame": {
+    "x": 2880,
+    "y": 1000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 65",
+   "frame": {
+    "x": 3200,
+    "y": 1000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 66",
+   "frame": {
+    "x": 0,
+    "y": 1200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 67",
+   "frame": {
+    "x": 320,
+    "y": 1200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 68",
+   "frame": {
+    "x": 640,
+    "y": 1200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 69",
+   "frame": {
+    "x": 960,
+    "y": 1200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 70",
+   "frame": {
+    "x": 1280,
+    "y": 1200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 71",
+   "frame": {
+    "x": 1600,
+    "y": 1200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 72",
+   "frame": {
+    "x": 1920,
+    "y": 1200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 73",
+   "frame": {
+    "x": 2240,
+    "y": 1200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 74",
+   "frame": {
+    "x": 2560,
+    "y": 1200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 75",
+   "frame": {
+    "x": 2880,
+    "y": 1200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 76",
+   "frame": {
+    "x": 3200,
+    "y": 1200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 77",
+   "frame": {
+    "x": 0,
+    "y": 1400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 78",
+   "frame": {
+    "x": 320,
+    "y": 1400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 79",
+   "frame": {
+    "x": 640,
+    "y": 1400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 80",
+   "frame": {
+    "x": 960,
+    "y": 1400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 81",
+   "frame": {
+    "x": 1280,
+    "y": 1400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 82",
+   "frame": {
+    "x": 1600,
+    "y": 1400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 83",
+   "frame": {
+    "x": 1920,
+    "y": 1400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 84",
+   "frame": {
+    "x": 2240,
+    "y": 1400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 85",
+   "frame": {
+    "x": 2560,
+    "y": 1400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 86",
+   "frame": {
+    "x": 2880,
+    "y": 1400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 87",
+   "frame": {
+    "x": 3200,
+    "y": 1400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 88",
+   "frame": {
+    "x": 0,
+    "y": 1600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 89",
+   "frame": {
+    "x": 320,
+    "y": 1600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 90",
+   "frame": {
+    "x": 640,
+    "y": 1600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 91",
+   "frame": {
+    "x": 960,
+    "y": 1600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 92",
+   "frame": {
+    "x": 1280,
+    "y": 1600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 93",
+   "frame": {
+    "x": 1600,
+    "y": 1600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 94",
+   "frame": {
+    "x": 1920,
+    "y": 1600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 95",
+   "frame": {
+    "x": 2240,
+    "y": 1600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 96",
+   "frame": {
+    "x": 2560,
+    "y": 1600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 97",
+   "frame": {
+    "x": 2880,
+    "y": 1600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 98",
+   "frame": {
+    "x": 3200,
+    "y": 1600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 99",
+   "frame": {
+    "x": 0,
+    "y": 1800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 100",
+   "frame": {
+    "x": 320,
+    "y": 1800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 101",
+   "frame": {
+    "x": 640,
+    "y": 1800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 102",
+   "frame": {
+    "x": 960,
+    "y": 1800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 103",
+   "frame": {
+    "x": 1280,
+    "y": 1800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 104",
+   "frame": {
+    "x": 1600,
+    "y": 1800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 105",
+   "frame": {
+    "x": 1920,
+    "y": 1800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 106",
+   "frame": {
+    "x": 2240,
+    "y": 1800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 107",
+   "frame": {
+    "x": 2560,
+    "y": 1800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 108",
+   "frame": {
+    "x": 2880,
+    "y": 1800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 109",
+   "frame": {
+    "x": 3200,
+    "y": 1800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 110",
+   "frame": {
+    "x": 0,
+    "y": 2000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 111",
+   "frame": {
+    "x": 320,
+    "y": 2000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 112",
+   "frame": {
+    "x": 640,
+    "y": 2000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 113",
+   "frame": {
+    "x": 960,
+    "y": 2000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 114",
+   "frame": {
+    "x": 1280,
+    "y": 2000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 115",
+   "frame": {
+    "x": 1600,
+    "y": 2000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 116",
+   "frame": {
+    "x": 1920,
+    "y": 2000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 117",
+   "frame": {
+    "x": 2240,
+    "y": 2000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 118",
+   "frame": {
+    "x": 2560,
+    "y": 2000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 119",
+   "frame": {
+    "x": 2880,
+    "y": 2000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 120",
+   "frame": {
+    "x": 3200,
+    "y": 2000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 121",
+   "frame": {
+    "x": 0,
+    "y": 2200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 122",
+   "frame": {
+    "x": 320,
+    "y": 2200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 123",
+   "frame": {
+    "x": 640,
+    "y": 2200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 124",
+   "frame": {
+    "x": 960,
+    "y": 2200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 125",
+   "frame": {
+    "x": 1280,
+    "y": 2200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 126",
+   "frame": {
+    "x": 1600,
+    "y": 2200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 127",
+   "frame": {
+    "x": 1920,
+    "y": 2200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 128",
+   "frame": {
+    "x": 2240,
+    "y": 2200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 129",
+   "frame": {
+    "x": 2560,
+    "y": 2200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 130",
+   "frame": {
+    "x": 2880,
+    "y": 2200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 131",
+   "frame": {
+    "x": 3200,
+    "y": 2200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 132",
+   "frame": {
+    "x": 0,
+    "y": 2400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 133",
+   "frame": {
+    "x": 320,
+    "y": 2400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 134",
+   "frame": {
+    "x": 640,
+    "y": 2400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 135",
+   "frame": {
+    "x": 960,
+    "y": 2400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 136",
+   "frame": {
+    "x": 1280,
+    "y": 2400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 137",
+   "frame": {
+    "x": 1600,
+    "y": 2400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 138",
+   "frame": {
+    "x": 1920,
+    "y": 2400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 139",
+   "frame": {
+    "x": 2240,
+    "y": 2400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 140",
+   "frame": {
+    "x": 2560,
+    "y": 2400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 141",
+   "frame": {
+    "x": 2880,
+    "y": 2400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 142",
+   "frame": {
+    "x": 3200,
+    "y": 2400,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 143",
+   "frame": {
+    "x": 0,
+    "y": 2600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 144",
+   "frame": {
+    "x": 320,
+    "y": 2600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 145",
+   "frame": {
+    "x": 640,
+    "y": 2600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 146",
+   "frame": {
+    "x": 960,
+    "y": 2600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 147",
+   "frame": {
+    "x": 1280,
+    "y": 2600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 148",
+   "frame": {
+    "x": 1600,
+    "y": 2600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 149",
+   "frame": {
+    "x": 1920,
+    "y": 2600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 150",
+   "frame": {
+    "x": 2240,
+    "y": 2600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 151",
+   "frame": {
+    "x": 2560,
+    "y": 2600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 152",
+   "frame": {
+    "x": 2880,
+    "y": 2600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 153",
+   "frame": {
+    "x": 3200,
+    "y": 2600,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 154",
+   "frame": {
+    "x": 0,
+    "y": 2800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 155",
+   "frame": {
+    "x": 320,
+    "y": 2800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 156",
+   "frame": {
+    "x": 640,
+    "y": 2800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 157",
+   "frame": {
+    "x": 960,
+    "y": 2800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 158",
+   "frame": {
+    "x": 1280,
+    "y": 2800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 159",
+   "frame": {
+    "x": 1600,
+    "y": 2800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 160",
+   "frame": {
+    "x": 1920,
+    "y": 2800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 161",
+   "frame": {
+    "x": 2240,
+    "y": 2800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 162",
+   "frame": {
+    "x": 2560,
+    "y": 2800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 163",
+   "frame": {
+    "x": 2880,
+    "y": 2800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 164",
+   "frame": {
+    "x": 3200,
+    "y": 2800,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 165",
+   "frame": {
+    "x": 0,
+    "y": 3000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 166",
+   "frame": {
+    "x": 320,
+    "y": 3000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 167",
+   "frame": {
+    "x": 640,
+    "y": 3000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 168",
+   "frame": {
+    "x": 960,
+    "y": 3000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 169",
+   "frame": {
+    "x": 1280,
+    "y": 3000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 170",
+   "frame": {
+    "x": 1600,
+    "y": 3000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 171",
+   "frame": {
+    "x": 1920,
+    "y": 3000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 172",
+   "frame": {
+    "x": 2240,
+    "y": 3000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 173",
+   "frame": {
+    "x": 2560,
+    "y": 3000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 174",
+   "frame": {
+    "x": 2880,
+    "y": 3000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 175",
+   "frame": {
+    "x": 3200,
+    "y": 3000,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 176",
+   "frame": {
+    "x": 0,
+    "y": 3200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 177",
+   "frame": {
+    "x": 320,
+    "y": 3200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 178",
+   "frame": {
+    "x": 640,
+    "y": 3200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  },
+  {
+   "filename": "meteor_rite 179",
+   "frame": {
+    "x": 960,
+    "y": 3200,
+    "w": 320,
+    "h": 200
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 320,
+    "h": 200
+   },
+   "sourceSize": {
+    "w": 320,
+    "h": 200
+   },
+   "duration": 33
+  }
+ ],
+ "meta": {
+  "app": "beanfx",
+  "version": "1",
+  "image": "meteor_rite.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 3520,
+   "h": 3400
+  },
+  "scale": "1",
+  "frameTags": [
+   {
+    "name": "chant",
+    "from": 0,
+    "to": 74,
+    "direction": "forward"
+   },
+   {
+    "name": "flare",
+    "from": 75,
+    "to": 86,
+    "direction": "forward"
+   },
+   {
+    "name": "point",
+    "from": 87,
+    "to": 95,
+    "direction": "forward"
+   },
+   {
+    "name": "fall",
+    "from": 96,
+    "to": 128,
+    "direction": "forward"
+   },
+   {
+    "name": "impact",
+    "from": 129,
+    "to": 140,
+    "direction": "forward"
+   },
+   {
+    "name": "fade",
+    "from": 141,
+    "to": 179,
+    "direction": "forward"
+   }
+  ],
+  "beanfx": {
+   "name": "meteor_rite",
+   "fps": 30,
+   "loop": false,
+   "end": "remove",
+   "frames": 180,
+   "rows": 1,
+   "frameSize": [
+    320,
+    200
+   ],
+   "pivot": [
+    70,
+    176
+   ],
+   "columns": 11,
+   "blend_light": "add",
+   "light_gain": 1.0,
+   "states": {
+    "chant": [
+     0,
+     74
+    ],
+    "flare": [
+     75,
+     86
+    ],
+    "point": [
+     87,
+     95
+    ],
+    "fall": [
+     96,
+     128
+    ],
+    "impact": [
+     129,
+     140
+    ],
+    "fade": [
+     141,
+     179
+    ]
+   },
+   "act": {
+    "windup": 0.0,
+    "hits": [
+     {
+      "frame": 129,
+      "t": 4.3,
+      "freeze": 0.15,
+      "shake": 5,
+      "push": 6,
+      "react": "knockback"
+     }
+    ],
+    "poses": [
+     {
+      "t": 0.0,
+      "pose": "channel",
+      "how": "smooth"
+     },
+     {
+      "t": 2.5,
+      "pose": "cast",
+      "how": "smooth"
+     },
+     {
+      "t": 2.9,
+      "pose": "release",
+      "how": "snap"
+     },
+     {
+      "t": 4.9,
+      "pose": "recover",
+      "how": "smooth"
+     }
+    ],
+    "target": {
+     "x": 150,
+     "react": "knockback"
+    }
+   },
+   "view": "side",
+   "directions": 1,
+   "facing": "east",
+   "mirror": true,
+   "mirror_pivot": [
+    250,
+    176
+   ],
+   "mirror_target": [
+    100,
+    176
+   ],
+   "glow": "strong",
+   "parts": {
+    "cast": {
+     "sheet": "meteor_rite_cast.png",
+     "w": 176,
+     "h": 200,
+     "frames": 129,
+     "fps": 30,
+     "pivot": [
+      70,
+      176
+     ],
+     "loop": false,
+     "anchor": "caster",
+     "start": 0
+    },
+    "travel": {
+     "sheet": "meteor_rite_travel.png",
+     "w": 140,
+     "h": 160,
+     "frames": 15,
+     "fps": 30,
+     "pivot": [
+      88,
+      110
+     ],
+     "loop": true,
+     "anchor": "travel",
+     "speed": 195,
+     "start": 96,
+     "end": 129,
+     "heading_deg": 59.4,
+     "spawn_from_target": [
+      -84,
+      -150
+     ],
+     "grow": [
+      0.25,
+      1.0
+     ],
+     "note": "spawn above the target, fly along heading_deg (below east), scale from grow[0] to grow[1], hand over to impact on contact"
+    },
+    "impact": {
+     "sheet": "meteor_rite_impact.png",
+     "w": 208,
+     "h": 200,
+     "frames": 51,
+     "fps": 30,
+     "pivot": [
+      108,
+      176
+     ],
+     "loop": false,
+     "anchor": "target",
+     "start": 129
+    }
+   },
+   "range_px": 150,
+   "sheet": "meteor_rite.png",
+   "light": "meteor_rite_light.png",
+   "color": "meteor_rite_color.png"
+  }
+ }
+}

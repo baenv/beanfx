@@ -12,9 +12,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
       - run: pip install numpy pillow
       - name: skill tests
         run: |
           S=plugins/beanfx/skills/beanfx
           python $S/tests/test_gate.py
           for t in facing derive export ref light; do python $S/tests/test_$t.py; done
+          node $S/tests/test_runtime.mjs
+          cmp $S/runtime/beanfx.js docs/beanfx.js

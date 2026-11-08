@@ -29,6 +29,7 @@ import numpy as np
 from PIL import Image
 
 MAX_EDGE = 4096  # a texture side most GPUs and WebGL2 phones take
+VRAM_NOTE = 64e6  # bytes of decoded sheets above which write() prints a texture memory note
 LIGHT_EDGE = 0.02  # light below this may reach the cell edge (a smooth pool fades past it)
 POP = 0.05  # the last frame of a one-shot may keep at most this share of the peak frame's pixels
 
@@ -240,6 +241,10 @@ def write(out, name, frames, fps, pivot, loop, light=None, color=None, states=No
         bfx["pages"] = pages
         js = _aseprite(entries, tags, pages[0]["image"], {"w": cols * w, "h": math.ceil(per / cols) * h}, bfx)
     (out / f"{name}.json").write_text(json.dumps(js, indent=1))
+    vram = len(flat) * w * h * 4 * (2 if lflat is not None and cflat is not None else 1)
+    if vram > VRAM_NOTE:
+        print("note: %s needs about %d MB of texture memory decoded (colour and light); porting.md, Budget"
+              % (name, round(vram / 1e6)))
     return js
 
 

@@ -12,7 +12,7 @@ scratch. pixelfx and earlier drafts in `drafts/<name>/` are reused only when the
 take pixelfx's light (it reads well) and redraw its base (often weak: blobs, flat fills, smooth teardrops).
 
 Paths: the skill is self-contained in the project you run in (its git root, else the current folder). This
-skill's folder is `${CLAUDE_SKILL_DIR}` and holds `setup.sh`, `gate.py`, `knobs/`, `research.md`, `porting.md` and the source of the drawing
+skill's folder is `${CLAUDE_SKILL_DIR}` and holds `setup.sh`, `gate.py`, `knobs/`, `research.md`, `porting.md`, `runtime/beanfx.js` and the source of the drawing
 kit. `setup.sh` copies the kit into the project's `kit/` (`fxkit.py`, `fxlib.py`, `light.py`, `pfx.py`, `caster.py`
 the mockup caster, `target.py` the preview target dummy, `ref.py` an object traced from a reference image, `facing.py` the direction fields for the JSON, `derive.py` points taken from a finished
 drawing, `export.py` the sheet, its Aseprite-style JSON and the checks), so a kit fix goes back to the skill copy. Drafts are `drafts/<name>/` in the project, Python is
@@ -327,7 +327,7 @@ meta = ex.write(OUT, NAME, finals, FPS, PIVOT, LOOP, light=lights, color=cols, s
   adds under `meta.beanfx`: fps, loop, frames, rows, frameSize, pivot, columns, the files, `blend_light`,
   `light_gain` (1.0; the engine multiplies the light sheet by it to tune the glow at runtime), `states`, `glow`
   and the direction fields. Phaser loads it with `load.aseprite`; `porting.md` in this skill's folder has the
-  import for each engine.
+  import for each engine, and `runtime/beanfx.js` plays it in a browser game with no engine.
 - **The act** for a blow, a strike, a cast or an impact: plain data in `meta.beanfx.act` that the game's own
   character and target follow.
   - `hits`: one `ex.hit(frame, fps, freeze, shake, push, react)` per contact. freeze 0.06 to 0.2 s of hit-stop

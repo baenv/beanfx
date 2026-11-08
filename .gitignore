@@ -29,8 +29,9 @@ pixelfx/
 # Local only
 site/
 
-# README previews
+# README previews and the demo page's sheets
 !docs/media/*.gif
+!docs/demo/*.png
 
 # Personal task tracking
 tasks/

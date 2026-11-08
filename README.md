@@ -3,10 +3,16 @@
 Pixel-art effects drawn as code. Each effect is a Python module: the base is shade maps of palette indices, and
 the light (glow) is a separate additive layer. A run writes a sprite sheet, a JSON file (frame size, count, fps,
 pivot, loop, states, in the Aseprite JSON layout that Phaser, Godot and Unity tools read) and preview gifs.
-`plugins/beanfx/skills/beanfx/porting.md` shows how to import it into each engine or port the draw code.
+`plugins/beanfx/skills/beanfx/porting.md` shows how to import it into each engine or port the draw code, and
+`runtime/beanfx.js` in the skill plays it in a browser game with no engine ([live demo](https://baenv.github.io/beanfx/)).
 
 The `/beanfx` skill (`plugins/beanfx/skills/beanfx/SKILL.md`) drives the work: it asks about the knobs the prompt leaves
 open, researches the subject, draws the effect and checks every frame for edge clipping and empty cells.
+
+beanfx and [pixelfx](https://github.com/patch-gg/pixelfx) share the idea of effects as code with a separate light
+buffer. pixelfx is a library of 244 small, ready effects written in JavaScript that draw live in the game. beanfx
+draws one effect to order from your brief (size, palette, view, style, states, directions), often a large
+multi-second skill, and ships it as sheets that any engine plays.
 
 Work in progress: `/char` for characters and `/scene` for scenes. They stay local until they are ready.
 
@@ -52,6 +58,17 @@ and are hurled down to bloom and burst on the ground.
 
 Then run `/beanfx <description | image>` in any project. The first run creates `.venv/` (numpy, pillow) and
 `kit/` in that project and writes each effect to `drafts/<name>/`.
+
+## Use in a browser game
+
+```js
+import { loadFx, createFx } from "./beanfx.js";        // plugins/beanfx/skills/beanfx/runtime/beanfx.js
+const fx = createFx(await loadFx("fx/meteor_rite.json"), { x: 120, y: 250, onHit: (h) => console.log(h.react) });
+// each frame: fx.update(dt); fx.draw(ctx); drop it when fx.done
+```
+
+It plays the colour sheet with the light added on top, states, mirror, heading rows, pages, and the hit-stop and
+screen shake from the JSON. `docs/index.html` is the demo page.
 
 ## Layout
 

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>beanfx demo</title>
+<style>
+  :root { --bg: #0d0d14; --panel: #171722; --ink: #e6e6f0; --dim: #8a8aa0; --line: #2a2a3a; --accent: #8fb8ff; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, sans-serif; }
+  main { max-width: 1000px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  p { color: var(--dim); margin: 0 0 16px; }
+  a { color: var(--accent); }
+  canvas { display: block; width: 100%; image-rendering: pixelated; background: #14141f; border: 1px solid var(--line); border-radius: 6px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin: 12px 0; padding: 12px; background: var(--panel); border-radius: 6px; }
+  label { display: flex; gap: 8px; align-items: center; color: var(--dim); }
+  select, button { font: inherit; color: var(--ink); background: #22222f; border: 1px solid var(--line); border-radius: 4px; padding: 4px 10px; }
+  button { cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  #status { color: var(--dim); font-variant-numeric: tabular-nums; }
+  code { color: var(--ink); }
+</style>
+</head>
+<body>
+<main>
+  <h1>beanfx demo</h1>
+  <p>Two effects exported by <a href="https://github.com/baenv/beanfx">beanfx</a>, played by <code>beanfx.js</code>
+    on a plain canvas: colour sheet, additive light sheet, states, mirror, hit-stop and screen shake from the JSON.</p>
+  <canvas id="stage" width="480" height="270"></canvas>
+  <div class="bar">
+    <label>Effect <select id="effect">
+      <option value="meteor_rite">Meteor Rite</option>
+      <option value="sigil_thunder_strike">Sigil Thunder Strike</option>
+    </select></label>
+    <label>State <select id="state"></select></label>
+    <label><input type="checkbox" id="flip"> Mirror</label>
+    <label>Light <input type="range" id="gain" min="0" max="1" step="0.05" value="1"></label>
+    <label>Speed <select id="speed"><option>0.25</option><option>0.5</option><option selected>1</option></select></label>
+    <button id="play">Play</button>
+    <span id="status"></span>
+  </div>
+  <p>Use it in your game: copy <code>beanfx.js</code> next to the exported <code>&lt;name&gt;.json</code> and sheets,
+    then <code>createFx(await loadFx("fx/name.json"), {x, y})</code>, <code>fx.update(dt)</code> and
+    <code>fx.draw(ctx)</code> each frame. See <code>porting.md</code> in the skill for engines.</p>
+</main>
+<script type="module">
+  import { loadFx, createFx } from "./beanfx.js";
+
+  const PLACE = { meteor_rite: [120, 250], sigil_thunder_strike: [240, 250] };
+  const cv = document.getElementById("stage");
+  const ctx = cv.getContext("2d");
+  const $ = (id) => document.getElementById(id);
+  const cache = {};
+  let fx = null, asset = null, name = "", flash = 0;
+
+  async function pick() {
+    name = $("effect").value;
+    asset = cache[name] ||= await loadFx("demo/" + name + ".json");
+    const sel = $("state");
+    sel.innerHTML = "<option value=''>whole effect</option>" +
+      Object.keys(asset.tags).map((t) => `<option>${t}</option>`).join("");
+    play();
+  }
+
+  function play() {
+    const [x, y] = PLACE[name];
+    fx = createFx(asset, {
+      x, y, flip: $("flip").checked, state: $("state").value || null,
+      lightGain: +$("gain").value, speed: +$("speed").value,
+      onHit: (h) => { flash = 0.08; $("status").textContent = `hit on frame ${h.frame}: freeze ${h.freeze}s, ${h.react}`; },
+    });
+    $("status").textContent = "";
+  }
+
+  function ground() {
+    ctx.fillStyle = "#14141f";
+    ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.fillStyle = "#1d1d2b";
+    ctx.fillRect(0, 250, cv.width, 20);
+    ctx.fillStyle = "#2a2a3d";
+    ctx.fillRect(0, 250, cv.width, 1);
+  }
+
+  let last = performance.now();
+  function tick(now) {
+    const dt = Math.min(0.1, (now - last) / 1000);
+    last = now;
+    ctx.save();
+    if (fx) {
+      fx.lightGain = +$("gain").value;
+      fx.update(dt);
+      ctx.translate(fx.shake[0], fx.shake[1]);
+    }
+    ctx.imageSmoothingEnabled = false;
+    ground();
+    if (fx) fx.draw(ctx);
+    if (flash > 0) { flash -= dt; ctx.fillStyle = "rgba(255,255,255,0.12)"; ctx.fillRect(0, 0, cv.width, cv.height); }
+    ctx.restore();
+    if (fx && fx.done) setTimeout(play, 600), fx = null;
+    requestAnimationFrame(tick);
+  }
+
+  $("effect").onchange = pick;
+  $("state").onchange = play;
+  $("flip").onchange = play;
+  $("speed").onchange = play;
+  $("play").onclick = play;
+  pick().then(() => requestAnimationFrame(tick));
+</script>
+</body>
+</html>
