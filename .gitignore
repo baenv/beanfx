@@ -5,7 +5,7 @@
 !.claude/skills/beanfx
 kit_char/
 kit_scene/
-chars/
+/chars/
 scenes/
 
 # Generated
@@ -28,6 +28,10 @@ pixelfx/
 
 # Local only
 site/
+/casters/
+/casters_archive/
+# the bundled game casters ship with the plugin (sheets and rig.json only)
+!plugins/beanfx/skills/beanfx/casters/*/*.png
 
 # README previews and the demo page's sheets
 !docs/media/*.gif

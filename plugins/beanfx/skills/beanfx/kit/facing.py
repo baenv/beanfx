@@ -74,11 +74,21 @@ def meta(view, w, h, pivot, directions=1, facing="east", mirror=True, target=Non
             if target is not None:
                 m["mirror_target"] = flip(target, w)
     else:
-        m["rows"] = "row k faces tau * k / n, y down: 0 east, n/4 south, n/2 west, 3n/4 north"
+        m["row_rule"] = "row k faces tau * k / n, y down: 0 east, n/4 south, n/2 west, 3n/4 north"
         m["row_of"] = "round(atan2(dy, dx) / tau * n) mod n"
         if directions == 8:
             m["row_names"] = list(NAMES8)
     return m
+
+
+def offset(rng, directions=None):
+    """Where a cast lands: the [dx, dy] from the caster's pivot to the effect's pivot, rng px along the facing
+    (screen px, y down). directions: names from NAMES8 (one pair each), or None for a side view (one pair facing
+    east; the engine flips dx with the mirror)."""
+    def at(name):
+        a = math.tau * NAMES8.index(name) / 8
+        return [round(rng * math.cos(a)), round(rng * math.sin(a))]
+    return at("east") if directions is None else {d: at(d) for d in directions}
 
 
 def part(sheet_file, w, h, frames, fps, pivot, loop, anchor, **extra):

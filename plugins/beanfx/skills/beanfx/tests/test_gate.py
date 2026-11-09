@@ -61,10 +61,10 @@ def run(prompt, env=None, extra=()):
         return p.returncode, {"raw": p.stdout + p.stderr}
 
 
-# knob files: all thirteen, names match the file, each has a Jev question and a "Fixed when" or steps for the model
+# knob files: all sixteen, names match the file, each has a Jev question and a "Fixed when" or steps for the model
 knobs = gate.load_knobs()
 names = [k["name"] for k in knobs]
-want = ["role", "view", "size", "timing", "loop", "shape", "style", "palette", "glow", "clarity", "density", "states", "caster"]
+want = ["role", "view", "size", "timing", "loop", "shape", "style", "palette", "glow", "clarity", "density", "states", "caster", "combo", "placement", "aura"]
 ok(names == want, "knob order %s" % names)
 for k in knobs:
     ok(Path(k["file"]).stem == k["name"], "%s: file name" % k["name"])
@@ -73,7 +73,7 @@ for k in knobs:
     body = Path(k["file"]).read_text()
     ok("**Fixed when**" in body or "1. " in body, "%s: body says when it is fixed" % k["name"])
     ok("**Ask" in body or "2. Ask" in body, "%s: body has the question" % k["name"])
-ok({k["name"] for k in knobs if k.get("applies")} == {"view", "density", "states", "caster"}, "applies set")
+ok({k["name"] for k in knobs if k.get("applies")} == {"view", "density", "states", "caster", "combo", "placement", "aura"}, "applies set")
 
 # Jev reads only the stated line, so an exclusion in a knob's "Fixed when" must be in that line too
 by = {k["name"]: k for k in knobs}
@@ -102,13 +102,13 @@ if HAVE_JEV:
     ok("states" in ask and "timing" in ask and "shape" in ask, "open knobs that apply are asked")
     ok(ask == [n for n in want if n in ask], "ask keeps the knob order")
     q = SEEN[-1]["questions"]
-    ok(len(q) == 13 + 4 and all(v["type"] == "noul" for v in q.values()), "one call, 17 nouls")
+    ok(len(q) == 16 + 7 and all(v["type"] == "noul" for v in q.values()), "one call, 23 nouls")
     ok(SEEN[-1]["state"].get("reference_image") == "a blue comet sketch", "context reaches Jev")
     ok("fireball" in SEEN[-1]["state"]["request"], "prompt reaches Jev")
 
 # every fallback exits 0 with source model and the knob files
 code, out = run("x", env=dict(BASE, BEANFX_GATE="model"))
-ok(code == 0 and out.get("source") == "model" and len(out.get("knobs", [])) == 13,
+ok(code == 0 and out.get("source") == "model" and len(out.get("knobs", [])) == 16,
    "BEANFX_GATE=model")
 code, out = run("x", env=dict(BASE, BEANFX_JEV_PY=os.path.join(tmp, "nope.py")))
 ok(code == 0 and out.get("reason") == "no jev.py" and "hint" not in out, "missing jev.py: %s" % out)

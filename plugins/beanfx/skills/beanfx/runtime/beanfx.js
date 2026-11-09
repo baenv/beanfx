@@ -46,7 +46,7 @@ export function fromJson(json, images = {}) {
   const bfx = json.meta.beanfx;
   const tags = {};
   for (const t of json.meta.frameTags || []) tags[t.name] = [t.from, t.to];
-  const frames = json.frames.map((e) => ({ ...e.frame, page: e.page || 0 }));
+  const frames = json.frames.map((e) => ({ ...e.frame, page: e.page || 0, ms: e.duration }));
   return { meta: bfx, tags, frames, images };
 }
 
@@ -59,7 +59,8 @@ export function createFx(asset, opts = {}) {
   const m = asset.meta;
   const fps = opts.fps || m.fps;
   const n = m.frames;
-  const rows = m.rows || 1;
+  // sheets written before facing.meta's row_rule carry a text `rows`; directions then gives the row count
+  const rows = Number.isInteger(m.rows) ? m.rows : Number.isInteger(m.directions) ? m.directions : 1;
   const row = opts.row ?? (opts.heading != null && rows > 1 ? rowOf(opts.heading, rows) : 0);
   // a heading row's tag spans the whole row; its states are tagged "<row>/<state>"
   const rowTag = rows > 1 ? Object.keys(asset.tags).find((k) => !k.includes("/") && asset.tags[k][0] === row * n) : null;
@@ -73,6 +74,21 @@ export function createFx(asset, opts = {}) {
   const len = b - a + 1;
   const loop = opts.loop ?? (opts.state ? false : m.loop);
   const end = opts.end || (loop ? "loop" : opts.state ? "hold" : m.end || "remove");
+  // frame times: each frame's own duration (a sheet locked to a game character's uneven frame times) when they
+  // differ from 1 / fps, else even steps at fps; opts.fps forces even steps
+  const ms = asset.frames.slice(row * n + a, row * n + b + 1).map((f) => f.ms);
+  const even = opts.fps || ms.some((x) => !x) || ms.every((x) => Math.abs(x - 1000 / fps) < 1.01);
+  const starts = [0];
+  for (let i = 0; i < len; i++) starts.push(starts[i] + (even ? 1 / fps : ms[i] / 1000));
+  const total = starts[len];
+  const timeOf = (f) => Math.floor(f / len) * total + starts[f % len];  // start of played frame f
+  function frameAt(t) {
+    if (even) return Math.floor(t * fps + 1e-9);
+    const lap = Math.floor((t + 1e-9) / total), r = t - lap * total;
+    let i = 0;
+    while (i < len - 1 && starts[i + 1] <= r + 1e-9) i++;
+    return lap * len + i;
+  }
   // hits as frames local to the range; only the ones inside it play
   const hits = ((m.act && m.act.hits) || []).filter((h) => h.frame >= a && h.frame <= b).map((h) => ({ ...h, at: h.frame - a }));
 
@@ -129,14 +145,14 @@ export function createFx(asset, opts = {}) {
       if (dt <= 0) return fx;
     }
     const prev = fx._abs;
-    let abs = Math.floor((fx.t + dt) * fps + 1e-9);
+    let abs = frameAt(fx.t + dt);
     // the first hit crossed this step stops time on its frame
     for (let f = prev + 1; f <= abs; f++) {
       const local = loop ? f % len : f;
       const h = hits.find((x) => x.at === local);
       if (h) {
         abs = f;
-        fx.t = f / fps;
+        fx.t = timeOf(f);
         strike(h);
         if (opts.onHit) opts.onHit(h, fx);
         dt = 0;

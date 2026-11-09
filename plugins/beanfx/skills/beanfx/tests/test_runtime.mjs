@@ -142,6 +142,19 @@ ctx = mockCtx(); fx.draw(ctx);
 const d = ctx.calls.find((c) => c[0] === "draw");
 ok(d[1] === "P1" && d[4] === 16, "frame 6 from page 1, cell 2: " + d.slice(1, 6));
 
+// uneven frame times (a sheet locked to a game character's ms): frames hold for their own duration
+const uneven = sheet({ n: 4, fps: 10 });
+uneven.frames.forEach((f, i) => (f.duration = [50, 200, 50, 100][i]));
+uneven.meta.beanfx.act = { windup: 0, hits: [{ frame: 2, freeze: 0, shake: 0 }] };
+let hitT = null;
+fx = createFx(fromJson(uneven, {}), { onHit: (h, f) => (hitT = Math.round(f.t * 1000) / 1000) });
+run(fx, 0.06, 0.01); ok(fx.frame === 1, "50 ms frame 0, then frame 1 at 0.06 s: " + fx.frame);
+run(fx, 0.18, 0.01); ok(fx.frame === 1, "frame 1 holds 200 ms (0.24 s): " + fx.frame);
+run(fx, 0.03, 0.01); ok(fx.frame === 2 && hitT === 0.25, "hit frame 2 lands at 0.25 s: " + fx.frame + " at " + hitT);
+run(fx, 0.2, 0.01); ok(fx.done, "one-shot ends after 400 ms of frames");
+fx = createFx(fromJson(uneven, {}), { fps: 10 });
+run(fx, 0.15, 0.01); ok(fx.frame === 1, "opts.fps forces even steps: " + fx.frame);
+
 for (const f of fails) console.log("FAIL", f);
 console.log((fails.length ? fails.length : "ok") + " runtime checks");
 process.exit(fails.length ? 1 : 0);

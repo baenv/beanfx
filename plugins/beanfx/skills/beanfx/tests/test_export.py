@@ -178,6 +178,40 @@ with tempfile.TemporaryDirectory() as d:
     got = [p for p in ex.check(shot, src=src) if "unseeded" in p]
     ok(len(got) == 2 and "draft.py:2" in got[0], f"unseeded {got}")
 
+# extra may add fields but not change the sheet's layout fields
+with tempfile.TemporaryDirectory() as d:
+    try:
+        ex.write(d, "clash", shot, FPS, (20, 30), False, extra={"rows": "text"})
+        ok(False, "extra overwriting rows raises")
+    except ValueError:
+        pass
+
+# the preview page: the result's JSON and sheets and its caster's rig and sheets embedded in out/<name>.html
+with tempfile.TemporaryDirectory() as d:
+    root = Path(d)
+    out = root / "drafts" / "demo" / "out"
+    rig = {"name": "hero", "view": "top-down", "fps": 10, "directions": ["east"],
+           "anims": {"attack1": {"frame": [8, 8], "frames": 1, "sheets": {"east": "a1_east.png"}},
+                     "kick": {"frame": [8, 8], "frames": 1, "sheets": {"east": "kick_east.png"}}}}
+    (root / "casters" / "hero").mkdir(parents=True)
+    (root / "casters" / "hero" / "rig.json").write_text(json.dumps(rig))
+    for n in ("a1_east.png", "kick_east.png"):
+        Image.new("RGBA", (8, 8)).save(root / "casters" / "hero" / n)
+    ex.write(out / "sheets", "blast", shot, FPS, (20, 30), False, light=light, color=shot,
+             extra={"caster": {"rig": "hero", "chain": [{"anim": "attack1"}]}})
+    tpl = root / "preview.html"
+    tpl.write_text('<html><body><script type="module">boot()</script></body></html>')
+    pg = ex.page(out / "sheets" / "blast.json", template=tpl)
+    ok(pg.resolve() == (out / "blast.html").resolve(), f"page lands in out/: {pg}")
+    text = pg.read_text()
+    ok(text.index("BEANFX_EMBED") < text.index('<script type="module">'), "page: the embed comes before the app")
+    emb = json.loads(text.split("window.BEANFX_EMBED = ", 1)[1].split(";</script>", 1)[0])
+    want = {"drafts/demo/out/sheets/blast.json", "drafts/demo/out/sheets/blast.png",
+            "drafts/demo/out/sheets/blast_light.png", "drafts/demo/out/sheets/blast_color.png",
+            "casters/hero/rig.json", "casters/hero/a1_east.png"}
+    ok(set(emb["files"]) == want, f"page files {sorted(emb['files'])}")
+    ok(emb["select"] == "fx:drafts/demo/out/sheets/blast.json", f"page select {emb['select']}")
+
 for f in fails:
     print("FAIL", f)
 print(f"{'ok' if not fails else len(fails)} export checks")

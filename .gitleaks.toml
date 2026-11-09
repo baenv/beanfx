@@ -1,0 +1,15 @@
+title = "beanfx gitleaks"
+
+# gitleaks' own rules (keys, tokens, private keys) plus the ones below
+[extend]
+useDefault = true
+
+[[rules]]
+id = "local-home-path"
+description = "An absolute path into a user's home folder: it names the machine's user and its private folders"
+regex = '''/(Users|home)/[A-Za-z0-9._-]+/'''
+keywords = ["/Users/", "/home/"]
+
+[allowlist]
+description = "Binary sheets and generated output"
+paths = ['''\.png$''', '''\.gif$''', '''(^|/)out/''']

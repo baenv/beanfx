@@ -1,0 +1,365 @@
+{
+ "name": "nghich_tien_kiem",
+ "view": "side",
+ "fps": 7.5,
+ "directions": [
+  "east",
+  "west"
+ ],
+ "pixel_scale": 1,
+ "height": 63,
+ "density": 1.5,
+ "source": "beanfx bundled game caster: a robed cultivator in a veiled hat with a straight sword",
+ "anims": {
+  "idle": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 12,
+   "fps": 7.5,
+   "loop": true,
+   "sheets": {
+    "east": "idle_east.png",
+    "west": "idle_west.png"
+   },
+   "pivot": [
+    72,
+    100
+   ]
+  },
+  "run": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 12,
+   "fps": 21,
+   "loop": true,
+   "sheets": {
+    "east": "run_east.png",
+    "west": "run_west.png"
+   },
+   "pivot": [
+    72,
+    100
+   ]
+  },
+  "cast": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 10,
+   "fps": 20,
+   "loop": false,
+   "sheets": {
+    "east": "cast_east.png",
+    "west": "cast_west.png"
+   },
+   "pivot": [
+    72,
+    100
+   ],
+   "ms": [
+    37.5,
+    37.5,
+    56.25,
+    37.5,
+    93.75,
+    37.5,
+    41.67,
+    83.33,
+    33.33,
+    41.67
+   ],
+   "contact": [
+    6
+   ],
+   "emit": {
+    "frames": [
+     6
+    ],
+    "point": {
+     "east": [
+      -2,
+      -41
+     ],
+     "west": [
+      4,
+      -43
+     ]
+    },
+    "at": "weapon tip"
+   }
+  },
+  "attack1": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 9,
+   "fps": 21,
+   "loop": false,
+   "sheets": {
+    "east": "attack1_east.png",
+    "west": "attack1_west.png"
+   },
+   "pivot": [
+    72,
+    100
+   ],
+   "ms": [
+    28.57,
+    28.57,
+    85.71,
+    39.14,
+    31.31,
+    97.85,
+    46.97,
+    31.31,
+    39.14
+   ],
+   "contact": [
+    3
+   ],
+   "swing": {
+    "east": [
+     {
+      "kind": "slash",
+      "turn": "cw",
+      "from": -164,
+      "to": 152,
+      "sweep": 316,
+      "frames": [
+       2,
+       3,
+       4
+      ]
+     }
+    ],
+    "west": [
+     {
+      "kind": "slash",
+      "turn": "ccw",
+      "from": -38,
+      "to": 67,
+      "sweep": -255,
+      "frames": [
+       2,
+       3,
+       4
+      ]
+     }
+    ]
+   },
+   "emit": {
+    "frames": [
+     3
+    ],
+    "point": {
+     "east": [
+      39,
+      -43
+     ],
+     "west": [
+      -37,
+      -14
+     ]
+    },
+    "at": "weapon tip"
+   }
+  },
+  "attack2": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 9,
+   "fps": 21,
+   "loop": false,
+   "sheets": {
+    "east": "attack2_east.png",
+    "west": "attack2_west.png"
+   },
+   "pivot": [
+    72,
+    100
+   ],
+   "ms": [
+    28.57,
+    28.57,
+    85.71,
+    39.14,
+    31.31,
+    97.85,
+    46.97,
+    31.31,
+    39.14
+   ],
+   "contact": [
+    3
+   ],
+   "swing": {
+    "east": [
+     {
+      "kind": "slash",
+      "turn": "ccw",
+      "from": 143,
+      "to": -113,
+      "sweep": -256,
+      "frames": [
+       2,
+       3,
+       4
+      ]
+     }
+    ],
+    "west": [
+     {
+      "kind": "slash",
+      "turn": "cw",
+      "from": 55,
+      "to": -76,
+      "sweep": 229,
+      "frames": [
+       2,
+       3,
+       4
+      ]
+     }
+    ]
+   },
+   "emit": {
+    "frames": [
+     3
+    ],
+    "point": {
+     "east": [
+      45,
+      -42
+     ],
+     "west": [
+      -46,
+      -58
+     ]
+    },
+    "at": "weapon tip"
+   }
+  },
+  "attack3": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 10,
+   "fps": 21.666666666666668,
+   "loop": false,
+   "sheets": {
+    "east": "attack3_east.png",
+    "west": "attack3_west.png"
+   },
+   "pivot": [
+    72,
+    100
+   ],
+   "ms": [
+    32.05,
+    32.05,
+    38.46,
+    32.05,
+    96.15,
+    37.83,
+    30.26,
+    94.58,
+    30.26,
+    37.83
+   ],
+   "contact": [
+    5
+   ],
+   "swing": {
+    "east": [
+     {
+      "kind": "slash",
+      "turn": "cw",
+      "from": -133,
+      "to": 46,
+      "sweep": 179,
+      "frames": [
+       4,
+       5,
+       6
+      ]
+     }
+    ],
+    "west": [
+     {
+      "kind": "slash",
+      "turn": "ccw",
+      "from": -50,
+      "to": 133,
+      "sweep": -178,
+      "frames": [
+       4,
+       5,
+       6
+      ]
+     }
+    ]
+   },
+   "emit": {
+    "frames": [
+     5
+    ],
+    "point": {
+     "east": [
+      45,
+      -2
+     ],
+     "west": [
+      -47,
+      0
+     ]
+    },
+    "at": "weapon tip"
+   }
+  },
+  "hurt": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 2,
+   "fps": 8,
+   "loop": false,
+   "sheets": {
+    "east": "hurt_east.png",
+    "west": "hurt_west.png"
+   },
+   "pivot": [
+    72,
+    100
+   ]
+  },
+  "dead": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 6,
+   "fps": 8,
+   "loop": false,
+   "sheets": {
+    "east": "dead_east.png",
+    "west": "dead_west.png"
+   },
+   "pivot": [
+    72,
+    100
+   ]
+  }
+ },
+ "facing": "east",
+ "mirror": false
+}

@@ -253,6 +253,9 @@ def write(out, name, frames, fps, pivot, loop, light=None, color=None, states=No
         bfx["states"] = {k: list(v) for k, v in states.items()}
     if hits or windup or poses or target:
         bfx["act"] = act(hits, windup, poses, target)
+    clash = {k for k in (extra or {}) if k in bfx and extra[k] != bfx[k]}
+    if clash:  # the sheet's own layout fields; an engine reads them to find frames, so extra may not change them
+        raise ValueError(f"extra would overwrite {sorted(clash)} of meta.beanfx")
     bfx.update(extra or {})
 
     entries, pages = [], []
@@ -357,3 +360,98 @@ def check(frames, light=None, loop=False, src=None, hold=False):
             line = text.count("\n", 0, m.start()) + 1
             bad.append(f"{Path(src).name}:{line}: unseeded randomness; use np.random.default_rng(seed)")
     return bad
+
+
+def skill_dir(kit_dir=None):
+    """The skill folder: BEANFX_SKILL, else the path setup.sh --draft wrote to kit/skill.txt, else the skill this
+    kit sits in (its own kit/). None when none holds tools/preview.html."""
+    import os
+    kit_dir = Path(kit_dir) if kit_dir else Path(__file__).resolve().parent
+    tries = []
+    if os.environ.get("BEANFX_SKILL"):
+        tries.append(Path(os.environ["BEANFX_SKILL"]))
+    note = kit_dir / "skill.txt"
+    if note.exists():
+        tries.append(Path(note.read_text().strip()))
+    tries.append(kit_dir.parent)
+    for t in tries:
+        if (t / "tools" / "preview.html").exists():
+            return t
+    return None
+
+
+def _skill_page(kit_dir):
+    """tools/preview.html of the skill (skill_dir)."""
+    s = skill_dir(kit_dir)
+    return s / "tools" / "preview.html" if s else None
+
+
+def page(json_path, out=None, template=None, project=None):
+    """A preview page for one result: <out>/<name>.html (out defaults to the draft's out/), the skill's
+    tools/preview.html with this result's JSON and sheets embedded, and its game character's rig.json and the
+    sheets of the animations it rides on when meta.beanfx.caster names one. It opens from disk with no server and
+    no folder to pick. The character sprites are the owner's licensed art, so the page stays in out/ (gitignored)
+    and is never shipped. Returns the page path, or None (with a note) when the template cannot be found."""
+    import base64
+    json_path = Path(json_path).resolve()
+    template = Path(template) if template else _skill_page(Path(__file__).resolve().parent)
+    if template is None or not template.exists():
+        print("note: no tools/preview.html found for the preview page; set BEANFX_SKILL or rerun setup.sh --draft")
+        return None
+    parts = json_path.parts
+    if "out" not in parts:
+        raise ValueError(f"{json_path} is not under a draft's out/")
+    i = len(parts) - 1 - parts[::-1].index("out")
+    draft_dir = Path(*parts[:i])
+    project = Path(project) if project else draft_dir.parent.parent
+    vpath = lambda p: "drafts/" + Path(p).resolve().relative_to(draft_dir.parent).as_posix()  # noqa: E731
+
+    js = json.loads(json_path.read_text())
+    bfx = js["meta"]["beanfx"]
+    files = {}
+
+    def sheet_files(jp, b, image):
+        files[jp] = vpath(jp)
+        for pg in b.get("pages") or [dict(image=b.get("sheet") or image, color=b.get("color"), light=b.get("light"))]:
+            for k in ("image", "color", "light", "json"):
+                if pg.get(k) and (jp.parent / pg[k]).exists():
+                    files[jp.parent / pg[k]] = vpath(jp.parent / pg[k])
+    sheet_files(json_path, bfx, js["meta"]["image"])
+    for part in (bfx.get("parts") or {}).values():   # an aura that rides on the caster has its own sheet
+        jp = json_path.parent / part["json"] if part.get("json") else None
+        if jp and jp.exists():
+            pj = json.loads(jp.read_text())
+            sheet_files(jp, pj["meta"]["beanfx"], pj["meta"]["image"])
+    caster = bfx.get("caster") or {}
+    if caster.get("rig"):
+        rdir = project / "casters" / caster["rig"]
+        bundled = skill_dir(Path(__file__).resolve().parent)
+        if not (rdir / "rig.json").exists() and bundled:  # a caster that ships with the skill
+            rdir = bundled / "casters" / caster["rig"]
+        if (rdir / "rig.json").exists():
+            spec = json.loads((rdir / "rig.json").read_text())
+            used = {s["anim"] for s in caster.get("chain", [])} | ({caster["anim"]} if caster.get("anim") else set())
+            used |= {"idle", "run"} & set(spec.get("anims", {}))   # Control mode walks the character
+            files[rdir / "rig.json"] = f"casters/{caster['rig']}/rig.json"
+            for an in used:
+                a = spec["anims"].get(an, {})
+                for sheet in list(a.get("sheets", {}).values()) + ([a["sheet"]] if a.get("sheet") else []):
+                    if (rdir / sheet).exists():
+                        files[rdir / sheet] = f"casters/{caster['rig']}/{sheet}"
+        else:
+            print(f"note: casters/{caster['rig']}/rig.json not found; the preview page shows the effect alone")
+
+    def url(p):
+        kind = "application/json" if p.suffix == ".json" else "image/png"
+        return f"data:{kind};base64," + base64.b64encode(p.read_bytes()).decode()
+
+    embed = dict(label=f"{draft_dir.name}/{json_path.stem}", select="fx:" + vpath(json_path),
+                 files={v: url(k) for k, v in files.items()})
+    tag = "<script>window.BEANFX_EMBED = " + json.dumps(embed) + ";</script>\n"
+    html = template.read_text()
+    at = html.index('<script type="module">')
+    out = Path(out) if out else draft_dir / "out"
+    out.mkdir(parents=True, exist_ok=True)
+    dst = out / f"{json_path.stem}.html"
+    dst.write_text(html[:at] + tag + html[at:])
+    return dst

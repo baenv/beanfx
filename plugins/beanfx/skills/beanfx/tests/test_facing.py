@@ -58,7 +58,7 @@ for n in (8, 16):
         fc.sheet(rs, p)
         ok(Image.open(p).size == (3 * W, n * H), f"{n}: sheet size")
     m = fc.check(fc.meta("top-down", W, H, PIV, directions=n))
-    ok(m["directions"] == n and "rows" in m, f"{n}: meta")
+    ok(m["directions"] == n and "row_rule" in m and "rows" not in m, f"{n}: meta")
 ok(fc.meta("top-down", W, H, PIV, directions=8)["row_names"][2] == "south", "row 2 of 8 is south")
 ok(fc.row_of(0, 5, 8) == 2 and fc.row_of(-5, 0, 8) == 4 and fc.row_of(0, -5, 8) == 6, "row_of compass")
 

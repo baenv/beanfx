@@ -1,0 +1,423 @@
+{
+ "name": "nghich_tien_truong_topdown",
+ "view": "top-down",
+ "fps": 7.5,
+ "directions": [
+  "east",
+  "south-east",
+  "south",
+  "south-west",
+  "west",
+  "north-west",
+  "north",
+  "north-east"
+ ],
+ "pixel_scale": 1,
+ "height": 63,
+ "density": 1.5,
+ "source": "beanfx bundled game caster: a robed cultivator in a veiled hat with a staff",
+ "anims": {
+  "idle": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 6,
+   "fps": 6,
+   "loop": true,
+   "sheets": {
+    "east": "idle_east.png",
+    "south-east": "idle_south-east.png",
+    "south": "idle_south.png",
+    "south-west": "idle_south-west.png",
+    "west": "idle_west.png",
+    "north-west": "idle_north-west.png",
+    "north": "idle_north.png",
+    "north-east": "idle_north-east.png"
+   },
+   "pivot": [
+    72,
+    100
+   ]
+  },
+  "run": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 12,
+   "fps": 21,
+   "loop": true,
+   "sheets": {
+    "east": "run_east.png",
+    "south-east": "run_south-east.png",
+    "south": "run_south.png",
+    "south-west": "run_south-west.png",
+    "west": "run_west.png",
+    "north-west": "run_north-west.png",
+    "north": "run_north.png",
+    "north-east": "run_north-east.png"
+   },
+   "pivot": [
+    72,
+    100
+   ]
+  },
+  "cast": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 10,
+   "fps": 20,
+   "loop": false,
+   "sheets": {
+    "east": "cast_east.png",
+    "south-east": "cast_south-east.png",
+    "south": "cast_south.png",
+    "south-west": "cast_south-west.png",
+    "west": "cast_west.png",
+    "north-west": "cast_north-west.png",
+    "north": "cast_north.png",
+    "north-east": "cast_north-east.png"
+   },
+   "pivot": [
+    72,
+    100
+   ],
+   "ms": [
+    37.5,
+    37.5,
+    56.25,
+    37.5,
+    93.75,
+    37.5,
+    41.67,
+    83.33,
+    33.33,
+    41.67
+   ],
+   "contact": [
+    6
+   ],
+   "emit": {
+    "frames": [
+     6
+    ],
+    "point": {
+     "east": [
+      2,
+      -45
+     ],
+     "south-east": [
+      0,
+      -6
+     ],
+     "south": [
+      12,
+      -4
+     ],
+     "south-west": [
+      -9,
+      -50
+     ],
+     "west": [
+      4,
+      -42
+     ],
+     "north-west": [
+      4,
+      -43
+     ],
+     "north": [
+      7,
+      -53
+     ],
+     "north-east": [
+      8,
+      -45
+     ]
+    },
+    "at": "weapon tip"
+   }
+  },
+  "attack1": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 9,
+   "fps": 21,
+   "loop": false,
+   "sheets": {
+    "east": "attack1_east.png",
+    "south-east": "attack1_south-east.png",
+    "south": "attack1_south.png",
+    "south-west": "attack1_south-west.png",
+    "west": "attack1_west.png",
+    "north-west": "attack1_north-west.png",
+    "north": "attack1_north.png",
+    "north-east": "attack1_north-east.png"
+   },
+   "pivot": [
+    72,
+    100
+   ],
+   "ms": [
+    28.57,
+    28.57,
+    85.71,
+    39.14,
+    31.31,
+    97.85,
+    46.97,
+    31.31,
+    39.14
+   ],
+   "contact": [
+    3
+   ],
+   "emit": {
+    "frames": [
+     3
+    ],
+    "point": {
+     "east": [
+      32,
+      -68
+     ],
+     "south-east": [
+      33,
+      -54
+     ],
+     "south": [
+      1,
+      -47
+     ],
+     "south-west": [
+      -34,
+      -52
+     ],
+     "west": [
+      -33,
+      -68
+     ],
+     "north-west": [
+      -36,
+      -72
+     ],
+     "north": [
+      -22,
+      -71
+     ],
+     "north-east": [
+      35,
+      -72
+     ]
+    },
+    "at": "weapon tip"
+   }
+  },
+  "attack2": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 9,
+   "fps": 21,
+   "loop": false,
+   "sheets": {
+    "east": "attack2_east.png",
+    "south-east": "attack2_south-east.png",
+    "south": "attack2_south.png",
+    "south-west": "attack2_south-west.png",
+    "west": "attack2_west.png",
+    "north-west": "attack2_north-west.png",
+    "north": "attack2_north.png",
+    "north-east": "attack2_north-east.png"
+   },
+   "pivot": [
+    72,
+    100
+   ],
+   "ms": [
+    28.57,
+    28.57,
+    85.71,
+    39.14,
+    31.31,
+    97.85,
+    46.97,
+    31.31,
+    39.14
+   ],
+   "contact": [
+    3
+   ],
+   "emit": {
+    "frames": [
+     3
+    ],
+    "point": {
+     "east": [
+      35,
+      -21
+     ],
+     "south-east": [
+      16,
+      -9
+     ],
+     "south": [
+      -34,
+      -8
+     ],
+     "south-west": [
+      -36,
+      -26
+     ],
+     "west": [
+      -36,
+      -40
+     ],
+     "north-west": [
+      -15,
+      -56
+     ],
+     "north": [
+      34,
+      -53
+     ],
+     "north-east": [
+      35,
+      -34
+     ]
+    },
+    "at": "weapon tip"
+   }
+  },
+  "attack3": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 10,
+   "fps": 21.666666666666668,
+   "loop": false,
+   "sheets": {
+    "east": "attack3_east.png",
+    "south-east": "attack3_south-east.png",
+    "south": "attack3_south.png",
+    "south-west": "attack3_south-west.png",
+    "west": "attack3_west.png",
+    "north-west": "attack3_north-west.png",
+    "north": "attack3_north.png",
+    "north-east": "attack3_north-east.png"
+   },
+   "pivot": [
+    72,
+    100
+   ],
+   "ms": [
+    32.05,
+    32.05,
+    38.46,
+    32.05,
+    96.15,
+    37.83,
+    30.26,
+    94.58,
+    30.26,
+    37.83
+   ],
+   "contact": [
+    5
+   ],
+   "emit": {
+    "frames": [
+     5
+    ],
+    "point": {
+     "east": [
+      30,
+      -54
+     ],
+     "south-east": [
+      22,
+      -44
+     ],
+     "south": [
+      -1,
+      -41
+     ],
+     "south-west": [
+      -26,
+      -46
+     ],
+     "west": [
+      -31,
+      -55
+     ],
+     "north-west": [
+      -22,
+      -62
+     ],
+     "north": [
+      4,
+      -47
+     ],
+     "north-east": [
+      24,
+      -61
+     ]
+    },
+    "at": "weapon tip"
+   }
+  },
+  "hurt": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 2,
+   "fps": 8,
+   "loop": false,
+   "sheets": {
+    "east": "hurt_east.png",
+    "south-east": "hurt_south-east.png",
+    "south": "hurt_south.png",
+    "south-west": "hurt_south-west.png",
+    "west": "hurt_west.png",
+    "north-west": "hurt_north-west.png",
+    "north": "hurt_north.png",
+    "north-east": "hurt_north-east.png"
+   },
+   "pivot": [
+    72,
+    100
+   ]
+  },
+  "dead": {
+   "frame": [
+    144,
+    128
+   ],
+   "frames": 6,
+   "fps": 8,
+   "loop": false,
+   "sheets": {
+    "east": "dead_east.png",
+    "south-east": "dead_south-east.png",
+    "south": "dead_south.png",
+    "south-west": "dead_south-west.png",
+    "west": "dead_west.png",
+    "north-west": "dead_north-west.png",
+    "north": "dead_north.png",
+    "north-east": "dead_north-east.png"
+   },
+   "pivot": [
+    72,
+    100
+   ]
+  }
+ }
+}

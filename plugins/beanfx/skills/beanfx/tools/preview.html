@@ -1,0 +1,1213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>beanfx preview</title>
+<style>
+  :root {
+    --bg: #12151d; --panel: #1a1e29; --line: #2a3040; --text: #d9dde7; --dim: #8a92a6; --accent: #6fb6ff;
+    --on: #24456b; --warn: #ffb35c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 13px/1.4 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  body { display: grid; grid-template-columns: 280px 1fr; }
+  aside { border-right: 1px solid var(--line); background: var(--panel); display: flex; flex-direction: column; min-height: 0; }
+  aside header { padding: 12px; border-bottom: 1px solid var(--line); }
+  aside h1 { font-size: 14px; margin: 0 0 8px; letter-spacing: .02em; }
+  aside input { width: 100%; padding: 6px 8px; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 6px; }
+  #list { overflow: auto; flex: 1; padding: 6px 0 12px; }
+  .group { padding: 10px 12px 4px; color: var(--dim); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+  .item { display: block; width: 100%; text-align: left; padding: 5px 12px 5px 18px; border: 0; background: none; color: var(--text); cursor: pointer; font: inherit; }
+  .item:hover { background: #222838; }
+  .item.sel { background: var(--on); }
+  .item small { color: var(--dim); margin-left: 6px; }
+  main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+  .bar { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; padding: 8px 14px; border-bottom: 1px solid var(--line); }
+  .bar .lab { color: var(--dim); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; margin-right: 2px; }
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+  button.b { background: #232938; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 4px 9px; cursor: pointer; font: inherit; }
+  button.b:hover { border-color: #3c4560; }
+  button.b.on { background: var(--on); border-color: var(--accent); }
+  button.b:disabled { opacity: .4; cursor: default; }
+  label.t { display: inline-flex; gap: 5px; align-items: center; color: var(--text); cursor: pointer; }
+  select, input[type=range] { accent-color: var(--accent); }
+  select { background: #232938; color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 3px 6px; font: inherit; }
+  #stageWrap { flex: 1; overflow: auto; display: grid; place-items: center; padding: 16px; min-height: 0; }
+  canvas { image-rendering: pixelated; display: block; border: 1px solid var(--line); }
+  #info { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--dim); white-space: pre-wrap; padding: 6px 14px 10px; border-top: 1px solid var(--line); min-height: 44px; }
+  #info b { color: var(--text); font-weight: 600; }
+  #info .hit { color: var(--warn); }
+  .keys { color: var(--dim); font-size: 12px; }
+  .keys kbd { background: #232938; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; font: 11px ui-monospace, Menlo, monospace; color: var(--text); }
+  #slider { flex: 1; min-width: 160px; }
+  .empty { color: var(--dim); padding: 40px; text-align: center; }
+  @media (max-width: 760px) { body { grid-template-columns: 1fr; grid-template-rows: 40vh 1fr; } aside { border-right: 0; border-bottom: 1px solid var(--line); } }
+</style>
+</head>
+<body>
+<aside>
+  <header>
+    <h1>beanfx preview</h1>
+    <div class="seg" style="margin-bottom:8px">
+      <button class="b" id="openDir" title="Pick the project folder (the one holding drafts/ and casters/)">Open project folder</button>
+      <button class="b" id="reopen" hidden></button>
+      <button class="b" id="rescan" hidden title="Read the folder again for new results">Rescan</button>
+    </div>
+    <input type="file" id="dirInput" webkitdirectory multiple hidden>
+    <input id="q" placeholder="Filter results" autocomplete="off">
+    <div id="status" class="keys" style="margin-top:6px"></div>
+  </header>
+  <div id="list"></div>
+</aside>
+<main>
+  <div class="bar">
+    <span class="seg" id="modes">
+      <button class="b on" data-mode="view">View</button>
+      <button class="b" data-mode="play">Control</button>
+    </span>
+    <span id="title" style="font-weight:600"></span>
+    <span id="sub" class="keys"></span>
+  </div>
+  <div class="bar" id="pickBar">
+    <span class="lab">Direction</span><span class="seg" id="dirs"></span>
+    <span class="lab">Action</span><span class="seg" id="acts"></span>
+    <span class="lab" id="riglab" hidden>Caster</span><select id="rigSel" hidden></select>
+  </div>
+  <div class="bar" id="viewBar">
+    <button class="b" id="prev" title="Previous frame (Left)">&lt;</button>
+    <button class="b" id="play" title="Play or pause (Space)">Pause</button>
+    <button class="b" id="next" title="Next frame (Right)">&gt;</button>
+    <input type="range" id="slider" min="0" max="0" value="0">
+    <label class="t"><input type="checkbox" id="loop" checked> Loop</label>
+    <span class="lab">Speed</span>
+    <select id="speed"><option>0.1</option><option>0.25</option><option>0.5</option><option selected>1</option><option>2</option></select>
+  </div>
+  <div class="bar">
+    <span class="lab">Zoom</span><input type="range" id="zoom" min="1" max="8" value="4" style="width:90px"><span id="zoomv">4x</span>
+    <span class="lab">Ground</span>
+    <span class="seg" id="bgs">
+      <button class="b on" data-bg="dark">Dark</button><button class="b" data-bg="mid">Mid</button><button class="b" data-bg="light">Light</button><button class="b" data-bg="checker">Checker</button>
+    </span>
+    <label class="t"><input type="checkbox" id="light" checked> Light layer</label>
+    <label class="t"><input type="checkbox" id="showChar" checked> Caster</label>
+    <label class="t"><input type="checkbox" id="pivot"> Pivot</label>
+    <label class="t"><input type="checkbox" id="box"> Cell box</label>
+    <label class="t"><input type="checkbox" id="swing" checked> Swing arc</label>
+    <label class="t"><input type="checkbox" id="root" checked> Root motion</label>
+  </div>
+  <div id="stageWrap"><canvas id="stage" width="10" height="10"></canvas></div>
+  <div id="info"></div>
+  <div class="bar keys" id="keys"></div>
+</main>
+
+<script type="module">
+// ---------- runtime/beanfx.js, inlined (pages opened from disk cannot import modules); tests/test_preview.py checks
+// it matches the runtime ----------
+// RUNTIME START
+// beanfx.js: play an exported beanfx effect on a 2D canvas. No dependencies, one ES module.
+//
+//   import { loadFx, createFx } from "./beanfx.js";
+//   const blast = await loadFx("fx/blast.json");            // the <name>.json writes, sheets beside it
+//   const fx = createFx(blast, { x: 160, y: 140, flip: false, state: "strike", onHit: (h) => shakeCamera(h) });
+//   function tick(dt) {                                      // dt in seconds
+//     fx.update(dt);
+//     ctx.imageSmoothingEnabled = false;
+//     fx.draw(ctx);                                          // colour, then the light added on top
+//     if (fx.done) dropIt(fx);
+//   }
+// Hits (meta.beanfx.act.hits) freeze the effect, set fx.shake (px along the blow; translate the scene by it) and
+// fx.flash (0 to 1; tint the struck target white by it), and call onHit with the hit: react, push, dir, weight and
+// sound (the cue to play now).
+//
+// The JSON is the Aseprite array layout; everything beanfx adds sits in meta.beanfx (porting.md, route A).
+
+const TAU = Math.PI * 2;
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("beanfx: cannot load " + src));
+    img.src = src;
+  });
+}
+
+// Fetches <name>.json and its sheets (every page when the sheet splits). light: false skips the light sheet and
+// draws the baked <name>.png instead.
+async function loadFx(url, { light = true } = {}) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("beanfx: cannot load " + url);
+  const json = await res.json();
+  const base = new URL(".", new URL(url, location.href)).href;
+  const bfx = json.meta.beanfx;
+  const pages = bfx.pages || [{ image: bfx.sheet || json.meta.image, color: bfx.color, light: bfx.light }];
+  const split = light && pages.every((p) => p.color && p.light);
+  const load = (key) => Promise.all(pages.map((p) => loadImage(base + p[key])));
+  const images = split ? { color: await load("color"), light: await load("light") } : { sheet: await load("image") };
+  return fromJson(json, images);
+}
+
+// The asset from parsed JSON and loaded images; loadFx calls it, tests and custom loaders may too.
+function fromJson(json, images = {}) {
+  const bfx = json.meta.beanfx;
+  const tags = {};
+  for (const t of json.meta.frameTags || []) tags[t.name] = [t.from, t.to];
+  const frames = json.frames.map((e) => ({ ...e.frame, page: e.page || 0, ms: e.duration }));
+  return { meta: bfx, tags, frames, images };
+}
+
+// The heading row for a direction (radians, y down: 0 east, tau/4 south), as facing.py picks it.
+function rowOf(angle, rows) {
+  return ((Math.round((angle / TAU) * rows) % rows) + rows) % rows;
+}
+
+function createFx(asset, opts = {}) {
+  const m = asset.meta;
+  const fps = opts.fps || m.fps;
+  const n = m.frames;
+  // sheets written before facing.meta's row_rule carry a text `rows`; directions then gives the row count
+  const rows = Number.isInteger(m.rows) ? m.rows : Number.isInteger(m.directions) ? m.directions : 1;
+  const row = opts.row ?? (opts.heading != null && rows > 1 ? rowOf(opts.heading, rows) : 0);
+  // a heading row's tag spans the whole row; its states are tagged "<row>/<state>"
+  const rowTag = rows > 1 ? Object.keys(asset.tags).find((k) => !k.includes("/") && asset.tags[k][0] === row * n) : null;
+  let range = [0, n - 1];
+  if (opts.state) {
+    const r = asset.tags[rowTag ? rowTag + "/" + opts.state : opts.state];
+    if (!r) throw new Error("beanfx: no state " + opts.state);
+    range = [r[0] - row * n, r[1] - row * n];
+  }
+  const [a, b] = range;
+  const len = b - a + 1;
+  const loop = opts.loop ?? (opts.state ? false : m.loop);
+  const end = opts.end || (loop ? "loop" : opts.state ? "hold" : m.end || "remove");
+  // frame times: each frame's own duration (a sheet locked to a game character's uneven frame times) when they
+  // differ from 1 / fps, else even steps at fps; opts.fps forces even steps
+  const ms = asset.frames.slice(row * n + a, row * n + b + 1).map((f) => f.ms);
+  const even = opts.fps || ms.some((x) => !x) || ms.every((x) => Math.abs(x - 1000 / fps) < 1.01);
+  const starts = [0];
+  for (let i = 0; i < len; i++) starts.push(starts[i] + (even ? 1 / fps : ms[i] / 1000));
+  const total = starts[len];
+  const timeOf = (f) => Math.floor(f / len) * total + starts[f % len];  // start of played frame f
+  function frameAt(t) {
+    if (even) return Math.floor(t * fps + 1e-9);
+    const lap = Math.floor((t + 1e-9) / total), r = t - lap * total;
+    let i = 0;
+    while (i < len - 1 && starts[i + 1] <= r + 1e-9) i++;
+    return lap * len + i;
+  }
+  // hits as frames local to the range; only the ones inside it play
+  const hits = ((m.act && m.act.hits) || []).filter((h) => h.frame >= a && h.frame <= b).map((h) => ({ ...h, at: h.frame - a }));
+
+  const fx = {
+    x: opts.x || 0,
+    y: opts.y || 0,
+    flip: !!opts.flip,
+    scale: opts.scale || 1,
+    lightGain: opts.lightGain ?? m.light_gain ?? 1,
+    speed: opts.speed ?? 1,
+    t: 0,               // effect time in s, freezes excluded
+    frame: a,           // the sheet frame within the row (0 to frames - 1)
+    done: false,
+    frozen: 0,          // s of hit-stop left
+    shake: [0, 0],      // px to throw the camera this frame, along the blow
+    flash: 0,           // 0 to 1: how white to tint the target this frame (the hit's flash, then half for a frame)
+    _abs: 0,            // frames played since the start
+    _shakeAmp: 0,
+    _shakeLeft: 0,
+    _shakeTotal: 0,
+    _dir: [1, 0],
+    _flashLeft: 0,
+    _flashTotal: 0,
+  };
+
+  // a hit starts its freeze, its shake along the blow (mirrored when flipped) and the target flash
+  function strike(h) {
+    fx.frozen = h.freeze || 0;
+    fx._shakeAmp = h.shake || 0;
+    fx._shakeTotal = fx._shakeLeft = h.shake_time ?? (h.freeze || 0) + 0.1;
+    const a = ((h.dir || 0) * Math.PI) / 180;
+    fx._dir = [Math.cos(a) * (fx.flip ? -1 : 1), Math.sin(a)];
+    fx._flashTotal = fx._flashLeft = (h.flash ?? 1 / fps) + 1 / fps;
+    fx.flash = 1;
+  }
+
+  fx.update = function (dt) {
+    if (fx.done) return fx;
+    dt *= fx.speed;
+    if (fx._shakeLeft > 0) {
+      fx._shakeLeft = Math.max(0, fx._shakeLeft - dt);
+      const d = fx._shakeAmp * (fx._shakeLeft / fx._shakeTotal);
+      const odd = Math.floor(fx._shakeLeft * 60) % 2 ? 1 : -1;
+      fx.shake = [Math.round(d * fx._dir[0]) * odd, Math.round(d * fx._dir[1]) * odd];
+    } else fx.shake = [0, 0];
+    if (fx._flashLeft > 0) {
+      fx._flashLeft = Math.max(0, fx._flashLeft - dt);
+      fx.flash = fx._flashLeft <= 0 ? 0 : fx._flashLeft < 1 / fps ? 0.5 : 1;
+    } else fx.flash = 0;
+    if (fx.frozen > 0) {
+      const used = Math.min(fx.frozen, dt);
+      fx.frozen -= used;
+      dt -= used;
+      if (dt <= 0) return fx;
+    }
+    const prev = fx._abs;
+    let abs = frameAt(fx.t + dt);
+    // the first hit crossed this step stops time on its frame
+    for (let f = prev + 1; f <= abs; f++) {
+      const local = loop ? f % len : f;
+      const h = hits.find((x) => x.at === local);
+      if (h) {
+        abs = f;
+        fx.t = timeOf(f);
+        strike(h);
+        if (opts.onHit) opts.onHit(h, fx);
+        dt = 0;
+        break;
+      }
+    }
+    if (dt > 0) fx.t += dt;
+    fx._abs = abs;
+    if (loop) fx.frame = a + (abs % len);
+    else if (abs < len) fx.frame = a + abs;
+    else if (end === "hold") fx.frame = b;
+    else {
+      fx.frame = b;
+      fx.done = true;
+      if (opts.onEnd) opts.onEnd(fx);
+    }
+    return fx;
+  };
+  // the first hit can sit on the range's first frame
+  const h0 = hits.find((x) => x.at === 0);
+  if (h0) {
+    strike(h0);
+    if (opts.onHit) queueMicrotask(() => opts.onHit(h0, fx));
+  }
+
+  // Draws the current frame with its pivot on (x, y). Flipped, it mirrors about the pivot (mirror_pivot in the
+  // JSON is the same point on the flipped cell).
+  fx.draw = function (ctx) {
+    if (fx.done) return;
+    const r = asset.frames[row * n + fx.frame];
+    const [px, py] = m.pivot;
+    const s = fx.scale;
+    ctx.save();
+    ctx.translate(fx.x, fx.y);
+    ctx.scale(fx.flip ? -s : s, s);
+    const blit = (img) => ctx.drawImage(img, r.x, r.y, r.w, r.h, -px, -py, r.w, r.h);
+    const im = asset.images;
+    if (im.color) {
+      blit(im.color[r.page]);
+      if (fx.lightGain > 0) {
+        ctx.globalCompositeOperation = "lighter";
+        ctx.globalAlpha = Math.min(1, fx.lightGain);
+        blit(im.light[r.page]);
+      }
+    } else if (im.sheet) blit(im.sheet[r.page]);
+    ctx.restore();
+  };
+
+  return fx;
+}
+// RUNTIME END
+
+const $ = (id) => document.getElementById(id);  // TAU comes from the runtime above
+const ROW4 = ["east", "south", "west", "north"];
+const HEADING = { east: 0, south: TAU / 4, west: TAU / 2, north: (3 * TAU) / 4 };
+const BG = { dark: "#0d111a", mid: "#5b6170", light: "#d6dae3" };
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("beanfx-preview:" + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("beanfx-preview:" + k, JSON.stringify(v)); } catch {} },
+};
+
+const S = {
+  index: null, item: null, kind: null, asset: null, rig: null, rigs: {},
+  dirs: [], dir: 0, acts: [], act: 0, frame: 0, playing: true, acc: 0,
+  zoom: store.get("zoom", 4), bg: store.get("bg", "dark"), mode: "view",
+  loadToken: 0,
+};
+const off = document.createElement("canvas");
+const octx = off.getContext("2d");
+const stage = $("stage");
+const sctx = stage.getContext("2d");
+
+// ---------- the project on disk ----------
+// No server: the owner picks the project folder and the page reads drafts/*/out/ and casters/ from it. VFS maps a
+// project-relative path to its File.
+const VFS = new Map();
+let ROOT = null;          // the picked directory handle (Chrome, Edge), kept in IndexedDB for Reopen
+const SKIP = new Set([".git", ".venv", "node_modules", "pixelfx", "__pycache__", "site", ".wrangler"]);
+
+function keep(path) {
+  return /^drafts\/[^/]+\/out\/.+\.(json|png)$/.test(path) || /^casters\/[^/]+\/[^/]+\.(json|png)$/.test(path);
+}
+
+// a path as the picker gives it (starting at the picked folder) to a project path
+function projectPath(rel) {
+  const parts = rel.split("/");
+  const at = parts.findIndex((x) => x === "drafts" || x === "casters");
+  if (at >= 0) return parts.slice(at).join("/");
+  const out = parts.indexOf("out");
+  if (out >= 1) return "drafts/" + parts.slice(out - 1).join("/");  // a single draft folder picked
+  return null;
+}
+
+// only drafts/<name>/out/ and casters/ are read; the rest of the project (.venv, kits, sources) is skipped
+function descend(p) {
+  const parts = p.split("/");
+  if (parts[0] !== "drafts" && parts[0] !== "casters") return false;
+  return !(parts[0] === "drafts" && parts.length >= 3 && parts[2] !== "out");
+}
+
+async function walkHandle(dir, rel) {  // rel: the project path of dir, "" for the project root
+  for await (const [name, h] of dir.entries()) {
+    const p = rel ? rel + "/" + name : name;
+    if (h.kind === "directory") {
+      if (!SKIP.has(name) && descend(p)) await walkHandle(h, p);
+    } else if (keep(p)) VFS.set(p, await h.getFile());
+  }
+}
+
+async function walkEntry(entry, prefix) {  // drag and drop (webkitGetAsEntry)
+  if (entry.isFile) {
+    const p = projectPath(prefix + entry.name);
+    if (p && keep(p)) VFS.set(p, await new Promise((ok, no) => entry.file(ok, no)));
+    return;
+  }
+  if (SKIP.has(entry.name)) return;
+  const reader = entry.createReader();
+  for (;;) {
+    const batch = await new Promise((ok, no) => reader.readEntries(ok, no));
+    if (!batch.length) break;
+    for (const e of batch) await walkEntry(e, prefix + entry.name + "/");
+  }
+}
+
+const idb = {
+  open() { return new Promise((ok, no) => { const r = indexedDB.open("beanfx-preview", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("kv"); r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error); }); },
+  async get(k) { try { const db = await this.open(); return await new Promise((ok) => {
+    const q = db.transaction("kv").objectStore("kv").get(k); q.onsuccess = () => ok(q.result); q.onerror = () => ok(null); }); } catch { return null; } },
+  async set(k, v) { try { const db = await this.open(); db.transaction("kv", "readwrite").objectStore("kv").put(v, k); } catch {} },
+};
+
+async function readText(path) {
+  const f = VFS.get(path);
+  if (!f) throw new Error("missing " + path);
+  return f.text();
+}
+
+async function readImage(path) {
+  const f = VFS.get(path);
+  if (!f) throw new Error("missing " + path);
+  return createImageBitmap(f);
+}
+
+const dirOf = (path) => path.slice(0, path.lastIndexOf("/") + 1);
+
+// loadFx from the runtime, reading the picked folder in place of the network
+async function loadFxFile(path) {
+  const json = JSON.parse(await readText(path));
+  const base = dirOf(path), bfx = json.meta.beanfx;
+  const pages = bfx.pages || [{ image: bfx.sheet || json.meta.image, color: bfx.color, light: bfx.light }];
+  const split = pages.every((p) => p.color && p.light && VFS.has(base + p.color) && VFS.has(base + p.light));
+  const load = (key) => Promise.all(pages.map((p) => readImage(base + p[key])));
+  const images = split ? { color: await load("color"), light: await load("light") } : { sheet: await load("image") };
+  return fromJson(json, images);
+}
+
+// parts that ride on the caster (meta.beanfx.parts, anchor caster, each with its own json): an aura round the body
+async function loadParts(m, base) {
+  const out = [];
+  for (const [name, p] of Object.entries(m.parts || {})) {
+    if (p.anchor !== "caster" || !p.json || !VFS.has(base + p.json)) continue;
+    out.push({ name, layer: p.layer || "front", directions: p.directions || null, asset: await loadFxFile(base + p.json) });
+  }
+  return out;
+}
+
+// the caster's pivot to the effect's pivot for a direction (meta.beanfx.caster.offset, knobs/placement.md);
+// a side view keeps one pair and flips dx with the mirror
+function castOffset(c, dirName, flip) {
+  const o = c && c.offset;
+  if (!o) return [0, 0];
+  const v = Array.isArray(o) ? o : o[dirName] || [0, 0];
+  return [flip ? -v[0] : v[0], v[1]];
+}
+
+function partRow(p, dirName) {
+  const rows = rowsOf(p.asset.meta, p.asset);
+  if (rows <= 1 || !p.directions) return 0;
+  return Math.max(0, p.directions.indexOf(dirName)) % rows;
+}
+
+// the view stage for an effect cast away from the body: the cell, the character and its aura in every direction
+function fxStage() {
+  const m = S.asset.meta, c = m.caster, [W0, H0] = m.frameSize;
+  if (!c || !c.offset || !S.rig) return { W: W0, H: H0, O: [0, 0] };
+  let x0 = 0, y0 = 0, x1 = W0, y1 = H0;
+  const offs = Array.isArray(c.offset) ? [c.offset, [-c.offset[0], c.offset[1]]] : Object.values(c.offset);
+  const a = S.rig.spec.anims[c.anim], [px, py] = rigPivot(S.rig, c.anim);
+  const boxes = [[px, py, a.frame[0], a.frame[1]]];
+  for (const p of S.asset.parts || []) { const pm = p.asset.meta; boxes.push([pm.pivot[0], pm.pivot[1], pm.frameSize[0], pm.frameSize[1]]); }
+  for (const [dx, dy] of offs) {
+    const qx = m.pivot[0] - dx, qy = m.pivot[1] - dy;
+    for (const [bx, by, bw, bh] of boxes) {
+      x0 = Math.min(x0, qx - Math.max(bx, bw - bx)); x1 = Math.max(x1, qx + Math.max(bx, bw - bx));
+      y0 = Math.min(y0, qy - by); y1 = Math.max(y1, qy - by + bh);
+    }
+  }
+  return { W: Math.ceil(x1 - x0), H: Math.ceil(y1 - y0), O: [-Math.floor(x0), -Math.floor(y0)] };
+}
+
+function rowsOfMeta(b, nFrames) {
+  if (Number.isInteger(b.rows)) return b.rows;
+  if (Number.isInteger(b.directions)) return b.directions;
+  return Math.max(1, Math.floor(nFrames / Math.max(b.frames || 1, 1)));
+}
+
+async function buildIndex() {
+  const results = [], casters = [];
+  for (const path of [...VFS.keys()].sort()) {
+    if (/^drafts\/[^/]+\/out\/.+\.json$/.test(path)) {
+      let j;
+      try { j = JSON.parse(await readText(path)); } catch { continue; }
+      const b = j && j.meta && j.meta.beanfx;
+      if (!b || "page" in b) continue;  // one page of a split sheet; its parent entry plays it
+      results.push({ id: path, path, draft: path.split("/")[1], name: path.split("/").pop().replace(/\.json$/, ""),
+        view: b.view, fps: b.fps, frames: b.frames, rows: rowsOfMeta(b, (j.frames || []).length),
+        tags: (j.meta.frameTags || []).map((t) => t.name), states: b.states || {}, caster: b.caster ? b.caster.rig : null });
+    } else if (/^casters\/[^/]+\/rig\.json$/.test(path)) {
+      try {
+        const r = JSON.parse(await readText(path));
+        casters.push({ name: r.name || path.split("/")[1], path, view: r.view, anims: Object.keys(r.anims || {}) });
+      } catch {}
+    }
+  }
+  return { results, casters };
+}
+
+async function loadRig(name) {
+  if (S.rigs[name] !== undefined) return S.rigs[name];
+  const entry = S.index.casters.find((c) => c.name === name);
+  if (!entry) return (S.rigs[name] = null);
+  const spec = JSON.parse(await readText(entry.path));
+  const base = dirOf(entry.path);
+  const rig = { spec, base, images: {}, name };
+  rig.dirs = spec.directions || [spec.facing || "east"];  // a side rig may draw east and west as its own rows
+  const jobs = [];
+  for (const [an, a] of Object.entries(spec.anims)) {
+    for (const d of rig.dirs) {
+      const sheet = a.sheets ? a.sheets[d] : a.sheet;
+      jobs.push(readImage(base + sheet).then((im) => (rig.images[an + "|" + d] = im)).catch(() => {}));
+    }
+  }
+  await Promise.all(jobs);
+  return (S.rigs[name] = rig);
+}
+
+function rigPivot(rig, an) {
+  const a = rig.spec.anims[an];
+  return a.pivot || [a.frame[0] / 2, a.frame[1]];
+}
+
+function rigRoot(rig, an, dirName, k) {
+  const r = rig.spec.anims[an]?.root;
+  if (!r) return [0, 0];
+  const list = Array.isArray(r) ? r : r[dirName] || [];
+  return list[Math.max(0, Math.min(list.length - 1, k))] || [0, 0];
+}
+
+function rigTravel(rig, an, dirName) {
+  const a = rig.spec.anims[an];
+  return a?.root ? rigRoot(rig, an, dirName, a.frames - 1) : [0, 0];
+}
+
+function isAction(an) { return /attack|cast|skill|dash/i.test(an); }
+
+function rigSwing(rig, an, dirName) {
+  const s = rig.spec.anims[an]?.swing;
+  if (!s) return [];
+  const list = Array.isArray(s) ? s : s[dirName] || [];
+  // a stroke without its measured centre turns about the chest: the pivot raised by 0.6 of the character's height
+  const [px, py] = rigPivot(rig, an), up = 0.6 * (rig.spec.height || 40);
+  return list.map((x) => (x.centre ? x : { ...x, centre: [px, py - up] }));
+}
+
+// ---------- list ----------
+function renderList() {
+  const q = $("q").value.trim().toLowerCase();
+  const list = $("list");
+  list.innerHTML = "";
+  const add = (label, items) => {
+    if (!items.length) return;
+    const g = document.createElement("div"); g.className = "group"; g.textContent = label; list.append(g);
+    for (const it of items) {
+      const b = document.createElement("button");
+      b.className = "item" + (S.item && S.item.key === it.key ? " sel" : "");
+      b.innerHTML = `${it.label}<small>${it.note}</small>`;
+      b.onclick = () => select(it);
+      list.append(b);
+    }
+  };
+  const match = (s) => !q || s.toLowerCase().includes(q);
+  add("Casters", S.index.casters.filter((c) => match(c.name)).map((c) => ({
+    key: "caster:" + c.name, kind: "caster", label: c.name, note: c.view, data: c })));
+  const byDraft = {};
+  for (const r of S.index.results) if (match(r.draft + " " + r.name)) (byDraft[r.draft] ||= []).push(r);
+  for (const d of Object.keys(byDraft).sort()) {
+    add(d, byDraft[d].map((r) => ({
+      key: "fx:" + r.id, kind: "fx", label: r.name,
+      note: [r.view, r.rows > 1 ? r.rows + " dirs" : "", r.caster ? "on " + r.caster : ""].filter(Boolean).join(", "), data: r })));
+  }
+}
+
+// ---------- selection ----------
+async function select(it) {
+  const token = ++S.loadToken;
+  S.ready = false;
+  S.item = it; S.kind = it.kind; S.asset = null; S.rig = null; S.frame = 0; S.acc = 0; S.dir = 0; S.act = 0;
+  location.hash = encodeURIComponent(it.key);
+  renderList();
+  $("title").textContent = it.label;
+  $("sub").textContent = "loading";
+  try {
+    if (it.kind === "fx") {
+      const asset = await loadFxFile(it.data.path);
+      if (token !== S.loadToken) return;
+      S.asset = asset;
+      asset.parts = await loadParts(asset.meta, dirOf(it.data.path));
+      const rigName = asset.meta.caster?.rig;
+      S.rig = rigName ? await loadRig(rigName) : null;
+    } else {
+      S.rig = await loadRig(it.data.name);
+    }
+  } catch (e) {
+    $("sub").textContent = "failed: " + e.message;
+    return;
+  }
+  if (token !== S.loadToken) return;
+  buildPicks();
+  setupPlay();
+  sizeStage();
+  S.ready = true;
+}
+
+function rowsOf(m, asset) {
+  if (Number.isInteger(m.rows)) return m.rows;
+  if (Number.isInteger(m.directions)) return m.directions;
+  return Math.max(1, Math.round(asset.frames.length / m.frames));
+}
+
+function rowName(k, rows, tags, n) {
+  const t = Object.keys(tags).find((name) => !name.includes("/") && tags[name][0] === k * n && tags[name][1] === k * n + n - 1);
+  if (t) return t;
+  if (rows === 4) return ROW4[k];
+  return Math.round((360 * k) / rows) + "°";
+}
+
+function buildPicks() {
+  S.dirs = []; S.acts = [];
+  if (S.kind === "fx") {
+    const m = S.asset.meta, n = m.frames, rows = rowsOf(m, S.asset);
+    S.rows = rows;
+    if (rows > 1) {
+      for (let k = 0; k < rows; k++) S.dirs.push({ name: rowName(k, rows, S.asset.tags, n), row: k, flip: false });
+    } else {
+      S.dirs.push({ name: m.facing || "as drawn", row: 0, flip: false });
+      if (m.mirror) S.dirs.push({ name: "mirrored", row: 0, flip: true });
+    }
+    S.acts.push({ name: "all", a: 0, b: n - 1 });
+    const seen = new Set(["all"]);
+    const rowNames = new Set(S.dirs.map((d) => d.name));
+    for (const [name, r] of Object.entries(m.states || {})) { S.acts.push({ name, a: r[0], b: r[1] }); seen.add(name); }
+    for (const [name, r] of Object.entries(S.asset.tags)) {
+      const local = name.includes("/") ? name.split("/").slice(1).join("/") : name;
+      if (seen.has(local) || rowNames.has(name)) continue;
+      if (r[0] === 0 && r[1] === n - 1) continue;
+      if (rows > 1 && name.includes("/")) {
+        S.acts.push({ name: local, a: r[0] % n, b: r[1] % n }); seen.add(local);
+      } else if (rows === 1) { S.acts.push({ name: local, a: r[0], b: r[1] }); seen.add(local); }
+    }
+    const c = m.caster;
+    $("sub").textContent = `${m.view || ""}  ${n} frames x ${rows} rows  ${m.fps} fps  ${m.loop ? "loop" : "once"}` +
+      (c ? `  on ${c.rig} ` + (c.chain ? `chain of ${c.chain.length} (${c.chain.map((x) => x.anim.replace("attack", "a")).join(" ")})` : `${c.anim} from frame ${c.start}`) + (S.rig ? "" : " (caster sprites not found)") : "");
+    $("loop").checked = true;
+  } else {
+    const rig = S.rig, spec = rig.spec;
+    rig.dirs.forEach((d, k) => S.dirs.push({ name: d, row: k, flip: false }));
+    if (spec.view !== "top-down" && rig.dirs.length < 2) S.dirs.push({ name: "mirrored", row: 0, flip: true });
+    for (const [an, a] of Object.entries(spec.anims)) S.acts.push({ name: an, a: 0, b: a.frames - 1, anim: an });
+    $("sub").textContent = `${spec.view}  ${rig.dirs.length} dir  ${spec.fps} fps  pixel scale ${spec.pixel_scale ?? "?"}  height ${spec.height ?? "?"} px`;
+    $("loop").checked = true;
+  }
+  const mk = (box, arr, cur, fn) => {
+    box.innerHTML = "";
+    arr.forEach((x, i) => {
+      const b = document.createElement("button");
+      b.className = "b" + (i === cur ? " on" : "");
+      b.textContent = (i < 9 && box.id === "acts" ? i + 1 + " " : "") + x.name;
+      b.onclick = () => fn(i);
+      box.append(b);
+    });
+  };
+  mk($("dirs"), S.dirs, S.dir, (i) => { S.dir = i; buildPicks(); });
+  mk($("acts"), S.acts, S.act, (i) => { S.act = i; S.frame = 0; S.acc = 0; buildPicks(); if (S.kind === "caster") sizeStage(); });
+  const a = S.acts[S.act];
+  $("slider").max = a.b - a.a;
+  $("slider").value = S.frame;
+  renderKeys();
+}
+
+// ---------- geometry ----------
+// the stage for a caster alone: every animation fits, and root motion plays centred (start and end equally far out)
+function casterBounds(rig) {
+  let l = 0, t = 0, b = 0, ex = 0, ey = 0;
+  for (const an of Object.keys(rig.spec.anims)) {
+    const [w, h] = rig.spec.anims[an].frame, [px, py] = rigPivot(rig, an);
+    l = Math.max(l, px, w - px); t = Math.max(t, py); b = Math.max(b, h - py);
+    for (const d of rig.dirs) { const [dx, dy] = rigTravel(rig, an, d); ex = Math.max(ex, Math.abs(dx) / 2); ey = Math.max(ey, Math.abs(dy) / 2); }
+  }
+  return { W: 2 * (l + Math.ceil(ex)), H: t + b + 2 * Math.ceil(ey), P: [l + Math.ceil(ex), t + Math.ceil(ey)] };
+}
+
+function sizeStage() {
+  let W, H;
+  if (S.mode === "play") { W = PLAY.W; H = PLAY.H; }
+  else if (S.kind === "fx") { ({ W, H } = fxStage()); }
+  else if (S.kind === "caster") { ({ W, H } = casterBounds(S.rig)); }
+  else return;
+  off.width = W; off.height = H;
+  const wrap = $("stageWrap");
+  const fit = Math.max(1, Math.floor(Math.min((wrap.clientWidth - 34) / W, (wrap.clientHeight - 34) / H)));
+  S.z = Math.min(S.zoom, fit);  // the zoom asked for, cut down so the stage fits the window
+  stage.width = W * S.z; stage.height = H * S.z;
+}
+
+// ---------- drawing ----------
+function paintBg(ctx, W, H) {
+  if (S.bg === "checker") {
+    for (let y = 0; y < H; y += 8) for (let x = 0; x < W; x += 8) {
+      ctx.fillStyle = ((x + y) / 8) % 2 ? "#2b303c" : "#3a404e"; ctx.fillRect(x, y, 8, 8);
+    }
+  } else { ctx.fillStyle = BG[S.bg]; ctx.fillRect(0, 0, W, H); }
+}
+
+function drawFxFrame(ctx, asset, row, f, x, y, flip, lightOn) {
+  const m = asset.meta, r = asset.frames[row * m.frames + f];
+  if (!r) return;
+  const [px, py] = m.pivot;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(flip ? -1 : 1, 1);
+  const blit = (img) => ctx.drawImage(img, r.x, r.y, r.w, r.h, -px, -py, r.w, r.h);
+  const im = asset.images;
+  if (im.color) {
+    blit(im.color[r.page]);
+    if (lightOn) { ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = Math.min(1, m.light_gain ?? 1); blit(im.light[r.page]); }
+  } else blit(im.sheet[r.page]);
+  ctx.restore();
+}
+
+function drawChar(ctx, rig, an, dirName, k, x, y, flip) {
+  const a = rig.spec.anims[an];
+  const img = rig.images[an + "|" + dirName];
+  if (!a || !img) return;
+  const [w, h] = a.frame, [px, py] = rigPivot(rig, an);
+  k = Math.max(0, Math.min(a.frames - 1, k));
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(flip ? -1 : 1, 1);
+  ctx.drawImage(img, k * w, 0, w, h, -px, -py, w, h);
+  ctx.restore();
+}
+
+// screen-space overlays on the zoomed stage
+function overlay(P, flip, cell, swingInfo) {
+  const z = S.z, ctx = sctx;
+  ctx.save();
+  if ($("box").checked && cell) {
+    ctx.strokeStyle = "rgba(111,182,255,.7)"; ctx.setLineDash([4, 3]);
+    ctx.strokeRect(cell[0] * z + 0.5, cell[1] * z + 0.5, cell[2] * z - 1, cell[3] * z - 1);
+    ctx.setLineDash([]);
+  }
+  if ($("pivot").checked) {
+    ctx.strokeStyle = "#ff4fd8"; ctx.lineWidth = 1;
+    const X = P[0] * z, Y = P[1] * z;
+    ctx.beginPath(); ctx.moveTo(X - 8, Y + 0.5); ctx.lineTo(X + 8, Y + 0.5); ctx.moveTo(X + 0.5, Y - 8); ctx.lineTo(X + 0.5, Y + 8); ctx.stroke();
+  }
+  if ($("swing").checked && swingInfo) {
+    for (const s of swingInfo.strokes) {
+      const live = s.frames.includes(swingInfo.charFrame);
+      const cx = (P[0] + (s.centre[0] - swingInfo.pivot[0]) * (flip ? -1 : 1)) * z;
+      const cy = (P[1] + (s.centre[1] - swingInfo.pivot[1])) * z;
+      const R = 22 * z;
+      let a0 = (s.from * Math.PI) / 180, a1 = ((s.from + s.sweep) * Math.PI) / 180;
+      if (flip) { a0 = Math.PI - a0; a1 = Math.PI - a1; }
+      ctx.strokeStyle = live ? "rgba(255,179,92,.95)" : "rgba(255,179,92,.3)";
+      ctx.lineWidth = live ? 2 : 1;
+      ctx.beginPath(); ctx.arc(cx, cy, R, a0, a1, a1 < a0); ctx.stroke();
+      const ex = cx + R * Math.cos(a1), ey = cy + R * Math.sin(a1), dir = a1 < a0 ? -1 : 1;
+      const tx = -Math.sin(a1) * dir, ty = Math.cos(a1) * dir;
+      ctx.beginPath(); ctx.moveTo(ex, ey);
+      ctx.lineTo(ex - tx * 9 + ty * 5, ey - ty * 9 - tx * 5); ctx.moveTo(ex, ey);
+      ctx.lineTo(ex - tx * 9 - ty * 5, ey - ty * 9 + tx * 5); ctx.stroke();
+      if (live) { ctx.fillStyle = "rgba(255,179,92,.95)"; ctx.font = "11px ui-monospace, Menlo, monospace";
+        ctx.fillText(`${s.turn} ${s.from} to ${s.to}`, cx - R, cy - R - 6); }
+    }
+  }
+  ctx.restore();
+}
+
+function blitStage() {
+  sctx.imageSmoothingEnabled = false;
+  sctx.clearRect(0, 0, stage.width, stage.height);
+  sctx.drawImage(off, 0, 0, stage.width, stage.height);
+}
+
+function renderView() {
+  const W = off.width, H = off.height;
+  octx.setTransform(1, 0, 0, 1, 0, 0);
+  octx.globalCompositeOperation = "source-over"; octx.globalAlpha = 1;
+  paintBg(octx, W, H);
+  const d = S.dirs[S.dir], a = S.acts[S.act];
+  const f = a.a + S.frame;
+  const info = [];
+  let swingInfo = null, P, cell = null;
+  if (S.kind === "fx") {
+    const m = S.asset.meta, c = m.caster, st = fxStage(), [W0, H0] = m.frameSize;
+    // mirrored, the whole cell turns over inside the stage; an effect cast away from the body sits st.O in
+    P = d.flip ? [st.O[0] + W0 - m.pivot[0], st.O[1] + m.pivot[1]] : [st.O[0] + m.pivot[0], st.O[1] + m.pivot[1]];
+    cell = [st.O[0], st.O[1], W0, H0];
+    let ck = null, dirName = null;
+    const ca = c ? casterAt(c, f) : null;
+    if (c && S.rig && $("showChar").checked) {
+      ck = ca.k;
+      dirName = S.rig.spec.view === "top-down" ? (c.directions || S.rig.dirs)[d.row] : sideDir(S.rig, d);
+    }
+    const front = !c || c.layer !== "behind";
+    // on a moving animation (root motion) the effect stays where the move began and the character travels
+    const off = castOffset(c, dirName || (c && c.directions ? c.directions[d.row] : null), d.flip);
+    let Q = [P[0] - off[0], P[1] - off[1]];
+    if (off[0] || off[1]) info.push(`cast lands ${off[0]},${off[1]} px from the caster (range ${c.range ?? "?"})`);
+    if (ck != null && $("root").checked) {
+      const [dx, dy] = rigRoot(S.rig, ca.anim, dirName, ck);
+      Q = [Q[0] + (d.flip ? -dx : dx), Q[1] + dy];
+    }
+    const parts = (layer) => { for (const p of S.asset.parts || []) if (p.layer === layer && f < p.asset.meta.frames)
+      drawFxFrame(octx, p.asset, partRow(p, dirName), f, Q[0], Q[1], d.flip, $("light").checked); };
+    parts("behind");
+    if (ck != null && front) drawChar(octx, S.rig, ca.anim, dirName, ck, Q[0], Q[1], d.flip);
+    drawFxFrame(octx, S.asset, d.row, f, P[0], P[1], d.flip, $("light").checked);
+    if (ck != null && !front) drawChar(octx, S.rig, ca.anim, dirName, ck, Q[0], Q[1], d.flip);
+    parts("front");
+    info.push(`<b>frame ${f}</b> / ${m.frames - 1}   t ${(f / m.fps).toFixed(3)} s   row ${d.row} ${d.name}${d.flip ? " (mirrored)" : ""}   action ${a.name} [${a.a}, ${a.b}]`);
+    if (c) {
+      const k = ca.k;
+      const contact = ca.contact.includes(k);
+      info.push(`caster ${c.rig} ${ca.anim} frame ${k}${contact ? '  <span class="hit">contact</span>' : ""}   layer ${c.layer}`);
+      if (S.rig) swingInfo = { strokes: rigSwing(S.rig, ca.anim, dirName || S.rig.dirs[0]), charFrame: k, pivot: rigPivot(S.rig, ca.anim) };
+    }
+    const hits = (m.act?.hits || []).filter((h) => h.frame === f);
+    for (const h of hits) info.push(`<span class="hit">hit</span> freeze ${h.freeze ?? 0}s shake ${h.shake ?? 0} react ${h.react ?? ""}`);
+  } else {
+    const rig = S.rig, an = a.anim, b = casterBounds(rig);
+    P = b.P;
+    const dirName = d.flip ? rig.dirs[0] : d.name;
+    if ($("root").checked && rig.spec.anims[an].root) {
+      const [dx, dy] = rigRoot(rig, an, dirName, S.frame), [tx, ty] = rigTravel(rig, an, dirName), sg = d.flip ? -1 : 1;
+      P = [P[0] + sg * (dx - tx / 2), P[1] + dy - ty / 2];
+      info.push(`root ${dx},${dy} of ${tx},${ty} px`);
+    }
+    drawChar(octx, rig, an, dirName, S.frame, P[0], P[1], d.flip);
+    const [w, h] = rig.spec.anims[an].frame, [px, py] = rigPivot(rig, an);
+    cell = d.flip ? [P[0] - (w - px), P[1] - py, w, h] : [P[0] - px, P[1] - py, w, h];
+    const contact = (rig.spec.anims[an].contact || []).includes(S.frame);
+    info.push(`<b>frame ${S.frame}</b> / ${a.b}   t ${(S.frame / animFps(rig, an)).toFixed(3)} s   ${an} ${d.name}${contact ? '  <span class="hit">contact</span>' : ""}   pivot ${px},${py}`);
+    const strokes = rigSwing(rig, an, dirName);
+    swingInfo = { strokes, charFrame: S.frame, pivot: [px, py] };
+    for (const s of strokes) info.push(`swing frames ${s.frames.join(",")}: ${s.turn}, from ${s.from} to ${s.to} (sweep ${s.sweep})`);
+  }
+  blitStage();
+  overlay(P, d.flip, cell, swingInfo);
+  $("info").innerHTML = info.join("\n");
+  $("slider").value = S.frame;
+}
+
+// ---------- playback ----------
+// the caster animation and its frame under effect frame f: one animation from `start`, or a chain of animations
+// (meta.beanfx.caster.chain, each {anim, char_from, char_to, effect_from, effect_to}) played in order
+function casterAt(c, f) {
+  const per = c.frames_per_char_frame || 1;
+  if (c.chain && c.chain.length) {
+    const seg = c.chain.find((s) => f >= s.effect_from && f <= s.effect_to) || c.chain[c.chain.length - 1];
+    const k = Math.min(seg.char_from + Math.floor((f - seg.effect_from) / per), seg.char_to);
+    return { anim: seg.anim, k, contact: [seg.contact] };
+  }
+  return { anim: c.anim, k: Math.min(c.start + Math.floor(f / per), c.char_frames - 1), contact: c.contact || [] };
+}
+
+// a rig row may run at its own fps (rig.json anims.<name>.fps), else the rig's
+// a side effect's row k on a side rig with its own east and west rows: the rig row of that name
+function sideDir(rig, d) { return rig.dirs.length > 1 && !d.flip ? (rig.dirs[d.row] || rig.dirs[0]) : rig.dirs[0]; }
+function animFps(rig, an) { return rig.spec.anims[an]?.fps || rig.spec.fps; }
+// the frame shown t s into an animation: by the game's own frame times (rig.json `ms`) when it has them, else by
+// its fps; past the end it returns the frame count (loop wraps), so the effect, held by the same ms, stays in step
+function rigFrameAt(rig, an, t, loop = false) {
+  const a = rig.spec.anims[an];
+  if (!a?.ms) return Math.floor(t * animFps(rig, an));
+  const total = a.ms.reduce((x, y) => x + y, 0) / 1000;
+  if (loop) t %= total;
+  let acc = 0;
+  for (let i = 0; i < a.ms.length; i++) { acc += a.ms[i] / 1000; if (t < acc) return i; }
+  return a.frames;
+}
+function rigTimeOf(rig, an, k) {
+  const a = rig.spec.anims[an];
+  return a?.ms ? a.ms.slice(0, k).reduce((x, y) => x + y, 0) / 1000 : k / animFps(rig, an);
+}
+function fps() { return S.kind === "fx" ? S.asset.meta.fps : animFps(S.rig, S.acts[S.act].anim); }
+
+function step(dir) {
+  const a = S.acts[S.act], len = a.b - a.a + 1;
+  S.frame = (S.frame + dir + len) % len;
+}
+
+function tickView(dt) {
+  if (!S.playing) return;
+  S.acc += dt * Number($("speed").value);
+  const spf = 1 / fps();
+  const a = S.acts[S.act], len = a.b - a.a + 1;
+  while (S.acc >= spf) {
+    S.acc -= spf;
+    if (S.frame + 1 >= len) {
+      if ($("loop").checked) S.frame = 0;
+      else { S.playing = false; $("play").textContent = "Play"; S.acc = 0; break; }
+    } else S.frame++;
+  }
+}
+
+// ---------- control mode ----------
+const PLAY = { W: 320, H: 180 };
+const held = new Set();
+const P1 = { x: 160, y: 120, dir: "east", flip: false, anim: "idle", t: 0, effects: [], spawned: false };
+
+function playRig() { return S.rigs[$("rigSel").value] || null; }
+
+function setupPlay() {
+  const sel = $("rigSel");
+  sel.innerHTML = "";
+  for (const c of S.index.casters) { const o = document.createElement("option"); o.value = o.textContent = c.name; sel.append(o); }
+  const bound = S.kind === "fx" ? S.asset.meta.caster?.rig : S.kind === "caster" ? S.item.data.name : null;
+  if (bound) sel.value = bound;
+  P1.x = PLAY.W / 2; P1.y = PLAY.H * 0.66; P1.effects = []; P1.anim = "idle"; P1.t = 0;
+  if (sel.value) loadRig(sel.value);
+}
+
+function attackAnims(rig) { return Object.keys(rig.spec.anims).filter((a) => /attack|cast|skill/i.test(a)); }
+
+function startDash() {
+  const rig = playRig();
+  if (!rig || !rig.spec.anims.dash || isAction(P1.anim)) return;
+  P1.anim = "dash"; P1.t = 0; P1.spawned = false; P1.ox = P1.x; P1.oy = P1.y;
+}
+
+function startAttack(n) {
+  const rig = playRig();
+  if (!rig) { spawnFx(P1.x, P1.y); return; }
+  const bound = S.kind === "fx" ? S.asset.meta.caster : null;
+  const list = attackAnims(rig);
+  const own = n === 0 && bound && bound.rig === rig.name;
+  // a combo (meta.beanfx.caster.combo): one press, one step; a press while a step plays queues the next one
+  const steps = own ? bound.combo?.steps : null;
+  if (steps?.length) {
+    if (P1.combo && isAction(P1.anim)) { P1.combo.queued = true; return; }
+    startStep(rig, steps, 0);
+    return;
+  }
+  P1.combo = null;
+  const an = own ? bound.anim : list[n] || list[0];
+  if (!an || P1.anim === an) return;
+  P1.anim = an; P1.t = 0; P1.spawned = false;
+}
+
+// step i of a combo: its animation from char_from and its own effect instance (its state) at the same moment
+function startStep(rig, steps, i) {
+  const st = steps[i];
+  P1.combo = { steps, i, queued: false };
+  P1.anim = st.anim; P1.t = rigTimeOf(rig, st.anim, st.char_from || 0); P1.spawned = true;
+  spawnFx(P1.x, P1.y, st.state);
+}
+
+function fxRowFor(dirName) {
+  const m = S.asset.meta, rows = rowsOf(m, S.asset);
+  if (rows <= 1) return 0;
+  if (m.caster?.directions) { const k = m.caster.directions.indexOf(dirName); if (k >= 0) return k; }
+  return rowOf(HEADING[dirName] ?? 0, rows);
+}
+
+function spawnFx(x, y, state) {
+  if (S.kind !== "fx") return;
+  const side = S.asset.meta.view !== "top-down";
+  const row = fxRowFor(P1.dir);
+  const flip = side && P1.flip, off = castOffset(S.asset.meta.caster, P1.dir, flip);
+  const fx = createFx(S.asset, { x: x + off[0], y: y + off[1], row, flip, speed: Number($("speed").value),
+    ...(state ? { state, end: "remove" } : {}) });
+  fx.row = row;
+  P1.effects.push(fx);
+  for (const p of S.asset.parts || []) {  // an aura rides on the caster while it plays
+    const a = createFx(p.asset, { x, y, row: partRow(p, P1.dir), flip, speed: Number($("speed").value) });
+    Object.assign(a, { row: partRow(p, P1.dir), asset: p.asset, layer: p.layer, follow: true });
+    P1.effects.push(a);
+  }
+}
+
+function tickPlay(dt) {
+  const rig = playRig();
+  const speed = Number($("speed").value);
+  dt *= speed;
+  const atk = rig && isAction(P1.anim);
+  if (rig && !atk) {
+    let dx = 0, dy = 0;
+    if (held.has("ArrowLeft") || held.has("KeyA")) dx -= 1;
+    if (held.has("ArrowRight") || held.has("KeyD")) dx += 1;
+    const top = rig.spec.view === "top-down";
+    if (top) {
+      if (held.has("ArrowUp") || held.has("KeyW")) dy -= 1;
+      if (held.has("ArrowDown") || held.has("KeyS")) dy += 1;
+    }
+    if (dx || dy) {
+      const v = 70 * dt, l = Math.hypot(dx, dy);
+      P1.x = Math.max(16, Math.min(PLAY.W - 16, P1.x + (dx / l) * v));
+      P1.y = Math.max(40, Math.min(PLAY.H - 4, P1.y + (dy / l) * v));
+      if (top) P1.dir = Math.abs(dx) >= Math.abs(dy) && dx ? (dx > 0 ? "east" : "west") : dy > 0 ? "south" : "north";
+      else { P1.flip = dx < 0; P1.dir = dx < 0 ? "west" : "east"; }
+      if (P1.anim !== "run" && rig.spec.anims.run) { P1.anim = "run"; P1.t = 0; }
+    } else if (P1.anim !== "idle" && rig.spec.anims.idle) { P1.anim = "idle"; P1.t = 0; }
+  }
+  if (rig) {
+    // hit-stop freezes the attacker with the effect
+    if (!(isAction(P1.anim) && P1.effects.some((fx) => fx.frozen > 0))) P1.t += dt;
+    const a = rig.spec.anims[P1.anim];
+    const k = rigFrameAt(rig, P1.anim, P1.t, !isAction(P1.anim));
+    if (atk) {
+      const bound = S.kind === "fx" ? S.asset.meta.caster : null;
+      const own = bound && bound.rig === rig.name && bound.anim === P1.anim;
+      const start = own ? (bound.start ?? 0) : (a.contact && a.contact[0]) ?? 0;
+      if (a.root) {  // the body travels by root motion from where the move began
+        const dirName = rig.spec.view === "top-down" ? P1.dir : rig.dirs[0];
+        const [dx, dy] = rigRoot(rig, P1.anim, dirName, Math.min(k, a.frames - 1));
+        P1.x = Math.max(16, Math.min(PLAY.W - 16, P1.ox + (P1.flip && rig.spec.view !== "top-down" ? -dx : dx)));
+        P1.y = Math.max(40, Math.min(PLAY.H - 4, P1.oy + dy));
+      }
+      // an effect drawn on this animation fires on its start frame; on a moving one it stays where the move began
+      if (!P1.spawned && k >= start && (own || !a.root)) {
+        P1.spawned = true;
+        if (a.root) spawnFx(P1.ox, P1.oy); else spawnFx(P1.x, P1.y);
+      }
+      const cb = P1.combo, st = cb ? cb.steps[cb.i] : null;
+      if (st && cb.queued && k > st.char_to && cb.i + 1 < cb.steps.length) {
+        startStep(rig, cb.steps, cb.i + 1);  // the swing is over: cancel the recovery into the next step
+      } else if (k >= a.frames) {
+        P1.anim = rig.spec.anims.idle ? "idle" : P1.anim; P1.t = 0; P1.combo = null;  // no press: back to step 1
+      }
+    }
+  }
+  for (const fx of P1.effects) { if (fx.follow) { fx.x = P1.x; fx.y = P1.y; } fx.update(dt / speed); }
+  P1.effects = P1.effects.filter((fx) => !fx.done);
+}
+
+function renderPlay() {
+  const W = off.width, H = off.height, rig = playRig();
+  octx.setTransform(1, 0, 0, 1, 0, 0);
+  octx.globalCompositeOperation = "source-over"; octx.globalAlpha = 1;
+  paintBg(octx, W, H);
+  let sx = 0, sy = 0;
+  for (const fx of P1.effects) { sx += fx.shake[0]; sy += fx.shake[1]; }
+  octx.save();
+  octx.translate(sx, sy);
+  octx.fillStyle = "rgba(255,255,255,.06)";
+  if (rig && rig.spec.view !== "top-down") octx.fillRect(0, Math.round(P1.y), W, 1);
+  const behind = S.kind === "fx" && S.asset.meta.caster?.layer === "behind";
+  const drawFx = (back) => { for (const fx of P1.effects) {
+    if ((fx.layer ? fx.layer === "behind" : behind) !== back) continue;
+    drawFxFrame(octx, fx.asset || S.asset, fx.row, fx.frame, fx.x, fx.y, fx.flip, $("light").checked); } };
+  drawFx(true);
+  if (rig && $("showChar").checked) {
+    const a = rig.spec.anims[P1.anim];
+    const loop = !isAction(P1.anim);
+    let k = rigFrameAt(rig, P1.anim, P1.t, loop);
+    k = loop ? k % a.frames : Math.min(k, a.frames - 1);
+    const own = rig.spec.view === "top-down" || rig.dirs.includes(P1.dir);  // its own row, else the mirror
+    const dirName = own ? P1.dir : rig.dirs[0];
+    drawChar(octx, rig, P1.anim, dirName, k, Math.round(P1.x), Math.round(P1.y), !own && P1.flip);
+  }
+  drawFx(false);
+  octx.restore();
+  blitStage();
+  if ($("pivot").checked) overlay([P1.x, P1.y], false, null, null);
+  const fxName = S.kind === "fx" ? S.item.label : "none";
+  $("info").innerHTML = rig
+    ? `<b>${rig.name}</b> ${P1.anim} facing ${P1.dir}   effect ${fxName}   live effects ${P1.effects.length}` +
+      (P1.combo ? `   combo step ${P1.combo.i + 1}/${P1.combo.steps.length}${P1.combo.queued ? " (next queued)" : ""}` : "")
+    : `<b>no caster</b>   click the stage or press J to fire ${fxName}`;
+}
+
+// ---------- keys and controls ----------
+function renderKeys() {
+  $("keys").innerHTML = S.mode === "view"
+    ? `<span><kbd>Space</kbd> play or pause</span> <span><kbd>Left</kbd> <kbd>Right</kbd> step</span> <span><kbd>Up</kbd> <kbd>Down</kbd> direction</span> <span><kbd>1</kbd> to <kbd>9</kbd> action</span> <span><kbd>L</kbd> light</span> <span><kbd>P</kbd> pivot</span> <span><kbd>+</kbd> <kbd>-</kbd> zoom</span>`
+    : `<span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrows move</span> <span><kbd>J</kbd> attack (the effect's own animation; a combo goes one step per press)</span> <span><kbd>K</kbd> second attack</span> <span><kbd>L</kbd> or <kbd>Shift</kbd> dash</span> <span>click the stage to fire the effect there</span> <span><kbd>Esc</kbd> back to View</span>`;
+}
+
+function setMode(mode) {
+  S.mode = mode;
+  for (const b of $("modes").children) b.classList.toggle("on", b.dataset.mode === mode);
+  $("viewBar").style.display = mode === "view" ? "" : "none";
+  $("riglab").hidden = $("rigSel").hidden = mode !== "play";
+  $("dirs").parentElement.querySelectorAll("#dirs, #acts, .lab:not(#riglab)").forEach((e) => (e.style.display = mode === "view" ? "" : "none"));
+  sizeStage();
+  renderKeys();
+}
+
+for (const b of $("modes").children) b.onclick = () => S.item && setMode(b.dataset.mode);
+for (const b of $("bgs").children) b.onclick = () => {
+  S.bg = b.dataset.bg; store.set("bg", S.bg);
+  for (const x of $("bgs").children) x.classList.toggle("on", x === b);
+};
+$("rigSel").onchange = () => { loadRig($("rigSel").value); P1.anim = "idle"; P1.t = 0; };
+$("play").onclick = () => { S.playing = !S.playing; $("play").textContent = S.playing ? "Pause" : "Play";
+  if (S.playing && !$("loop").checked) { const a = S.acts[S.act]; if (S.frame >= a.b - a.a) S.frame = 0; } };
+$("prev").onclick = () => { S.playing = false; $("play").textContent = "Play"; step(-1); };
+$("next").onclick = () => { S.playing = false; $("play").textContent = "Play"; step(1); };
+$("slider").oninput = (e) => { S.playing = false; $("play").textContent = "Play"; S.frame = Number(e.target.value); };
+$("zoom").value = S.zoom; $("zoomv").textContent = S.zoom + "x";
+$("zoom").oninput = (e) => { S.zoom = Number(e.target.value); store.set("zoom", S.zoom); $("zoomv").textContent = S.zoom + "x"; sizeStage(); };
+$("q").oninput = renderList;
+for (const x of $("bgs").children) x.classList.toggle("on", x.dataset.bg === S.bg);
+stage.addEventListener("click", (e) => {
+  if (S.mode !== "play") return;
+  const r = stage.getBoundingClientRect();
+  spawnFx(Math.round(((e.clientX - r.left) / r.width) * PLAY.W), Math.round(((e.clientY - r.top) / r.height) * PLAY.H));
+});
+
+window.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "INPUT" && e.target.type !== "checkbox" && e.target.type !== "range") return;
+  if (!S.ready) return;
+  const k = e.code;
+  if (S.mode === "play") {
+    if (k === "Escape") return setMode("view");
+    if (k === "KeyJ" || k === "Space") { startAttack(0); e.preventDefault(); return; }
+    if (k === "KeyK") { startAttack(1); e.preventDefault(); return; }
+    if (k === "KeyL" || k === "ShiftLeft" || k === "ShiftRight") { startDash(); e.preventDefault(); return; }
+    held.add(k);
+    if (k.startsWith("Arrow")) e.preventDefault();
+    return;
+  }
+  if (k === "Space") { $("play").click(); e.preventDefault(); }
+  else if (k === "ArrowLeft") { $("prev").click(); e.preventDefault(); }
+  else if (k === "ArrowRight") { $("next").click(); e.preventDefault(); }
+  else if (k === "ArrowUp" || k === "ArrowDown") {
+    S.dir = (S.dir + (k === "ArrowUp" ? -1 : 1) + S.dirs.length) % S.dirs.length; buildPicks(); e.preventDefault();
+  } else if (/^Digit[1-9]$/.test(k)) {
+    const i = Number(k.slice(5)) - 1;
+    if (i < S.acts.length) { S.act = i; S.frame = 0; S.acc = 0; buildPicks(); if (S.kind === "caster") sizeStage(); }
+  } else if (k === "KeyL") $("light").click();
+  else if (k === "KeyP") $("pivot").click();
+  else if (e.key === "+" || e.key === "=") { $("zoom").value = Math.min(8, S.zoom + 1); $("zoom").oninput({ target: $("zoom") }); }
+  else if (e.key === "-") { $("zoom").value = Math.max(1, S.zoom - 1); $("zoom").oninput({ target: $("zoom") }); }
+});
+window.addEventListener("keyup", (e) => held.delete(e.code));
+window.addEventListener("resize", () => S.ready && sizeStage());
+window.addEventListener("blur", () => held.clear());
+
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.1, (now - last) / 1000);
+  last = now;
+  try {
+    if (S.ready && S.mode === "view") { tickView(dt); renderView(); }
+    else if (S.ready && S.mode === "play") { tickPlay(dt); renderPlay(); }
+  } catch (e) {
+    $("info").textContent = "error: " + e.message;
+    console.error(e);
+  }
+  requestAnimationFrame(frame);
+}
+
+// ---------- opening the project ----------
+async function loaded(label) {
+  S.index = await buildIndex();
+  S.rigs = {};
+  $("status").textContent = `${label}: ${S.index.results.length} results, ${S.index.casters.length} casters`;
+  $("rescan").hidden = !ROOT;
+  renderList();
+  if (!S.index.results.length && !S.index.casters.length) {
+    $("list").innerHTML = '<div class="empty">No results under drafts/*/out/ or casters/ in this folder.</div>';
+    return;
+  }
+  const want = decodeURIComponent(location.hash.slice(1)) || (S.item && S.item.key) || window.BEANFX_EMBED?.select;
+  const all = [...S.index.casters.map((c) => ({ key: "caster:" + c.name, kind: "caster", label: c.name, note: c.view, data: c })),
+    ...S.index.results.map((r) => ({ key: "fx:" + r.id, kind: "fx", label: r.name, note: "", data: r }))];
+  const first = all.find((x) => x.key === want) || all.find((x) => x.kind === "fx" && x.data.caster) || all[0];
+  if (first) select(first);
+}
+
+async function openHandle(h) {
+  ROOT = h;
+  VFS.clear();
+  $("status").textContent = "reading " + h.name;
+  await walkHandle(h, /^(drafts|casters)$/.test(h.name) ? h.name : "");
+  await loaded(h.name);
+}
+
+$("openDir").onclick = async () => {
+  if (window.showDirectoryPicker) {
+    try {
+      const h = await window.showDirectoryPicker({ id: "beanfx-project", mode: "read" });
+      await idb.set("root", h);
+      await openHandle(h);
+    } catch (e) { if (e.name !== "AbortError") $("status").textContent = "cannot open: " + e.message; }
+  } else $("dirInput").click();
+};
+$("dirInput").onchange = async (e) => {  // browsers without showDirectoryPicker; a second pick adds to the first
+  for (const f of e.target.files) { const p = projectPath(f.webkitRelativePath); if (p && keep(p)) VFS.set(p, f); }
+  await loaded("picked folder");
+};
+$("rescan").onclick = () => ROOT && openHandle(ROOT);
+document.addEventListener("dragover", (e) => e.preventDefault());
+document.addEventListener("drop", async (e) => {
+  e.preventDefault();
+  const entries = [...e.dataTransfer.items].map((i) => i.webkitGetAsEntry && i.webkitGetAsEntry()).filter(Boolean);
+  if (!entries.length) return;
+  ROOT = null; VFS.clear();
+  $("status").textContent = "reading dropped folder";
+  for (const en of entries) await walkEntry(en, "");
+  await loaded("dropped folder");
+});
+
+renderKeys();
+$("list").innerHTML = '<div class="empty">Open the project folder (it holds drafts/ and casters/), or drop it here.</div>';
+// a page written by export.page() carries one result and its caster inline: open it at once, no folder to pick
+const EMBED = window.BEANFX_EMBED;
+if (EMBED) {
+  $("status").textContent = "reading " + EMBED.label;
+  for (const [p, url] of Object.entries(EMBED.files)) VFS.set(p, await (await fetch(url)).blob());
+  await loaded(EMBED.label);
+}
+const saved = EMBED ? null : await idb.get("root");
+if (saved) {
+  $("reopen").hidden = false;
+  $("reopen").textContent = "Reopen " + saved.name;
+  $("reopen").onclick = async () => {
+    if ((await saved.requestPermission({ mode: "read" })) === "granted") { $("reopen").hidden = true; await openHandle(saved); }
+  };
+  if ((await saved.queryPermission?.({ mode: "read" })) === "granted") { $("reopen").hidden = true; await openHandle(saved); }
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -15,7 +15,7 @@ Paths: the skill is self-contained in the project you run in (its git root, else
 skill's folder is `${CLAUDE_SKILL_DIR}` and holds `setup.sh`, `gate.py`, `knobs/`, `research.md`, `vfx_notes.md`, `porting.md`, `runtime/beanfx.js`, `tools/layers.mjs` and the source of the drawing
 kit. `setup.sh --draft <name>` copies the kit into the draft's own `drafts/<name>/kit/` (`fxkit.py`, `fxlib.py`, `light.py`, `pfx.py`, `caster.py`
 the mockup caster, `target.py` the preview target dummy, `ref.py` an object traced from a reference image, `facing.py` the direction fields for the JSON, `derive.py` points taken from a finished
-drawing, `export.py` the sheet, its Aseprite-style JSON and the checks). The copy is made once and never overwritten, so a plugin update leaves each existing draft on the kit
+drawing, `rig.py` the owner's game character as the caster, `export.py` the sheet, its Aseprite-style JSON and the checks). Each `--draft` run also writes `kit/skill.txt`, the skill path `ex.page` takes the preview template from, so pages always use the current `tools/preview.html`. The copy is made once and never overwritten, so a plugin update leaves each existing draft on the kit
 it was drawn with. A kit fix goes into the skill copy first, then into the current draft's `kit/` by hand; other
 drafts get it only when the owner names them. Drafts are `drafts/<name>/` in the project, Python is
 `.venv/bin/python` there. Older drafts without their own `kit/` import the project's root `kit/`; leave it as it is.
@@ -43,7 +43,8 @@ no house style applies unless the owner gives one.
 
 Each knob lives in its own file in `knobs/` (this skill's folder): what it is, when the prompt fixes it, the
 question to ask with its options, and the default. In order: `role`, `view` (and directions), `size`, `timing`,
-`loop`, `shape`, `style`, `palette`, `glow`, `clarity`, `density`, `states` (multi-state effects), `caster` (mockup caster).
+`loop`, `shape`, `style`, `palette`, `glow`, `clarity`, `density`, `states` (multi-state effects), `caster` (mockup caster), `combo` (how a combo's hits are triggered), `placement` (where a cast lands
+against the caster), `aura` (what shows round the caster while it casts).
 
 **Gate: which knobs to ask.** Run it on the owner's prompt, with one line on what a reference image shows when
 there is one:
@@ -236,6 +237,97 @@ gg = cs.draw(fr.over, (H, W), (foot[0] - 4, foot[1] - 6), sc * 1.27, pose, f * 0
 cs.ghost_light(fr.over, L, gg, k, f, point)
 ```
 
+**Game character caster** (the brief picks "Game character"): `kit/rig.py` reads the owner's sprite sheets from
+`casters/<name>/rig.json` in the project (frame size, fps, pivot at the feet, animations with frame counts and
+contact frames, and per direction the sheet of each row). Four casters ship with the skill in its own
+`casters/` and load by name with no setup when the project has none of that name: `nghich_tien_kiem` and
+`nghich_tien_truong` (a robed cultivator with a straight sword or a staff, side, east and west) and their
+`_topdown` versions (8 directions), each with idle, run, cast, attack1 to 3, hurt and dead. A project's own sprites
+in `casters/` are the owner's licensed art: they stay local (gitignored) and never go into the plugin or the sheet.
+Draw the effect in the character's frame space, so it drops into that game as it is:
+
+```
+import rig
+r = rig.load("knight_side")                       # casters/knight_side/rig.json
+PIVOT = (56, 84)                                  # the character's feet on the effect canvas
+K = FPS // r.fps_of(anim)                         # effect frames per character frame (a row may set its own fps)
+t = START + f / K                                 # character time of effect frame f; r.contact(anim) for the hits
+char = r.place((H, W), PIVOT, anim, f // K, direction, start=START)   # preview only
+prev = pfx.composite(rig.over(color, char), light)
+a0, a1 = r.arc(anim, direction, 0)                # the slash runs with the blade
+problems += r.check_arc(anim, a0, a1, direction, 0)
+meta["caster"] = r.meta(anim, FPS, start=START)  # into ex.write(extra=...)
+```
+
+- The effect fps is a whole multiple of the animation's fps (`r.fps_of(anim)`); `r.meta` refuses any other. A row
+  with uneven frame times (rig.json `ms`, from a game) goes into the JSON as `char_ms`, and the engine holds the
+  effect frames by those times.
+- Directions of a game caster: a side (horizontal) effect uses 2 rows, east and west, each drawn on the
+  character's own row of that name (`fc.rows(draw, 2, n)`, `fc.meta("side", ..., directions=2)`), since the
+  character holds its weapon in one hand and west is not a mirror. A top-down effect uses all 8 rows
+  (`fc.rows(draw, 8, n)`, order `facing.NAMES8`). A rig with one side row (`facing` only) keeps the mirrored
+  single row.
+- Time the blows on the character's contact frames, not on a guess. Character sheets come without baked smears
+  (white arcs in the attack frames), so the effect's slash is the only one; strip them from a bought pack first
+  and keep the original in `casters/<name>/orig/`.
+- A combo on a game character follows the `combo` knob. One press per hit: draw one clip per stroke and weight,
+  each from its animation's frame 0 to wisps, write `caster.combo.steps` (state, anim, char_from, char_to the
+  frame the swing ends on, contact, weight) and `caster.chain` (each clip on its animation, for the viewer), and
+  preview the whole string with every press on time by laying the clips on the timeline. `drafts/thap_tram` is
+  the reference.
+- Follow the sword. rig.json `swing` gives each stroke's turn (cw or ccw on screen), `from` and `to` angles
+  (0 east, 90 south, y down) and frames. Take a slash arc from `a0, a1 = r.arc(anim, direction, stroke)` (a1 - a0
+  carries the turn), never from a guess, and add `r.check_arc(anim, a0, a1, direction, stroke)` to the draft's
+  problems so a wrong turn or an end over 60 deg off exits 1. Time the arc's head on the stroke's frames.
+  `r.meta` carries `swing` and `pixel_scale` into the JSON. `swing` fixes the turn and the ends, not where the
+  blade is on the contact frame: put the smear's head on the blade tip measured from that frame of the sprite (the
+  weapon's own colour, the pixel farthest from the hand; `measure_blade` in `drafts/thap_tram`) and the hit spark
+  on rig.json `emit` (the weapon tip). A smear placed by eye or toward the target runs ahead of or behind the
+  blade. A stroke near 180 deg (an overhead chop) swings in the upright plane of the heading: squash it across by
+  |cos heading|, and facing away, end it at the ground in front (`plane` in the same draft).
+  Top-down, the way round comes from the camera: when the blade jumps from `from` to `to` in one character frame
+  the sprite cannot show which way it went, and rig.json's turn is only the shorter screen path. A cut sweeps the
+  side the character faces, so draw the way round that passes the heading (the other way when the rig's way runs
+  behind the body, as on a character facing the camera), and check that the blade's tip on the contact frame
+  lies on the drawn arc in place of `r.check_arc`. Record the drawn way in `caster.swing_drawn`.
+- A cast that lands away from the body (a summon, a strike from the sky, a ground blast) follows the `placement`
+  knob: the sheet's pivot is the struck spot and `r.meta(anim, fps, start, offset=range)` writes
+  `caster.offset` (per direction the `[dx, dy]` from the character's pivot to the effect's pivot) and `range`.
+  Never leave such a cast on the character's own pivot: the engine then plays it on the caster's feet. Learnt on
+  `drafts/thien_kiep`, whose first cut struck under the caster in the game.
+- The caster shows the power it calls, per the `aura` knob: `aura_back` and `aura_front` parts in
+  `meta.beanfx.parts` (anchor caster, layer behind and front), each its own sheet from `ex.write` on the effect's
+  frames and palette, its JSON named in the part's `json`. A part that follows the hand or weapon (rig.json
+  `emit`) takes one row per caster direction. `drafts/thien_kiep` is the reference.
+- Moving animations (a dash): frames stay in place and rig.json `root` gives the body's travel per frame
+  (`r.root(anim, direction)`). The effect stays where the move began: size the canvas for the whole travel, preview
+  with `r.place(..., travel=True)`, and put trails and afterimages at earlier `root` points; `r.meta` carries `root`.
+- The example casters (`knight_side`, `adventurer_topdown`) are references to learn from: proportions, cell size,
+  pivot, frame counts, fps, contact frames, swing and root motion. A caster that needs a new look or a missing
+  animation is an original character built to the same rig.json contract (the `/char` route), never a recolour,
+  edit or composite of the example sheets; `casters/build.py` only cleans the local references.
+- A caster composed from the owner's game sheets builds each row the way the game draws it, never from the baked
+  layers alone. Take the game's own row for the weapon (a staff runs on the staff's own run row, not the generic
+  run). On rows where the game draws the weapon in the fist (its swing sprite on a per-frame hand track), draw it
+  there on every frame: turned to the track's angle, foreshortened by its length, and split in front of or behind
+  the body as the game splits it. Check every moving row at 4x, and fail the build when a held weapon leaves the
+  fist: a weapon that holds still while the body bobs is a baked pose for another grip, and the hand slides off it.
+  Learnt on `nghich_tien_truong`, whose staff floated beside the hand in the run.
+- Top-down: draw rows with `fc.rows(draw, len(r.directions), n)`; their order is the rig's directions.
+- A held weapon can dip below the feet, so check each animation's pivot with `r.place` over a ground line before
+  drawing; rig.json pivots override the measured ones (`python kit/rig.py <name>` prints both).
+- Review in the browser: every draft run writes its own page, `out/<name>.html` (`ex.page`, section 3), that
+  opens straight from disk. `<skill>/tools/preview.html` is the template and also opens from disk
+  on its own (pick the project folder) to browse every result. The page shows directions, actions (states, tags,
+  caster animations), frame stepping, speed, light layer, pivot, cell box, swing arc and root motion; Control mode
+  drives the caster with WASD, J and K attack, L dash, and fires the effect. An effect on a chain of animations
+  (a combo: `meta.beanfx.caster.chain`, each `{anim, char_from, char_to, effect_from, effect_to}`) shows the
+  character of each segment, and J plays the whole chain; animations with rig.json `ms` play by those times. It
+  carries `runtime/beanfx.js` inline: after a runtime change run `python3 <skill>/tests/test_preview.py --write`.
+- `drafts/rig_slash` is the reference: a side slash on `knight_side` attack1 and a top-down slash in 4 directions
+  on `adventurer_topdown` attack1, for the frame space, pivot and timing. Its arcs predate `swing` and run against
+  the blade (`check_arc` fails both knight strokes), so take arcs from `r.arc`, not from it.
+
 Draw the avatar before everything else and the caster after the swords behind it. Move the caster with a
 `foot_at(f)` path (rise, hover with a 2 px bob, land) and feed `lift` and `flut` from its speed. What made it
 read, learnt on `drafts/van_kiem_quy_tong_v2` and `v3` (v3 is the reference draft):
@@ -253,7 +345,9 @@ read, learnt on `drafts/van_kiem_quy_tong_v2` and `v3` (v3 is the reference draf
 The draft script writes, each run: the sheet and JSON (section 5), a 4x strip on a dark and on a mid ground, a
 4x gif at its fps (`pfx.gif`, through `ex.hitstop` when there are hits) and `out/contact.png`
 (`pfx.contact(path, frames, fps)`: 12 moments labelled with frame and time, so timing reads without the gif),
-and runs the checks on the effect
+a preview page per sheet, `ex.page(<out>/sheets/<name>.json)`: `out/<name>.html`, the skill's `tools/preview.html`
+with the sheets, the JSON and the caster's rig and sheets embedded, so it opens with no folder to pick (it embeds
+the owner's caster sprites, so it stays in the gitignored `out/` and is never shipped), and runs the checks on the effect
 frames, printing every line and exiting 1 when there is one:
 
 - `ex.check(frames, lights, loop, src=__file__, hold=HOLD)`: colour on the cell edge, light above 0.02 on the edge
@@ -357,6 +451,9 @@ second. Judge it in a travel gif; in place it reads as a pole that spins.
 - A mirrored side sheet still reads when flipped: no text or glyph, no part that must stay on one side. When it
   fails, set mirror False and draw the west sheet.
 
+**Hand over the page, every run.** Give the owner the absolute path of `out/<name>.html` next to the gif; it
+opens with a double click (file://), no server and no folder to pick.
+
 ## 5. Export
 
 Write the sheets with `kit/export.py` (`import export as ex`):
@@ -403,7 +500,8 @@ meta = ex.write(OUT, NAME, finals, FPS, PIVOT, LOOP, light=lights, color=cols, s
   cracks for heavy, finisher and blast weights; use the same weight as the hit. Put it under the blow for a ground
   strike, a slam, a landing or an explosion; leave it out for a hit in the air or on a body.
 - **The sheet is the effect alone.** The game draws its own character, so the mockup caster and the target dummy
-  go into the previews only (the 4x strips and the gif). `render(f, seed, caster)` draws with or without the
+  go into the previews only (the 4x strips and the gif), and so does a game character (`kit/rig.py`); its JSON
+  binding goes in `meta.beanfx.caster`. `render(f, seed, caster)` draws with or without the
   caster; export and check the frames without it. For a hit, put `kit/target.py` under the preview at the
   target's foot (`tg.under(frame, tg.draw((H, W), foot, f, hits, FPS, facing=-1))`), so the gif shows the body
   taking the blow.
@@ -428,7 +526,7 @@ the fields with `kit/facing.py` (`import facing as fc`) and pass the whole meta 
 For a game that cannot load a sheet as it is, or needs the effect to follow a moving target or recolour per
 instance at runtime, `porting.md` also covers porting the draw code to the engine's own language.
 
-Report in English with the paths, the brief, the state table for a multi-state effect, the "Suggestions" list
+Report in English with the path of the preview page `out/<name>.html` and the other paths, the brief, the state table for a multi-state effect, the "Suggestions" list
 (knobs the owner can turn next: speed or the length of one state, frame count, glow, light hue, density, size)
 and what is left.
 

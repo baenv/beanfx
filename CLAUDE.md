@@ -16,7 +16,7 @@ skills, kits and drafts stay local and are gitignored until they are ready.
 ## Layout
 
 - `plugins/beanfx/`: the plugin (`.claude-plugin/plugin.json`, `skills/beanfx/` with `SKILL.md`, `gate.py`,
-  `knobs/`, `tests/`, `setup.sh`, `tools/layers.mjs` (pixelfx colour and light layers) and the kit source in `kit/`). `.claude/skills/beanfx` is a symlink to its skill
+  `knobs/`, `tests/`, `setup.sh`, `tools/layers.mjs` (pixelfx colour and light layers), `tools/preview.html` (browser preview of results and casters; each draft run embeds it with its sheets as `out/<name>.html` via `ex.page`, opened with a double click) and the kit source in `kit/`). `.claude/skills/beanfx` is a symlink to its skill
   folder so /beanfx runs here without an install. `setup.sh` builds `.venv/` in the project it runs in
   (git root, else cwd, or `BEANFX_PROJECT`), and `--draft <name>` copies the kit into `drafts/<name>/kit/` once.
 - `kit/`: the Python drawing kit as the older drafts import it (`../../kit`), frozen; `setup.sh` no longer writes it.
@@ -32,13 +32,24 @@ skills, kits and drafts stay local and are gitignored until they are ready.
 - `drafts/<name>/`: one draft per effect, `<name>.py` plus `out/`. Only the drafts listed in `.gitignore` are tracked; new ones stay local. `*_v2`, `*_v3` are the redraws to the pixelfx bar.
 - `docs/media/`: the README preview gifs.
 - `.venv/`: Python with numpy and pillow. `setup.sh` creates it when missing; `--pixelfx` also checks node.
-- Local only, gitignored: `site/` (a static gallery of finished sheets), `pixelfx/` (the clone from `setup.sh
+- Bundled casters: the skill's `casters/` ships `nghich_tien_kiem`, `_kiem_topdown`, `_truong` and `_truong_topdown`
+  (a sword and a staff caster; side 2 rows, top-down 8), sheets and `rig.json` only. `rig.load(name)` and `ex.page`
+  look in the project's `casters/` first, then there, so any project can use them with no setup. Their build script
+  stays local (`chars/`, gitignored).
+- Local only, gitignored: the project's `casters/<name>/` (bought example packs with a `rig.json`, read by
+  `kit/rig.py` as the caster; their licence forbids redistribution, never commit them), `site/` (a static gallery of finished sheets), `pixelfx/` (the clone from `setup.sh
   --pixelfx`), and the WIP `kit_char/` and `chars/<name>/` for `/char`, `kit_scene/` and `scenes/<name>/` for `/scene`
   (SDF shapes raymarched in Python, with a Blender route that needs Blender 5.x).
 
 ```
 cd drafts/<name> && ../../.venv/bin/python <name>.py     # writes out/, exits 1 if a cell touches its edge
 ```
+
+## Leak check
+
+The repo is public. `.githooks/pre-commit` runs gitleaks on staged changes (`.gitleaks.toml`: the default rules
+plus home paths), then the private terms in `.git/gitleaks-private.toml` (local, never committed). Enable it once
+per clone with `git config core.hooksPath .githooks`; `.github/workflows/gitleaks.yml` scans every push.
 
 ## pixelfx
 
@@ -64,11 +75,11 @@ node plugins/beanfx/skills/beanfx/tools/layers.mjs <id> --out <draft>/src --pixe
   impact parts) and a gif. `porting.md` in the skill covers engine import and porting the draw code. Report in
   English.
 - Each brief knob is a file in the skill's `knobs/` (role, view, size, timing, loop, shape, style,
-  palette, glow, clarity, density, states, caster). `gate.py` asks Jev (an optional prompt classifier, used only when its client
+  palette, glow, clarity, density, states, caster, combo, placement, aura). `gate.py` asks Jev (an optional prompt classifier, used only when its client
   is installed) in one call which knobs the prompt leaves open; without it the model decides from the files. Each open knob is one
   AskUserQuestion question, and no draft file is written before the brief is in the reply.
   Tests (`S=plugins/beanfx/skills/beanfx`): `python3 $S/tests/test_gate.py`, `.venv/bin/python $S/tests/test_facing.py`,
-  `test_derive.py`, `test_export.py`, `test_ref.py`, `test_light.py`, `test_impact.py` and `test_kit.py`; `node $S/tests/test_runtime.mjs`. Plugin check: `claude plugin validate plugins/beanfx` and `claude plugin validate .`.
+  `test_derive.py`, `test_export.py`, `test_rig.py`, `test_ref.py`, `test_light.py`, `test_impact.py` and `test_kit.py`; `python3 $S/tests/test_preview.py`; `node $S/tests/test_runtime.mjs`. Plugin check: `claude plugin validate plugins/beanfx` and `claude plugin validate .`.
 - Glow levels are subtle, medium and strong. Clarity is clear (default), balanced or hazy: how far light and
   translucent colour spread.
 - All text in this repo is English: docs, skill, comments, printed output and JSON values. Effect ids and file

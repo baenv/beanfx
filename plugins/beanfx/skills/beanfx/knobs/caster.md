@@ -16,7 +16,9 @@ its use are in SKILL.md section 2.
 leaves it out without asking.
 
 **Ask:** "Add a mockup caster?" Options "No, effect only" (recommended for a hit, projectile, aura or pickup),
-"Glowing silhouette" (recommended for a cast skill), "Silhouette with an avatar". If yes and the prompt leaves
+"Glowing silhouette" (recommended for a cast skill), "Silhouette with an avatar", "Game character" (the owner's
+own sprites in `casters/<name>/` or a caster that ships with the skill: `nghich_tien_kiem` (sword) and
+`nghich_tien_truong` (staff), each side or `_topdown`; listed by name). If yes and the prompt leaves
 them open, the follow-ups: height against the carrier (default shorter than the main carrier, such as about 34 px
 beside a 47 px sword, so the effect stays the hero), hair (`loose`, a wild mane; `bun`, pinned with nape locks),
 and what it does in each state (charge, rise, point, land).
@@ -25,5 +27,14 @@ and what it does in each state (charge, rise, point, land).
 - Effect starting from a held object: the flame at the tip of a Noita wand, the sword of light in Hyper Light
   Drifter. Draw the object as the caster when the effect comes out of it.
 - A glowing silhouette is a stand-in for scale in the preview only; the sheet ships without it.
+- Game character: the effect is drawn on the character's own frames (pivot on its feet, frames locked to one of
+  its animations, one row per direction top-down) so the sheet drops into that game as it is. Follow-ups: which
+  character, which animation, the character frame the effect starts on (default the first contact frame), and
+  front or behind the character. A slash follows the blade's stroke in rig.json `swing` (turn, from, to).
+  The example casters are references: a new look or a missing animation means an original character on the same
+  rig.json, not a recoloured or edited copy.
+  Directions: a side effect on a game character has 2 rows (east and west, each on the character's own row); a
+  top-down effect has all 8. A character composed from the owner's own game sheets may be used as it is;
+  each comes as `<name>` (side, east and west) and `<name>_topdown` (8 directions).
 
 **Default:** no caster.

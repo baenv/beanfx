@@ -45,7 +45,7 @@ fi
 
 # 2. The drawing kit: source of truth is this skill's kit/. Each draft gets its own copy in drafts/<name>/kit/,
 # made once and never overwritten, so a plugin update leaves the kit of an existing draft as it was drawn with
-if [ $fail -eq 0 ] && (cd "$SKILL/kit" && "$PY" -B -c "import fxkit, fxlib, light, pfx, caster, facing, derive, export, target, ref" 2>/dev/null); then
+if [ $fail -eq 0 ] && (cd "$SKILL/kit" && "$PY" -B -c "import fxkit, fxlib, light, pfx, caster, facing, derive, export, target, ref, rig" 2>/dev/null); then
   say "kit: ok"
 else
   say "kit: does not import"; fail=1
@@ -61,6 +61,8 @@ if [ -n "$draft" ]; then
     mkdir -p "$DKIT" && cp "$SKILL"/kit/*.py "$DKIT"/ && say "draft: copied the kit into drafts/$draft/kit" \
       || { say "draft: copying the kit failed"; fail=1; }
   fi
+  # where the preview page template lives (export.page); a pointer, not part of the pinned kit, so it is rewritten
+  [ -d "$DKIT" ] && printf '%s\n' "$SKILL" > "$DKIT/skill.txt"
 fi
 
 # 3. pixelfx, only for reuse and the benchmark: a clone in the project
