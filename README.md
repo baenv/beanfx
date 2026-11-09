@@ -5,6 +5,8 @@ sprite sheet with JSON that any engine plays.
 
 See the effects and the live demo at https://beanfx.vhbien000.workers.dev/
 
+Used in a game: [Nine Heavens](https://play.nineheavens.online/) draws its skill effects with beanfx.
+
 ## Install
 
 ```
