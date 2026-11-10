@@ -23,6 +23,6 @@ First public version (2026-11-08 to 2026-11-10).
   frozen and keeps `docs/` under 8 MB.
 - `setup.sh --kit-status` lists the drafts whose pinned kit is behind the skill's kit; `setup.sh --draft <name>
   --refresh-kit` copies the current kit into one draft.
-- README: quick start and the layout of the exported JSON.
+- README: demo first, quick start; the layout of the exported JSON in `docs/output-json.md`.
 - Removed three preview gifs that no page linked any more (about 8 MB); `docs/` is now 6.5 MB.
 - `CONTRIBUTING.md`, this file and a release workflow.
