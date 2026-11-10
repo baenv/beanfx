@@ -44,6 +44,7 @@ Present when the effect uses them:
 | `states` | named frame ranges `[from, to]`, also in `meta.frameTags` |
 | `view`, `directions`, `facing`, `mirror`, `mirror_pivot` | the direction: one row drawn facing east and flipped for west, or 8 or 16 heading rows (`row_of` gives the row for an angle) |
 | `act` | timing round the effect: `windup`, `hits` (contact frame, freeze, shake, push, react), `poses`, `target` |
+| `sound` | optional, when the brief asked for sound: `track` (the whole effect as WAV from frame 0), `loop`, `length`, `rate`, `seed`, `voice`, `element` and `cues` (`name`, `kind`, `t`, `frame`, `file`, `length`, `gain`, `source` (`synth` or `sample:<file>`), `weight` for hits), and `samples` (recordings used, to credit); each act hit names its cue in `sound` |
 | `parts` | `cast`, `travel` and `impact` sheets of a caster to target effect, each with its own size, pivot and anchor |
 | `caster` | the game character the effect rides on: animation, layer, offset per direction, aura parts |
 

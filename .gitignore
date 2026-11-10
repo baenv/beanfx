@@ -27,6 +27,10 @@ pixelfx/
 *.webp
 *.mp4
 *.webm
+*.wav
+
+# Recordings a project layers into its effect sounds (kit/sfx.py); their licences vary
+/sounds/
 
 # Local only
 site/

@@ -81,6 +81,7 @@
     <button class="b" id="next" title="Next frame (Right)">&gt;</button>
     <input type="range" id="slider" min="0" max="0" value="0">
     <label class="t"><input type="checkbox" id="loop" checked> Loop</label>
+    <label class="t" id="soundlab" hidden><input type="checkbox" id="sound" checked> Sound</label>
     <span class="lab">Speed</span>
     <select id="speed"><option>0.1</option><option>0.25</option><option>0.5</option><option selected>1</option><option>2</option></select>
   </div>
@@ -342,7 +343,7 @@ let ROOT = null;          // the picked directory handle (Chrome, Edge), kept in
 const SKIP = new Set([".git", ".venv", "node_modules", "pixelfx", "__pycache__", "site", ".wrangler"]);
 
 function keep(path) {
-  return /^drafts\/[^/]+\/out\/.+\.(json|png)$/.test(path) || /^casters\/[^/]+\/[^/]+\.(json|png)$/.test(path);
+  return /^drafts\/[^/]+\/out\/.+\.(json|png|wav)$/.test(path) || /^casters\/[^/]+\/[^/]+\.(json|png)$/.test(path);
 }
 
 // a path as the picker gives it (starting at the picked folder) to a project path
@@ -427,6 +428,27 @@ async function loadParts(m, base) {
     out.push({ name, layer: p.layer || "front", directions: p.directions || null, asset: await loadFxFile(base + p.json) });
   }
   return out;
+}
+
+// the effect's sound (meta.beanfx.sound, kit/sfx.py): one blob URL per cue file, fired on the cue's frame
+function loadSound(m, base) {
+  const urls = {};
+  const cues = (m.sound?.cues || []).filter((c) => VFS.has(base + c.file));
+  for (const c of cues) urls[c.file] ||= URL.createObjectURL(VFS.get(base + c.file));
+  return cues.length ? { cues, urls } : null;
+}
+
+function soundAt(f) {
+  const snd = S.kind === "fx" && S.asset?.sound;
+  if (!snd || !$("sound").checked) return;
+  for (const c of snd.cues) {
+    if (c.frame !== f) continue;
+    const au = new Audio(snd.urls[c.file]);
+    au.preservesPitch = false;   // slow motion plays the sound slower and lower, like a tape
+    au.playbackRate = Number($("speed").value);
+    au.volume = Math.min(1, c.gain ?? 1);
+    au.play().catch(() => {});   // the browser may block sound until the first click
+  }
 }
 
 // the caster's pivot to the effect's pivot for a direction (meta.beanfx.caster.offset, knobs/placement.md);
@@ -569,6 +591,7 @@ function renderList() {
 async function select(it) {
   const token = ++S.loadToken;
   S.ready = false;
+  $("soundlab").hidden = true;
   S.item = it; S.kind = it.kind; S.asset = null; S.rig = null; S.frame = 0; S.acc = 0; S.dir = 0; S.act = 0;
   location.hash = encodeURIComponent(it.key);
   renderList();
@@ -580,6 +603,8 @@ async function select(it) {
       if (token !== S.loadToken) return;
       S.asset = asset;
       asset.parts = await loadParts(asset.meta, dirOf(it.data.path));
+      asset.sound = loadSound(asset.meta, dirOf(it.data.path));
+      $("soundlab").hidden = !asset.sound;
       const rigName = asset.meta.caster?.rig;
       S.rig = rigName ? await loadRig(rigName) : null;
     } else {
@@ -594,6 +619,7 @@ async function select(it) {
   setupPlay();
   sizeStage();
   S.ready = true;
+  if (S.playing && S.mode === "view") soundAt(S.acts[S.act].a + S.frame);   // the first frame's cue on open
 }
 
 function rowsOf(m, asset) {
@@ -887,6 +913,7 @@ function tickView(dt) {
       if ($("loop").checked) S.frame = 0;
       else { S.playing = false; $("play").textContent = "Play"; S.acc = 0; break; }
     } else S.frame++;
+    soundAt(a.a + S.frame);
   }
 }
 
@@ -1080,7 +1107,8 @@ for (const b of $("bgs").children) b.onclick = () => {
 };
 $("rigSel").onchange = () => { loadRig($("rigSel").value); P1.anim = "idle"; P1.t = 0; };
 $("play").onclick = () => { S.playing = !S.playing; $("play").textContent = S.playing ? "Pause" : "Play";
-  if (S.playing && !$("loop").checked) { const a = S.acts[S.act]; if (S.frame >= a.b - a.a) S.frame = 0; } };
+  if (S.playing && !$("loop").checked) { const a = S.acts[S.act]; if (S.frame >= a.b - a.a) S.frame = 0; }
+  if (S.playing && S.acc === 0) soundAt(S.acts[S.act].a + S.frame); };
 $("prev").onclick = () => { S.playing = false; $("play").textContent = "Play"; step(-1); };
 $("next").onclick = () => { S.playing = false; $("play").textContent = "Play"; step(1); };
 $("slider").oninput = (e) => { S.playing = false; $("play").textContent = "Play"; S.frame = Number(e.target.value); };

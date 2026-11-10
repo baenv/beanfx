@@ -5,6 +5,17 @@ Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag 
 
 ## Unreleased
 
+- Optional sound: `kit/sfx.py` synthesises an effect's sound in numpy from its own JSON (a hit cue per act hit by
+  its weight, a charge, whoosh or tail per state by its name, a hum for a bare loop; retro or soft voice; metal,
+  lightning, fire, ice, wind or arcane colour), seeded, as WAV next to the sheet with `meta.beanfx.sound`. Asked
+  only when the request asks for sound (knob `sound`). The preview page plays each cue on its frame.
+- Voice `real`: metal hits as a blade that lands (thud, a short dense chink that dies within a tenth of a second,
+  grit), a hit layer with `clash=True` as blade on blade by modal synthesis (bar modes as beating pairs), and thunder from N-waves (crack, rolling
+  rumble, sub-boom, echoes). Recordings in the project's `sounds/` (`<element>_<kind>[_<weight>]*.wav`) replace
+  the matching cues, trimmed to the hit and pitched by weight, and are listed in `sound.samples`.
+- `sfx.volley`: a fall (a blade or arrow tearing the air, swelling to its landing) and a landing for each of many
+  projectiles, spread by a seeded jitter, with a gain per layer; metal gather and settle have no ringing tone.
+
 ## 0.2.0
 
 Plain questions with pictures (2026-11-10).

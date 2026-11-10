@@ -28,6 +28,7 @@ skills, kits and drafts stay local and are gitignored until they are ready.
   edges, value levels, skeleton), `facing.py`
   (view, facing, mirror, heading rows and the cast, travel, impact split in the JSON) and `derive.py` (outline,
   inner lines, spine and scatter points taken from the finished peak drawing for build-up and break-down states)
+  `sfx.py` (optional sound synthesised from the effect's JSON: hit cues by weight, charge, whoosh, tail, hum; WAV plus `meta.beanfx.sound`)
   and `export.py` (the sheet grid with pages, its Aseprite-style JSON with the act, and the checks: edge, empty
   frame, pop off, loop seam, unseeded randomness, other seeds, act).
 - `drafts/<name>/`: one draft per effect, `<name>.py`, its `kit/` and `out/`. Only the drafts listed in `.gitignore` are tracked; new ones stay local. `*_v2`, `*_v3` are the redraws to the pixelfx bar.
@@ -79,11 +80,11 @@ node plugins/beanfx/skills/beanfx/tools/layers.mjs <id> --out <draft>/src --pixe
   impact parts) and a gif. `porting.md` in the skill covers engine import and porting the draw code. Report in
   English.
 - Each brief knob is a file in the skill's `knobs/` (role, view, size, timing, loop, shape, style,
-  palette, glow, clarity, density, states, caster, combo, placement, aura). `gate.py` asks Jev (an optional prompt classifier, used only when its client
+  palette, glow, clarity, density, states, caster, combo, placement, aura, sound). `gate.py` asks Jev (an optional prompt classifier, used only when its client
   is installed) in one call which knobs the prompt leaves open; without it the model decides from the files. Each open knob is one
   AskUserQuestion question, and no draft file is written before the brief is in the reply.
   Tests (`S=plugins/beanfx/skills/beanfx`): `python3 $S/tests/test_gate.py`, `.venv/bin/python $S/tests/test_facing.py`,
-  `test_derive.py`, `test_export.py`, `test_rig.py`, `test_ref.py`, `test_light.py`, `test_impact.py` and `test_kit.py`; `python3 $S/tests/test_preview.py`; `node $S/tests/test_runtime.mjs`. All of them in one run with coverage: `pytest --cov` from the repo root
+  `test_derive.py`, `test_export.py`, `test_rig.py`, `test_ref.py`, `test_light.py`, `test_impact.py`, `test_sfx.py` and `test_kit.py`; `python3 $S/tests/test_preview.py`; `node $S/tests/test_runtime.mjs`. All of them in one run with coverage: `pytest --cov` from the repo root
   (`tests/conftest.py` runs each script once and reports every check it records through `tests/checklog.py` as its
   own test; CI does the same and fails under the coverage floor in `pyproject.toml`). Plugin check: `claude plugin validate plugins/beanfx` and `claude plugin validate .`.
 - Glow levels are subtle, medium and strong. Clarity is clear (default), balanced or hazy: how far light and

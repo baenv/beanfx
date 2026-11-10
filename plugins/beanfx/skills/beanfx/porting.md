@@ -34,6 +34,12 @@ The rest, when the JSON has it:
   `shake_time` s, tint the target white for `flash` s then half for one frame, and play the `sound` cue (`hit_light`,
   `hit_heavy`, `hit_finisher`, `hit_blast`, mapped to the game's own sounds) on the contact frame. `act.target.x` is
   where the target stands, px from the pivot along the facing.
+- **Sound (optional, `meta.beanfx.sound`).** When the effect ships with sound, either play `sound.track` (one WAV,
+  16-bit mono) when frame 0 starts, or fire each of `sound.cues` yourself: play `file` at `gain` when the effect
+  reaches `t` s (frame `frame`). The cues run on sheet time, so keep the clock running through a hit-stop (the
+  freeze stops the picture, not the sound); a loop effect restarts the track on every loop (`sound.loop`). A hit's
+  `sound` names its cue, so a game that maps cue names to its own sounds can skip the files. Credit every file in
+  `sound.samples` (recordings from the project's `sounds/`) as its licence asks.
 - **Pages.** A big effect splits into `<name>_p<k>.png`, each with its own Aseprite JSON. `<name>.json` lists every
   frame with its `page`, and `meta.beanfx.pages` lists the files. Load every page and build one animation whose
   frames come from the page each frame names.

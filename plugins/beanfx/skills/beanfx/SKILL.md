@@ -44,7 +44,8 @@ no house style applies unless the owner gives one.
 Each knob lives in its own file in `knobs/` (this skill's folder): what it is, when the prompt fixes it, the
 question to ask with its options, and the default. In order: `role`, `view` (and directions), `size`, `timing`,
 `loop`, `shape`, `style`, `palette`, `glow`, `clarity`, `density`, `states` (multi-state effects), `caster` (mockup caster), `combo` (how a combo's hits are triggered), `placement` (where a cast lands
-against the caster), `aura` (what shows round the caster while it casts).
+against the caster), `aura` (what shows round the caster while it casts), `sound` (optional audio, asked only when the request
+asks for sound).
 
 **Gate: which knobs to ask.** Run it on the owner's prompt, with one line on what a reference image shows when
 there is one:
@@ -536,6 +537,24 @@ the fields with `kit/facing.py` (`import facing as fc`) and pass the whole meta 
   px/s from the caster to the target, with its own direction rows for top-down or `facing` for side) and
   `impact` (anchor target, one-shot, the hit and dissolve). Keep the joined preview sheet and gif too, for review. When the owner wants one fixed-range sheet, record `target` and its mirror and say the range is
   fixed in the report.
+
+**Sound (only when the brief asks for it; `knobs/sound.md`).** After `ex.write`, `sfx.write(OUT, NAME, meta,
+seed=1, voice="retro", element=...)` (`kit/sfx.py`) synthesises the sound from the effect's own data and adds
+`meta.beanfx.sound`: a hit cue per act hit by its weight, a charge, whoosh, tail or boom per state by its name, a
+hum for a bare loop. Look at `sfx.layers(meta)` first and fix a state the names map wrong (pass the edited list as
+`layers=`). Pick the element from the subject (a sword is metal). voice "real" models metal (a blade that lands: thud,
+short chink, grit; a hit layer with `clash=True` for blade on blade rings at the bar modes) and thunder (N-wave
+crack and rumble); recordings in the project's `sounds/` replace a cue whose name they match.
+Many things that land (a sword rain, an arrow volley, hail) are many sounds: add `sfx.volley(landing frames, FPS,
+fall_frames=..., weight=..., gain=...)` from the draft's own plan, a fall that whistles down and a quiet landing
+per projectile, and drop the broad state whoosh; one sound per wave reads as a few blows, not a rain. Sound is
+judged by ear, so every sound starts with takes: on the first pass write two or three into `out/sound_takes/`
+(`sfx.save(path, sfx.track(meta, seed, voice, element, layers)[0])`, each a different balance or voice, the one
+you recommend also written by `sfx.write`) and ask which with one AskUserQuestion, naming each file. Before handing
+them over, rule out the two known misses: a bell (most of the energy above 500 Hz in a few long tones) and a drum
+(a pitched low thud, most of the energy under 300 Hz). After a second miss, offer CC0 recordings in `sounds/`. Add `sfx.check(OUT, meta)` to the checks; the
+preview page plays the track with the effect, and the report says the sound is synthesised and lists its files.
+With no sound in the brief, write no audio.
 
 For a game that cannot load a sheet as it is, or needs the effect to follow a moving target or recolour per
 instance at runtime, `porting.md` also covers porting the draw code to the engine's own language.

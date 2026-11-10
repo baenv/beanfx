@@ -417,6 +417,10 @@ def page(json_path, out=None, template=None, project=None):
                 if pg.get(k) and (jp.parent / pg[k]).exists():
                     files[jp.parent / pg[k]] = vpath(jp.parent / pg[k])
     sheet_files(json_path, bfx, js["meta"]["image"])
+    snd = bfx.get("sound") or {}
+    for f in {snd.get("track")} | {c["file"] for c in snd.get("cues", [])}:   # kit/sfx.py, played on its frames
+        if f and (json_path.parent / f).exists():
+            files[json_path.parent / f] = vpath(json_path.parent / f)
     for part in (bfx.get("parts") or {}).values():   # an aura that rides on the caster has its own sheet
         jp = json_path.parent / part["json"] if part.get("json") else None
         if jp and jp.exists():
@@ -442,7 +446,7 @@ def page(json_path, out=None, template=None, project=None):
             print(f"note: casters/{caster['rig']}/rig.json not found; the preview page shows the effect alone")
 
     def url(p):
-        kind = "application/json" if p.suffix == ".json" else "image/png"
+        kind = {".json": "application/json", ".wav": "audio/wav"}.get(p.suffix, "image/png")
         return f"data:{kind};base64," + base64.b64encode(p.read_bytes()).decode()
 
     embed = dict(label=f"{draft_dir.name}/{json_path.stem}", select="fx:" + vpath(json_path),
