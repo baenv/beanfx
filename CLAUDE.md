@@ -32,6 +32,7 @@ skills, kits and drafts stay local and are gitignored until they are ready.
   and `export.py` (the sheet grid with pages, its Aseprite-style JSON with the act, and the checks: edge, empty
   frame, pop off, loop seam, unseeded randomness, other seeds, act).
 - `drafts/<name>/`: one draft per effect, `<name>.py` plus `out/`. Only the drafts listed in `.gitignore` are tracked; new ones stay local. `*_v2`, `*_v3` are the redraws to the pixelfx bar.
+- `docs/output-json.md`: the fields of the exported JSON, linked from the README.
 - `docs/media/`: the README preview gifs (CI budget: `docs/` at most 8 MB, one file at most 5 MB).
 - `CONTRIBUTING.md` (where to edit, tests, media, release steps), `CHANGELOG.md`, `pyproject.toml` (pytest and
   coverage settings only).
