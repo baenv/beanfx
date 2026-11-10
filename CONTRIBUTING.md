@@ -19,10 +19,7 @@ pip install pytest pytest-cov                        # for the tests
 | the skill, its knobs, the gate | `plugins/beanfx/skills/beanfx/` (`SKILL.md`, `knobs/`, `gate.py`) |
 | the browser runtime | `plugins/beanfx/skills/beanfx/runtime/beanfx.js`, then copy it to `docs/beanfx.js` and run `python3 plugins/beanfx/skills/beanfx/tests/test_preview.py --write` |
 
-Never edit the root `kit/`. It is the frozen kit of the older drafts (`kit/README.md`), and CI fails when a file
-there changes.
-
-Each draft made with `setup.sh --draft <name>` keeps its own copy of the kit, so a kit fix does not change a
+Each draft keeps its own copy of the kit, so a kit fix does not change a
 finished effect. To see which drafts are behind, and to move one to the current kit:
 
 ```
@@ -39,8 +36,13 @@ claude plugin validate plugins/beanfx && claude plugin validate .
 ```
 
 A test is a script in `plugins/beanfx/skills/beanfx/tests/` named `test_<part>.py` (or `.mjs`) that exits 0 when
-clean and prints one `FAIL` line per problem; it also runs alone with python. pytest picks up every such file
-through `tests/conftest.py`, and so does CI. A kit change comes with a check in the matching script.
+clean and prints one `FAIL` line per problem; it also runs alone with python. Its `ok(cond, name)` helper passes
+each check to `checklog.record` (the `.mjs` prints `CHECK ok|fail <name>` when `BEANFX_CHECKS` is set), and
+`tests/conftest.py` turns every record into its own pytest test, so a failure names the check. Give each check a
+short name that says what should hold; values go in the failure detail. A kit change comes with a check in the
+matching script.
+
+CI fails when coverage drops under `fail_under` in `pyproject.toml`. Raise it when you add tests.
 
 ## Media
 

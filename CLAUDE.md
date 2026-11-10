@@ -20,9 +20,8 @@ skills, kits and drafts stay local and are gitignored until they are ready.
   folder so /beanfx runs here without an install. `setup.sh` builds `.venv/` in the project it runs in
   (git root, else cwd, or `BEANFX_PROJECT`), and `--draft <name>` copies the kit into `drafts/<name>/kit/` once
   (`--kit-status` lists the drafts whose kit is behind the skill's; `--draft <name> --refresh-kit` recopies one).
-- `kit/`: the Python drawing kit as the older drafts import it (`../../kit`), frozen; `setup.sh` no longer writes it,
-  and CI checks it against `kit/FROZEN.sha256` (never edit it; `kit/README.md`).
-  The source of truth is the skill's `kit/`, and new drafts carry their own copy in `drafts/<name>/kit/`. Files: `fxkit.py` (shapes: lumpy, puff, streaks, facets, kite, leaf, claws, hits),
+- The kit: the source of truth is the skill's `kit/`, and every draft carries its own copy in `drafts/<name>/kit/`
+  (the published examples carry the kit they were drawn with, older than the skill's; there is no root `kit/`). Files: `fxkit.py` (shapes: lumpy, puff, streaks, facets, kite, leaf, claws, hits),
   `fxlib.py` (ramps, shade maps, strokes, noise, impact frames), `light.py` (additive glow), `pfx.py` (pixelfx
   layers, tint, composite, strip, gif), `caster.py` (the optional glowing mockup caster and avatar), `target.py` (a
   preview target dummy that reacts to hits), `ref.py` (an object traced from a reference image: derivative
@@ -31,7 +30,7 @@ skills, kits and drafts stay local and are gitignored until they are ready.
   inner lines, spine and scatter points taken from the finished peak drawing for build-up and break-down states)
   and `export.py` (the sheet grid with pages, its Aseprite-style JSON with the act, and the checks: edge, empty
   frame, pop off, loop seam, unseeded randomness, other seeds, act).
-- `drafts/<name>/`: one draft per effect, `<name>.py` plus `out/`. Only the drafts listed in `.gitignore` are tracked; new ones stay local. `*_v2`, `*_v3` are the redraws to the pixelfx bar.
+- `drafts/<name>/`: one draft per effect, `<name>.py`, its `kit/` and `out/`. Only the drafts listed in `.gitignore` are tracked; new ones stay local. `*_v2`, `*_v3` are the redraws to the pixelfx bar.
 - `docs/output-json.md`: the fields of the exported JSON, linked from the README.
 - `docs/media/`: the README preview gifs (CI budget: `docs/` at most 8 MB, one file at most 5 MB).
 - `CONTRIBUTING.md` (where to edit, tests, media, release steps), `CHANGELOG.md`, `pyproject.toml` (pytest and
@@ -85,7 +84,8 @@ node plugins/beanfx/skills/beanfx/tools/layers.mjs <id> --out <draft>/src --pixe
   AskUserQuestion question, and no draft file is written before the brief is in the reply.
   Tests (`S=plugins/beanfx/skills/beanfx`): `python3 $S/tests/test_gate.py`, `.venv/bin/python $S/tests/test_facing.py`,
   `test_derive.py`, `test_export.py`, `test_rig.py`, `test_ref.py`, `test_light.py`, `test_impact.py` and `test_kit.py`; `python3 $S/tests/test_preview.py`; `node $S/tests/test_runtime.mjs`. All of them in one run with coverage: `pytest --cov` from the repo root
-  (`tests/conftest.py` runs each script as one test; CI does the same). Plugin check: `claude plugin validate plugins/beanfx` and `claude plugin validate .`.
+  (`tests/conftest.py` runs each script once and reports every check it records through `tests/checklog.py` as its
+  own test; CI does the same and fails under the coverage floor in `pyproject.toml`). Plugin check: `claude plugin validate plugins/beanfx` and `claude plugin validate .`.
 - Glow levels are subtle, medium and strong. Clarity is clear (default), balanced or hazy: how far light and
   translucent colour spread.
 - All text in this repo is English: docs, skill, comments, printed output and JSON values. Effect ids and file

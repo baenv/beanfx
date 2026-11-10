@@ -10,6 +10,7 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "kit"))
+import checklog  # noqa: E402  (records each check for pytest, see conftest.py)
 import fxlib  # noqa: E402
 import pfx  # noqa: E402
 
@@ -17,6 +18,7 @@ fails = []
 
 
 def ok(cond, msg):
+    checklog.record(cond, msg)
     if not cond:
         fails.append(msg)
 

@@ -19,7 +19,7 @@ from types import SimpleNamespace
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "kit"))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "kit"))
 import pfx  # noqa: E402
 from fxlib import stroke  # noqa: E402
 from light import glow, glow_line, glow_ring  # noqa: E402

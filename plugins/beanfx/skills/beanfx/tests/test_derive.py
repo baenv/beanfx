@@ -10,12 +10,14 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "kit"))
+import checklog  # noqa: E402  (records each check for pytest, see conftest.py)
 import derive as dv  # noqa: E402
 
 fails = []
 
 
 def check(name, ok, detail=""):
+    checklog.record(ok, name)
     print(("ok   " if ok else "FAIL ") + name + (f"  ({detail})" if detail else ""))
     if not ok:
         fails.append(name)

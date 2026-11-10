@@ -20,7 +20,7 @@ from types import SimpleNamespace
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "kit"))
+sys.path.insert(0, str(Path(__file__).resolve().parent / "kit"))
 import pfx  # noqa: E402
 from fxkit import kite, lumpy, twinkle  # noqa: E402
 from fxlib import line, noise, outline  # noqa: E402

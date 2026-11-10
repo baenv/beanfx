@@ -22,8 +22,7 @@ import numpy as np
 from PIL import Image
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parents[1]  # beanfx
-sys.path[:0] = [str(ROOT / "kit")]
+sys.path[:0] = [str(HERE / "kit")]
 import light  # noqa: E402
 import pfx  # noqa: E402
 from fxkit import TAU, blit, hsh, kite, rot, twinkle  # noqa: E402
