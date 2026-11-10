@@ -1,4 +1,4 @@
-# beanfx
+<h1><img src="docs/media/logo.png" width="294" alt="beanfx"></h1>
 
 Pixel-art effects drawn as code. Describe an effect, and the `/beanfx` skill for Claude Code draws it in Python
 and exports a sprite sheet with JSON that any engine plays.

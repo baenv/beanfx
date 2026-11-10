@@ -37,6 +37,7 @@ site/
 
 # README previews and the demo page's sheets
 !docs/media/*.gif
+!docs/media/*.png
 !docs/demo/*.png
 
 # Personal task tracking
