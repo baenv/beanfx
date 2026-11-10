@@ -17,7 +17,7 @@ kit. `setup.sh --draft <name>` copies the kit into the draft's own `drafts/<name
 the mockup caster, `target.py` the preview target dummy, `ref.py` an object traced from a reference image, `facing.py` the direction fields for the JSON, `derive.py` points taken from a finished
 drawing, `rig.py` the owner's game character as the caster, `export.py` the sheet, its Aseprite-style JSON and the checks). Each `--draft` run also writes `kit/skill.txt`, the skill path `ex.page` takes the preview template from, so pages always use the current `tools/preview.html`. The copy is made once and never overwritten, so a plugin update leaves each existing draft on the kit
 it was drawn with. A kit fix goes into the skill copy first, then into the current draft's `kit/` by hand; other
-drafts get it only when the owner names them. Drafts are `drafts/<name>/` in the project, Python is
+drafts get it only when the owner names them (`setup.sh --kit-status` lists the drafts whose kit is behind; `setup.sh --draft <name> --refresh-kit` copies the current kit into a named one, then run that draft and compare). Drafts are `drafts/<name>/` in the project, Python is
 `.venv/bin/python` there. Older drafts without their own `kit/` import the project's root `kit/`; leave it as it is.
 
 ## Setup (first, every run)

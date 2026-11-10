@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Checks the tools /beanfx needs and installs the missing ones into the project (.venv/); --draft <name> gives drafts/<name>/ its own copy of the kit; --pixelfx adds node and pixelfx for the benchmark and reuse.
+# --kit-status lists the drafts whose pinned kit differs from this skill's kit; --draft <name> --refresh-kit copies the current kit over that draft's (asked for by name only, never by itself).
 # Prints PIXELFX=<dir> when the benchmark tools are there and LAYERS=<script> when reuse works; exits 1 when something cannot be installed here.
 set -u
 
@@ -9,15 +10,22 @@ ROOT="${BEANFX_PROJECT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 PIXELFX_URL="https://github.com/patch-gg/pixelfx"
 want_pixelfx=0
 draft=""
+kit_status=0
+refresh_kit=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --pixelfx) want_pixelfx=1 ;;
     --draft) draft="${2:-}"; shift ;;
+    --kit-status) kit_status=1 ;;
+    --refresh-kit) refresh_kit=1 ;;
     *) printf 'unknown option: %s\n' "$1"; exit 1 ;;
   esac
   shift
 done
 fail=0
+if [ $refresh_kit -eq 1 ] && [ -z "$draft" ]; then
+  printf '%s\n' "--refresh-kit needs --draft <name>"; exit 1
+fi
 
 say() { printf '%s\n' "$*"; }
 
@@ -55,7 +63,10 @@ if [ -n "$draft" ]; then
     */*|.*|"") say "draft: bad name '$draft'"; exit 1 ;;
   esac
   DKIT="$ROOT/drafts/$draft/kit"
-  if [ -d "$DKIT" ]; then
+  if [ -d "$DKIT" ] && [ $refresh_kit -eq 1 ]; then
+    cp "$SKILL"/kit/*.py "$DKIT"/ && say "draft: refreshed drafts/$draft/kit from the skill's kit; run the draft again and compare its output" \
+      || { say "draft: refreshing the kit failed"; fail=1; }
+  elif [ -d "$DKIT" ]; then
     say "draft: drafts/$draft/kit kept as it is"
   else
     mkdir -p "$DKIT" && cp "$SKILL"/kit/*.py "$DKIT"/ && say "draft: copied the kit into drafts/$draft/kit" \
@@ -63,6 +74,22 @@ if [ -n "$draft" ]; then
   fi
   # where the preview page template lives (export.page); a pointer, not part of the pinned kit, so it is rewritten
   [ -d "$DKIT" ] && printf '%s\n' "$SKILL" > "$DKIT/skill.txt"
+fi
+
+# 2b. Which drafts run on an older kit: a kit fix reaches a pinned draft only through --draft <name> --refresh-kit
+if [ $kit_status -eq 1 ]; then
+  seen=0
+  for DK in "$ROOT"/drafts/*/kit; do
+    [ -d "$DK" ] || continue
+    seen=1
+    name="$(basename "$(dirname "$DK")")"
+    changed=""
+    for f in "$SKILL"/kit/*.py; do
+      cmp -s "$f" "$DK/$(basename "$f")" || changed="$changed $(basename "$f")"
+    done
+    if [ -z "$changed" ]; then say "kit-status: $name current"; else say "kit-status: $name behind:$changed"; fi
+  done
+  [ $seen -eq 1 ] || say "kit-status: no draft has its own kit"
 fi
 
 # 3. pixelfx, only for reuse and the benchmark: a clone in the project

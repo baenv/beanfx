@@ -15,11 +15,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - run: pip install numpy pillow
-      - name: skill tests
+      - run: pip install numpy pillow pytest pytest-cov
+      - name: skill tests (every tests/test_*.py and test_*.mjs, with coverage of kit/ and gate.py)
+        run: pytest --cov --cov-report=term-missing
+      - name: the demo page's runtime is the skill's runtime
+        run: cmp plugins/beanfx/skills/beanfx/runtime/beanfx.js docs/beanfx.js
+      - name: the root kit/ is frozen (edit plugins/beanfx/skills/beanfx/kit instead)
+        run: cd kit && sha256sum -c --quiet FROZEN.sha256
+      - name: media budget (docs/ at most 8 MB, one file at most 5 MB)
         run: |
-          S=plugins/beanfx/skills/beanfx
-          python $S/tests/test_gate.py
-          for t in facing derive export ref light impact kit; do python $S/tests/test_$t.py; done
-          node $S/tests/test_runtime.mjs
-          cmp $S/runtime/beanfx.js docs/beanfx.js
+          total=$(du -sk docs | cut -f1)
+          big=$(find docs -type f -size +5M)
+          echo "docs: ${total} kB"
+          [ -z "$big" ] || { echo "over 5 MB: $big"; exit 1; }
+          [ "$total" -le 8192 ] || { echo "docs/ is over 8 MB; drop a gif that no page links, or host it on the site"; exit 1; }
