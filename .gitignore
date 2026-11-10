@@ -38,6 +38,7 @@ site/
 # setup.sh --draft writes this machine-specific pointer
 drafts/*/kit/skill.txt
 /casters_archive/
+/drafts_archive/
 # the bundled game casters ship with the plugin (sheets and rig.json only)
 !plugins/beanfx/skills/beanfx/casters/*/*.png
 

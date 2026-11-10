@@ -42,7 +42,7 @@ skills, kits and drafts stay local and are gitignored until they are ready.
   look in the project's `casters/` first, then there, so any project can use them with no setup. Their build script
   stays local (`chars/`, gitignored).
 - Local only, gitignored: the project's `casters/<name>/` (bought example packs with a `rig.json`, read by
-  `kit/rig.py` as the caster; their licence forbids redistribution, never commit them), `site/` (a static gallery of finished sheets), `pixelfx/` (the clone from `setup.sh
+  `kit/rig.py` as the caster; their licence forbids redistribution, never commit them), `site/` (a static gallery of finished sheets), `drafts_archive/` (drafts that no longer run, kept for reference), `pixelfx/` (the clone from `setup.sh
   --pixelfx`), and the WIP `kit_char/` and `chars/<name>/` for `/char`, `kit_scene/` and `scenes/<name>/` for `/scene`
   (SDF shapes raymarched in Python, with a Blender route that needs Blender 5.x).
 
