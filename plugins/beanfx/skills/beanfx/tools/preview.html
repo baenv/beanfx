@@ -424,7 +424,9 @@ async function loadFxFile(path) {
 async function loadParts(m, base) {
   const out = [];
   for (const [name, p] of Object.entries(m.parts || {})) {
-    if (p.anchor !== "caster" || !p.json || !VFS.has(base + p.json)) continue;
+    // a part placed away from the body (offset, knobs/placement.md) is already in the joined sheet; only parts
+    // that ride on the caster (an aura) draw again here
+    if (p.anchor !== "caster" || p.offset || !p.json || !VFS.has(base + p.json)) continue;
     out.push({ name, layer: p.layer || "front", directions: p.directions || null, asset: await loadFxFile(base + p.json) });
   }
   return out;
@@ -826,9 +828,23 @@ function renderView() {
     const parts = (layer) => { for (const p of S.asset.parts || []) if (p.layer === layer && f < p.asset.meta.frames)
       drawFxFrame(octx, p.asset, partRow(p, dirName), f, Q[0], Q[1], d.flip, $("light").checked); };
     parts("behind");
-    if (ck != null && front) drawChar(octx, S.rig, ca.anim, dirName, ck, Q[0], Q[1], d.flip);
+    if (ck != null && (ca.walk[0] || ca.walk[1])) Q = [Q[0] + (d.flip ? -ca.walk[0] : ca.walk[0]), Q[1] + ca.walk[1]];
+    const char = () => {
+      if (!ca.portal) { drawChar(octx, S.rig, ca.anim, dirName, ck, Q[0], Q[1], d.flip); return; }
+      const sg = d.flip ? -1 : 1, xin = P[0] + sg * ca.portal.in, xout = P[0] + sg * ca.portal.out;
+      for (const [shift, x0] of [[0, xin], [ca.portal.out - ca.portal.in, xout]]) {   // into the first, out of the second
+        octx.save();
+        octx.beginPath();
+        const before = shift === 0;
+        if ((sg > 0) === before) octx.rect(0, 0, x0, octx.canvas.height); else octx.rect(x0, 0, octx.canvas.width - x0, octx.canvas.height);
+        octx.clip();
+        drawChar(octx, S.rig, ca.anim, dirName, ck, Q[0] + sg * shift, Q[1], d.flip);
+        octx.restore();
+      }
+    };
+    if (ck != null && front) char();
     drawFxFrame(octx, S.asset, d.row, f, P[0], P[1], d.flip, $("light").checked);
-    if (ck != null && !front) drawChar(octx, S.rig, ca.anim, dirName, ck, Q[0], Q[1], d.flip);
+    if (ck != null && !front) char();
     parts("front");
     info.push(`<b>frame ${f}</b> / ${m.frames - 1}   t ${(f / m.fps).toFixed(3)} s   row ${d.row} ${d.name}${d.flip ? " (mirrored)" : ""}   action ${a.name} [${a.a}, ${a.b}]`);
     if (c) {
@@ -871,7 +887,15 @@ function casterAt(c, f) {
   if (c.chain && c.chain.length) {
     const seg = c.chain.find((s) => f >= s.effect_from && f <= s.effect_to) || c.chain[c.chain.length - 1];
     const k = Math.min(seg.char_from + Math.floor((f - seg.effect_from) / per), seg.char_to);
-    return { anim: seg.anim, k, contact: [seg.contact] };
+    // walk: the character's offset along the facing and down, eased from walk[0] to walk[1] over the segment;
+    // portal: {in, out} px from the effect pivot along the facing, the body is cut at `in` and shows past `out`
+    let walk = [0, 0];
+    if (seg.walk) {
+      const span = Math.max(1, seg.effect_to - seg.effect_from), t = Math.min(1, Math.max(0, (f - seg.effect_from) / span));
+      const e = t * t * (3 - 2 * t), [a0, a1] = seg.walk;
+      walk = [a0[0] + (a1[0] - a0[0]) * e, a0[1] + (a1[1] - a0[1]) * e];
+    }
+    return { anim: seg.anim, k, contact: [seg.contact], walk, portal: seg.portal || null };
   }
   return { anim: c.anim, k: Math.min(c.start + Math.floor(f / per), c.char_frames - 1), contact: c.contact || [] };
 }

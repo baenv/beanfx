@@ -5,6 +5,11 @@ Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag 
 
 ## Unreleased
 
+- Preview page: a `caster.chain` segment with `walk` moves the body over the segment, and one with `portal` cuts
+  the body at the first rift line and shows it past the second, so a step through a rift plays with the caster.
+  Parts placed with an `offset` are no longer drawn a second time on the body.
+- README demo: Shrinking the Earth (`caster_sword_suc_dia_thanh_thon.gif`) in one row with the two caster gifs.
+
 ## 0.3.0
 
 Sound for an effect, optional (2026-11-10).

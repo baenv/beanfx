@@ -4,8 +4,9 @@ Pixel-art effects drawn as code. Describe an effect, and the `/beanfx` skill for
 and exports a sprite sheet with JSON that any engine plays.
 
 <p>
-  <img src="docs/media/caster_staff_thien_kiep.gif" width="48%" alt="Heavenly tribulation cast by the staff caster">
-  <img src="docs/media/caster_sword_thap_tram.gif" width="48%" alt="Ten-slash combo on the sword caster">
+  <img src="docs/media/caster_staff_thien_kiep.gif" width="26%" alt="Heavenly tribulation cast by the staff caster">
+  <img src="docs/media/caster_sword_thap_tram.gif" width="26%" alt="Ten-slash combo on the sword caster">
+  <img src="docs/media/caster_sword_suc_dia_thanh_thon.gif" width="45%" alt="The sword caster cuts a space rift, runs into it and steps out of a second rift ahead">
 </p>
 
 **[Live demo and gallery](https://beanfx.vhbien000.workers.dev/)** · used in [Nine Heavens](https://play.nineheavens.online/)

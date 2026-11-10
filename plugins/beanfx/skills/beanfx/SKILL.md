@@ -337,7 +337,10 @@ meta["caster"] = r.meta(anim, FPS, start=START)  # into ex.write(extra=...)
   caster animations), frame stepping, speed, light layer, pivot, cell box, swing arc and root motion; Control mode
   drives the caster with WASD, J and K attack, L dash, and fires the effect. An effect on a chain of animations
   (a combo: `meta.beanfx.caster.chain`, each `{anim, char_from, char_to, effect_from, effect_to}`) shows the
-  character of each segment, and J plays the whole chain; animations with rig.json `ms` play by those times. It
+  character of each segment, and J plays the whole chain; animations with rig.json `ms` play by those times. A
+  segment may add `walk` (`[[x0, y0], [x1, y1]]` px, eased over the segment) to move the body, and `portal`
+  (`{in, out}` px from the pivot along the facing) to cut the body at `in` and show it past `out`, for a step
+  through a rift. A part with an `offset` is already in the joined sheet, so the page does not draw it on the body. It
   carries `runtime/beanfx.js` inline: after a runtime change run `python3 <skill>/tests/test_preview.py --write`.
 - `drafts/rig_slash` is the reference: a side slash on `knight_side` attack1 and a top-down slash in 4 directions
   on `adventurer_topdown` attack1, for the frame space, pivot and timing. Its arcs predate `swing` and run against
