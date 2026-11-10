@@ -7,10 +7,11 @@ Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag 
 
 - Tests run under pytest (`pytest --cov` from the repo root); each script still runs alone with python.
 - CI runs every test script (`test_rig.py` and `test_preview.py` were missing), checks that the root `kit/` stays
-  frozen and keeps `docs/` under a size budget.
+  frozen and keeps `docs/` under 8 MB.
 - `setup.sh --kit-status` lists the drafts whose pinned kit is behind the skill's kit; `setup.sh --draft <name>
   --refresh-kit` copies the current kit into one draft.
 - README: quick start and the layout of the exported JSON.
+- Removed three preview gifs that no page linked any more (about 8 MB); `docs/` is now 6.5 MB.
 - `CONTRIBUTING.md`, this file and a release workflow.
 
 ## 0.1.0

@@ -47,7 +47,7 @@ through `tests/conftest.py`, and so does CI. A kit change comes with a check in 
 Images and video are gitignored; only `docs/media/*.gif` and `docs/demo/*.png` are tracked, and every byte
 committed there stays in the history. Keep a gif under 5 MB (fewer frames or a smaller scale before more colours),
 add one only when a page links it, and remove one that nothing links any more. CI fails when `docs/` passes
-16 MB. Other previews belong on the site.
+8 MB. Other previews belong on the site.
 
 ## Releases
 

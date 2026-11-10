@@ -22,10 +22,10 @@ jobs:
         run: cmp plugins/beanfx/skills/beanfx/runtime/beanfx.js docs/beanfx.js
       - name: the root kit/ is frozen (edit plugins/beanfx/skills/beanfx/kit instead)
         run: cd kit && sha256sum -c --quiet FROZEN.sha256
-      - name: media budget (docs/ at most 16 MB, one file at most 5 MB)
+      - name: media budget (docs/ at most 8 MB, one file at most 5 MB)
         run: |
           total=$(du -sk docs | cut -f1)
           big=$(find docs -type f -size +5M)
           echo "docs: ${total} kB"
           [ -z "$big" ] || { echo "over 5 MB: $big"; exit 1; }
-          [ "$total" -le 16384 ] || { echo "docs/ is over 16 MB; drop a gif that no page links, or host it on the site"; exit 1; }
+          [ "$total" -le 8192 ] || { echo "docs/ is over 8 MB; drop a gif that no page links, or host it on the site"; exit 1; }
