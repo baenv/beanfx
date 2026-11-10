@@ -1,0 +1,28 @@
+name: release
+
+# Pushing a tag v<version> publishes a GitHub release with that version's section of CHANGELOG.md.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: the tag matches plugin.json
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          p=$(python3 -c "import json; print(json.load(open('plugins/beanfx/.claude-plugin/plugin.json'))['version'])")
+          [ "$v" = "$p" ] || { echo "tag $GITHUB_REF_NAME but plugin.json says $p"; exit 1; }
+      - name: notes from CHANGELOG.md
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          awk -v v="$v" '/^## /{on = ($2 == v)} on' CHANGELOG.md | tail -n +2 > notes.md
+          [ -s notes.md ] || { echo "CHANGELOG.md has no section for $v"; exit 1; }
+      - run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md
+        env:
+          GH_TOKEN: ${{ github.token }}
