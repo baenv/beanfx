@@ -22,4 +22,13 @@ leaves both readings (a beam can be a held loop or a one-shot blast).
   that burns for 7 s after the grenade. Pick for beams, channels and ground zones.
 A flicker loop shorter than 8 frames looks mechanical; an idle loop needs at least 2 to 4 frames.
 
+**Preview:** give each option an ASCII `preview` of its timeline (`.` build-up, `#` peak, `-` fade, `~` the
+part that repeats, `|` where it wraps):
+
+```
+loop            |~~~~~~~~~~~~|~~~~~~~~~~~~|   runs until the game stops it
+one-shot         ...##-------------          builds, peaks, ends empty
+start, loop, end ..##|~~~~~~|~~~~~~|----     flare, repeat while held, fade
+```
+
 **Default:** from the role: aura, ambient and a held beam loop; hit, explosion and a cast play once.

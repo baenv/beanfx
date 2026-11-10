@@ -75,6 +75,7 @@ for k in knobs:
     body = Path(k["file"]).read_text()
     ok("**Fixed when**" in body or "1. " in body, "%s: body says when it is fixed" % k["name"])
     ok("**Ask" in body or "2. Ask" in body, "%s: body has the question" % k["name"])
+    ok("`preview`" in body and body.count("```") >= 2, "%s: body shows an ASCII preview for the options" % k["name"])
 ok({k["name"] for k in knobs if k.get("applies")} == {"view", "density", "states", "caster", "combo", "placement", "aura"}, "applies set")
 
 # Jev reads only the stated line, so an exclusion in a knob's "Fixed when" must be in that line too

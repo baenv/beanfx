@@ -25,4 +25,15 @@ alternative. Say what each does on a dark and a light ground.
 - Small locked palette (8 to 16 colours): instant retro cohesion, like Shovel Knight on the NES palette.
 Say what each ramp does on the game's brightest ground (snow, lava, sky): a white flash vanishes on snow.
 
+**Preview:** give each option an ASCII `preview` of its ramp from shadow to the white core, one tone per
+step, with the light hue under it:
+
+```
+Ember                         Frost
+#3a1020 #8a2a18 #e0601c       #1a1640 #2a4a9a #46a0e0
+#ffc040 #fff4d0               #a8e8ff #ffffff
+dark ......... bright         dark ......... bright
+light: orange                 light: cyan
+```
+
 **Default:** the element's natural ramp, hue-shifted, white only at the hottest core.

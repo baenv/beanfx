@@ -11,6 +11,7 @@ colour base, and put them back together. Used by the /beanfx skill.
     out = pfx.composite(base, L[i], bg="#101018")                  # one frame; bg None keeps transparency
     pfx.strip(frames, path) / pfx.gif(frames, path, fps, scale=4)  # write the result
     pfx.contact(path, frames, fps, ref=(ref_frames, ref_fps))       # labelled moments, the draft over a reference
+    pfx.takes(path, [("subtle", fr1), ("medium", fr2)], fps)        # takes side by side to pick from: png, and gif
 
 Colour and light keep the pixelfx contract: colour is ordinary RGBA (opaque, dithered or translucent), light is
 added on top. Over transparency the light becomes colour with alpha equal to its brightest channel.
@@ -169,3 +170,38 @@ def contact(path, frames, fps, n=12, scale=3, bg="#101018", ref=None, by="phase"
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     im.save(path)
     return picks
+
+
+def takes(path, options, fps=None, scale=4, bg="#101018"):
+    """Takes to pick from, side by side at scale, each labelled: options is [(label, frames)], frames a list of RGBA
+    uint8 (h, w, 4) as composite gives (a peak frame alone, or the frames round it). Writes path (png, the first frame
+    of each take) and, when fps is given and a take has more than one frame, the same name as a gif that plays them
+    in step, the shortest take holding its last frame. Returns the paths written."""
+    path = Path(path)
+    runs = [(str(lab), list(fr)) for lab, fr in options]
+    ch = max(fr[0].shape[0] for _, fr in runs) * scale
+    cw = max(fr[0].shape[1] for _, fr in runs) * scale
+    gap, head = 8, 16
+    size = (len(runs) * (cw + gap) + gap, ch + head + 2 * gap)
+
+    def board(k):
+        im = Image.new("RGB", size, tuple(_hex(bg).astype(int)))
+        dr = ImageDraw.Draw(im)
+        for n, (lab, fr) in enumerate(runs):
+            a = _flat(fr[min(k, len(fr) - 1)], bg)
+            cell = Image.fromarray(a).resize((a.shape[1] * scale, a.shape[0] * scale), Image.NEAREST)
+            x = gap + n * (cw + gap)
+            dr.text((x, gap), "%d. %s" % (n + 1, lab), fill=(220, 220, 230))
+            im.paste(cell, (x + (cw - cell.width) // 2, gap + head + (ch - cell.height) // 2))
+        return im
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    board(0).save(path)
+    written = [path]
+    n = max(len(fr) for _, fr in runs)
+    if fps and n > 1:
+        g = path.with_suffix(".gif")
+        ims = [board(k) for k in range(n)]
+        ims[0].save(g, save_all=True, append_images=ims[1:], duration=round(1000 / fps), loop=0)
+        written.append(g)
+    return written

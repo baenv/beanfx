@@ -24,4 +24,15 @@ image shows it. "Sparkling" or "shimmering" is clear.
 - Hazy: Dead Cells uses drifting particles and foreground clouds for depth, as set dressing and never for threats.
   On a busy ground a hazy effect needs a dark pad or an outline in the engine.
 
+**Preview:** give each option an ASCII `preview` of the same shape and how far its light and colour spread
+(`#` solid, `+` light, `.` mist):
+
+```
+clear            balanced           hazy
+                   . . .           . . . . . .
+   ###            . +###+ .       . . +###+ . .
+   ###            . +###+ .       . . +###+ . .
+                   . . .           . . . . . .
+```
+
 **Default:** clear.

@@ -23,4 +23,15 @@ grander but turns to noise past what the cell can hold.
   holds. Dead Cells lets players cap particles for that reason.
 Debris for a light hit: 3 to 8 pixels; a big burst only for kills or breakables.
 
+**Preview:** give each option an ASCII `preview` of the same cell at that count (`*` one part):
+
+```
+few              medium            many
++----------+     +----------+      +----------+
+|          |     |  *    *  |      |* * ** * *|
+|    *     |     |    *   * |      | ** * * **|
+|        * |     | *    *   |      |* ** * * *|
++----------+     +----------+      +----------+
+```
+
 **Default:** the fewest that read as the subject at the chosen size.

@@ -32,4 +32,14 @@ so the range is free.
 - An effect that wraps a body (a ring round the waist, a swirl) draws a back and a front layer; say so in the
   question when the shape does that.
 
+**Preview:** give each option an ASCII `preview` of the rows the sheet holds (`>` one drawn row, `<` the
+engine's mirror of it):
+
+```
+side, 1 + mirror      top-down, 8 rows        top-down, 16 rows
+                         \  |  /               more steps between
+  < o >                   - o -                 each of the 8
+  (1 row)                /  |  \               (16 rows)
+```
+
 **Default:** side, 1 direction, mirror True; 8 rows for a top-down projectile or cone, 16 when it travels fast or far.

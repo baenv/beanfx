@@ -17,6 +17,8 @@ asks for stepped light ("NES authentic", "no smooth glow"), so that sheet keeps 
                                            # render(f, seed) stays per frame for check_seeds
     k * flicker(i, f, seed)                # 0..1 per spark i at frame f, seeded and out of step: the twinkle
 
+    g = GLOW["medium"]                     # the glow level: core k, pool radius and k factors, target mean
+
 Keep k at 0.2 to 0.5; light the hot core, eyes, bolt heads, the landing flash and embers, never the whole body.
 Light that lives a few frames reads as sparkle; light that stays reads as haze.
 """
@@ -28,6 +30,13 @@ from fxlib import checker
 
 LEVELS = (0.3, 0.55, 0.8)  # outer, middle and inner band of the hard steps
 CUTS = (0.08, 0.2, 0.4)  # summed light where the outer, middle and inner band begin
+
+# glow level: core k, pool radius and k as factors of the core, target mean of lit pixels; render(f, seed, glow) reads it
+GLOW = {
+    "subtle": {"core": (0.25, 0.5), "pool_r": 2.0, "pool_k": 0.2, "mean": (0.04, 0.07)},
+    "medium": {"core": (0.3, 0.7), "pool_r": 2.5, "pool_k": 0.4, "mean": (0.06, 0.10)},
+    "strong": {"core": (0.3, 0.7), "pool_r": 3.0, "pool_k": 0.45, "mean": (0.08, 0.14)},
+}
 
 
 def buffer(c):

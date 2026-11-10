@@ -31,4 +31,13 @@ what it changes (directions, loop, size).
 Ask one plain line when it is open: what the player does while it plays. A player who is locked in place takes 1 to
 2 s; a running player needs it under 0.5 s.
 
+**Preview:** give each option an ASCII `preview` of what it does on screen (`o` the caster or target):
+
+```
+projectile          hit             explosion          aura
+ o  ---==>  o        o *             \ | /              ( o )
+/|\                 /|\  '           - @ -              (/|\)
+                                    / | \
+```
+
 **Default:** the plainest reading of the subject.

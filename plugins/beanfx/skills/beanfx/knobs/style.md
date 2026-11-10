@@ -29,6 +29,16 @@ as "NES authentic", "no smooth glow", "stepped light" or "banded glow".
 Outline: none for light and gas; a 1 px dark outline for solid objects (a disc, a rock), or when the effect must
 read on a busy ground (Dead Cells lets players outline projectiles for that reason).
 
+**Preview:** give each option an ASCII `preview` of one small blob in that look (`#` solid, `%` dither,
+`O` dark outline, `.` translucent, `+` glow):
+
+```
+soft             hard retro          painterly HD
+  . + .           OOOOO               .:::.
+ .+###+.          O#%#O              :=###=:
+  . + .           OOOOO               ':::'
+```
+
 **Default:** soft: 1 px lines and rims with white-hot cores, translucent smoke and mist, smooth additive light.
 The light is smooth in every style unless the owner asks for bands.
 Pick one look and keep it in every frame.

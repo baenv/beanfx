@@ -14,7 +14,8 @@ implies glints and stronger point light but is open.
 
 **Ask:** "How strong is the glow?" Options "Medium (Recommended): reads on dark and mid grounds", "Strong: bright
 cores and many flashes, blows out on a light ground", "Subtle: tight cores for a busy screen". The light ships as its own sheet with
-`light_gain`, so the engine can still tune it.
+`light_gain`, so the engine can still tune it. Ask it on the drawing when it is open: after the peak reads, the
+glow takes (SKILL.md) show the peak at the three levels and this question names the take each option matches.
 
 **Examples:**
 - Subtle: for a busy screen with many effects. Dead Cells added a switch to turn bright flashes down after players
@@ -23,5 +24,16 @@ cores and many flashes, blows out on a light ground", "Subtle: tight cores for a
 - Strong: for finishers and big magic; Celeste's hair goes white at the fastest moment of the dash. Blows out on a
   light ground.
 - No glow: flat pixels, the authentic NES look of Shovel Knight. Offer it only when the owner wants that flat look in words.
+
+**Preview:** the glow is picked on the drawing (Glow takes in SKILL.md): the peak at each level side by side in
+`out/glow_takes.png` and `.gif`. When it has to be asked in words (no peak yet, or the owner asks up front), give
+each option this ASCII `preview` of one hot core and its light (`@` core, `*` bright, `+` pool, `.` faint):
+
+```
+subtle          medium            strong
+                  .  .           .  .  .  .
+   + @ +        + * @ * +      + * * @ * * +
+                  .  .           .  .  .  .
+```
 
 **Default:** medium.

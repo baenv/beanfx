@@ -37,4 +37,13 @@ and what it does in each state (charge, rise, point, land).
   top-down effect has all 8. A character composed from the owner's own game sheets may be used as it is;
   each comes as `<name>` (side, east and west) and `<name>_topdown` (8 directions).
 
+**Preview:** give each option an ASCII `preview` of what the preview shows (`o` the caster, `*` the
+effect); the sheet ships without the caster in every case:
+
+```
+effect only      silhouette        silhouette + avatar     game character
+                  o   *              [face]  o   *          your sprite, its
+    *            /|\ ***                    /|\ ***         frames, its pivot
+```
+
 **Default:** no caster.

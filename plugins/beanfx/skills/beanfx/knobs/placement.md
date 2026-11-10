@@ -34,4 +34,13 @@ it) skips it.
 `[dx, dy]` from the character's pivot to the effect's pivot (screen px, y down; a side view gives one pair that
 flips with the mirror), and `range`. The engine adds it at spawn and leaves the effect there while the caster moves.
 
+**Preview:** give each option an ASCII `preview` of where it lands against the caster (`o` the caster, `X`
+the struck spot, `|---|` the range):
+
+```
+fixed in front       at the edge        game target          on the caster
+ o      X             o X                o    ...   X          X
+/|\|---|             /|\               /|\  (lock-on)         /|\
+```
+
 **Default:** fixed range in front for a cast that lands away; 0 (on the caster) for everything else.

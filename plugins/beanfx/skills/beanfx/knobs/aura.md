@@ -34,4 +34,14 @@ effect's frames: `aura_back` (`layer: behind`: the ring's far half, motes behind
 sheet and JSON (`json` in the part), drawn with `ex.write`; a part that follows the hand or weapon (the emit point
 in rig.json) has one row per caster direction. Preview it with the caster; it is checked like any sheet.
 
+**Preview:** give each option an ASCII `preview` of the caster while it casts (`o` the caster, `~` light,
+`=` the ring under the feet):
+
+```
+body aura        ground ring       outline           none
+ ~ o ~              o              (o)                o
+~ /|\ ~            /|\             (/|\)              /|\
+ =====            =====
+```
+
 **Default:** body aura for a cast skill with a caster; none otherwise.

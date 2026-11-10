@@ -5,6 +5,16 @@ Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag 
 
 ## Unreleased
 
+## 0.2.0
+
+Plain questions with pictures (2026-11-10).
+
+- Glow takes: an open glow knob is picked on the drawing. The peak and the frames round it render at subtle,
+  medium and strong into `out/glow_takes.png` and `.gif`, then one question asks which. `light.GLOW` holds the
+  level table and `pfx.takes` lays out any takes (glow or shape) side by side.
+- Every knob file now shows an ASCII preview for its options (view, loop, role, density, placement, clarity, style,
+  palette, glow, caster, combo, aura, states, besides size, timing and shape), and an owner new to VFX gets one on
+  every question.
 - pytest reports each check as its own test (371 of them), not one per script; `tests/checklog.py` records them.
 - CI fails when coverage drops under 60% (`fail_under` in `pyproject.toml`; 64% now).
 - The published example drafts carry their own kit in `drafts/<name>/kit/` (the same files they were drawn with,

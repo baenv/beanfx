@@ -66,12 +66,14 @@ PROMPT
 2 to 4 concrete values, the recommended one first and marked "(Recommended)", each saying what it does to the
 result. Send them with AskUserQuestion, at most 4 per call, in the gate's order; the next call goes after the
 answers when its options depend on them (a top-down view changes which shapes read). `states` may take more
-than one question.
+than one question. An open `glow` is the exception: it is picked on the drawing (Glow takes, section 2), so the
+brief carries medium for now and says the glow is picked on the peak.
 
 **Explain for an owner new to VFX.** A thin prompt (a subject only, no words like fps, loop, glow or palette)
 means the owner may not know the terms. Then each question gets one plain line saying why it matters, each
 option's description gets its "Examples" line from the knob file (what it looks like in a known game and when to
-pick it), and size, timing and shape options carry an ASCII `preview`. Use plain words in the text the owner reads
+pick it), and every option carries the ASCII `preview` its knob file shows (a picture of the cell, the timeline,
+the silhouette, the directions, the spread of the light), so the owner picks by sight. Use plain words in the text the owner reads
 ("how long the hit freezes the screen", not "hit-stop"). `vfx_notes.md` holds the sources and more examples.
 
 Research the subject (section 2a) before the `shape` question, so its options come from how
@@ -129,7 +131,7 @@ a. **Research, then from scratch (default).** Before the brief's beats and carri
    `twinkle`, `hit_burst`, `claw_tracks`) and `kit/fxlib.py` (`stroke`, `outline`, `checker`,
    `ground_ring`, `ramp`, `wgrid`, `noise`, and `Pen(px, py, density)`, whose `put` and `line` take the same
    world px as `grid` and `wgrid`, so no draft converts to sheet px by hand); light from `kit/light.py` (`glow`, `glow_line`, `glow_ring`,
-   falloff `(1 - d)^2 * k`); output with `kit/pfx.py` (`paint`, `composite`, `strip`, `gif`, `contact`). A draft puts its own
+   falloff `(1 - d)^2 * k`); output with `kit/pfx.py` (`paint`, `composite`, `strip`, `gif`, `contact`, `takes`). A draft puts its own
    `kit/` on `sys.path` (`sys.path.insert(0, str(HERE / "kit"))`). These are generic; use your own palette and size. Leave other drafts in `drafts/` unread.
 
    **Light stays smooth in every style.** Sum the glows into one float map `L`, then colour it with
@@ -150,7 +152,8 @@ a. **Research, then from scratch (default).** Before the brief's beats and carri
    a white heart). A big move wants dozens of these at its peak; pixelfx myriad-swords carries 400 to 800 bright
    points a frame and its light changes about three times as much between frames as a draft lit by still pools.
 
-   **Glow level** (a brief knob: subtle, medium, strong; medium when open) sets how bright the lit parts are:
+   **Glow level** (a brief knob: subtle, medium, strong; medium when open, then picked on the glow takes) sets how
+   bright the lit parts are (`light.GLOW` holds the table):
 
    | level | core k | pool along a part | mean |
    |---|---|---|---|
@@ -219,7 +222,18 @@ head lands on it exactly.
 do it", or the owner asks for options), draw 2 to 3 genuinely different takes of the peak frame only, each from a
 different reading in the research (a coiled dragon, a dragon in a dive, a dragon head alone). Put them side by
 side at 4x on the dark ground in `out/takes.png`, show it, and ask which one with AskUserQuestion before drawing
-any other frame. Delete the code of the takes not kept.
+any other frame. Write the board with `pfx.takes(out / "takes.png", [(label, [peak]), ...])`. Delete the code
+of the takes not kept.
+
+**Glow takes when the glow is open.** When `glow` was open in the brief, pick it on the drawing, not in words:
+once the peak reads, render the peak and the frames round it (about 6 before to 12 after) at each level, with
+`render(f, seed, glow=level)` drawing its cores and pools from `light.GLOW[level]`, and lay them side by side with
+`pfx.takes(out / "glow_takes.png", [("subtle", fr), ("medium", fr), ("strong", fr)], fps=FPS)`. It writes the
+png and a gif that plays the three in step. Show both, then ask one AskUserQuestion: "How strong is the glow?",
+options "Medium (Recommended)", "Strong", "Subtle", each with its line from `knobs/glow.md` and the take number
+it matches; say the light still ships as its own sheet with `light_gain`, so the game can tune it later. Keep
+the picked level as `GLOW` and draw the other frames with it. Skip the takes when the prompt set the glow, the
+owner wants flat pixels with no glow, or said "just do it" (then medium).
 
 **Mockup caster** (only when the brief says yes): `kit/caster.py` draws a golden robed silhouette with no face,
 glowing at max, plus an optional avatar. The style: 5 gold tones (`cs.BODY`) shaded by neighbour (a step up

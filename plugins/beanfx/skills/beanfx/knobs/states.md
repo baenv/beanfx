@@ -30,3 +30,13 @@ clusters when the owner meant a rain. Neither state had been asked about.
 - Freeze then release: Celeste's dash, 15 frames with 3 frozen at the start.
 - Trigger then payload: Noita's double trigger bolt releases its second spell only when it hits something.
 - Key states first: block the start, the peak and the end with as few frames as read, then add frames between.
+
+**Preview:** give each option an ASCII `preview` of the state table as a timeline, one row per state (one
+mark about 0.1 s):
+
+```
+gather   ##########
+hold               ###
+strike                ########
+fade                          #####
+```

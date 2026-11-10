@@ -18,6 +18,15 @@ reads as at 1x (a fireball: round head with broken puffs, a comet teardrop, a sp
 the one that reads clearest at the chosen size. A reference game or art the owner names gives principles, never a
 copy of its effect.
 
+**Preview** (a fireball; draw each from the research, about 16 x 8, `#` solid, `*` sparks, `-` the tail):
+
+```
+round burst        comet               ring of flame
+   * ### *                   ####        ## ##
+  #########       ---------######      ##     ##
+   * ### *                   ####        ## ##
+```
+
 **Examples** (pair each silhouette with one the owner may know):
 - Round burst: the fastest read, hides what is behind it. The Dead Cells grenade blast.
 - Ring or shockwave: shows the radius and keeps the middle open so the player stays visible. The Enter the Gungeon

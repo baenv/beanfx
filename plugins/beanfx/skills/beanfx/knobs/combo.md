@@ -35,6 +35,13 @@ light, then heavy, then the finisher).
 - One press, whole string: a fighting game super or Devil May Cry's Million Stab, where one input plays a fixed
   sequence.
 
+**Preview:** give each option an ASCII `preview` of presses against the clips (`P` a press, `[1]` a clip):
+
+```
+one press per hit      P    P    P            whole string     P
+                       [1]  [2]  [3]                           [1 2 3 4]
+```
+
 **Default:** one press per hit when the effect rides a game character; the whole string for a cinematic
 finisher or a mockup caster.
 
