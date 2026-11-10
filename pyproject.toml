@@ -8,3 +8,7 @@ addopts = "-ra"
 [tool.coverage.run]
 source = ["plugins/beanfx/skills/beanfx"]
 omit = ["*/tests/*"]
+
+[tool.coverage.report]
+# CI fails below this; raise it as tests are added (64% when it was set; fxkit, fxlib and gate.py are the gaps)
+fail_under = 60

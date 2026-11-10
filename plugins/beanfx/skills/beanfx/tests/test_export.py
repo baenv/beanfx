@@ -12,6 +12,7 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "kit"))
+import checklog  # noqa: E402  (records each check for pytest, see conftest.py)
 import export as ex  # noqa: E402
 import facing as fc  # noqa: E402
 import target as tg  # noqa: E402
@@ -21,6 +22,7 @@ fails = []
 
 
 def ok(cond, msg):
+    checklog.record(cond, msg)
     if not cond:
         fails.append(msg)
 

@@ -14,6 +14,7 @@ from pathlib import Path
 SKILL = Path(__file__).resolve().parents[1]
 GATE = SKILL / "gate.py"
 sys.path.insert(0, str(SKILL))
+import checklog  # noqa: E402  (records each check for pytest, see conftest.py)
 import gate  # noqa: E402
 
 # The stub answers stated::<knob> and applies::<knob> from this table (default 0.0 stated, 1.0 applies).
@@ -48,6 +49,7 @@ fails = []
 
 
 def ok(cond, msg):
+    checklog.record(cond, msg)
     if not cond:
         fails.append(msg)
 

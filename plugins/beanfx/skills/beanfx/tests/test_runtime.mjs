@@ -5,7 +5,11 @@
 import { createFx, fromJson, rowOf } from "../runtime/beanfx.js";
 
 const fails = [];
-const ok = (cond, msg) => cond || fails.push(msg);
+// BEANFX_CHECKS=1 (set by conftest.py) prints one line per check so pytest reports each one apart
+const ok = (cond, msg) => {
+  if (process.env.BEANFX_CHECKS) console.log(`CHECK ${cond ? "ok" : "fail"} ${String(msg).replace(/\s+/g, " ")}`);
+  return cond || fails.push(msg);
+};
 const near = (a, b) => Math.abs(a - b) < 1e-6;
 
 // the JSON export.write makes: frames row-major in a grid, tags, meta.beanfx

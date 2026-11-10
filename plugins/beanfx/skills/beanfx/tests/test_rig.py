@@ -11,6 +11,7 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "kit"))
+import checklog  # noqa: E402  (records each check for pytest, see conftest.py)
 import rig  # noqa: E402
 
 W, H, N = 24, 32, 3
@@ -34,6 +35,12 @@ SHIP_KEYS = {"frame", "frames", "fps", "loop", "sheets", "pivot", "ms", "contact
 
 def main():
     bad = []
+
+    def ok(cond, name, got=""):
+        checklog.record(cond, name)
+        if not cond:
+            bad.append(name + (f"; got {got}" if got != "" else ""))
+
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         side = root / "casters" / "hero"
@@ -58,46 +65,37 @@ def main():
         t_no_swing = rig.Rig(side)
         del t_no_swing.spec["anims"]["atk"]["swing"]
         fr = r.frames("atk")
-        if len(fr) != N or fr[0].shape != (H, W, 4):
-            bad.append(f"frames: {len(fr)} of {fr[0].shape}, want {N} of {(H, W, 4)}")
-        if [int(np.nonzero(f[2, :, 3])[0][0]) for f in fr] != list(range(N)):
-            bad.append("frames: cut in the wrong place (marker column per frame)")
-        if r.pivot("atk") != [10, 28]:
-            bad.append(f"measured pivot {r.pivot('atk')}, want [10, 28]")
+        ok(len(fr) == N and fr[0].shape == (H, W, 4), "frames: count and size", f"{len(fr)} of {fr[0].shape}")
+        ok([int(np.nonzero(f[2, :, 3])[0][0]) for f in fr] == list(range(N)), "frames: cut at the marker column per frame")
+        ok(r.pivot("atk") == [10, 28], "pivot: measured on the feet", r.pivot("atk"))
 
         canvas = r.place((60, 70), (40, 50), "atk", 0)
         ys, xs = np.nonzero(canvas[..., 3] > 0)
         feet = xs[ys == ys.max()]
-        if ys.max() + 1 != 50 or round((feet.min() + feet.max() + 1) / 2) != 40:
-            bad.append(f"place: feet at ({(feet.min() + feet.max() + 1) / 2}, {ys.max() + 1}), want (40, 50)")
-        if r.place((60, 70), (40, 50), "atk", N + 2, hold=False).any():
-            bad.append("place: frame after the animation with hold False should be empty")
-        if not r.place((10, 10), (500, 500), "atk", 0).shape == (10, 10, 4):
-            bad.append("place: off-canvas placement should clip, not fail")
+        ok(ys.max() + 1 == 50 and round((feet.min() + feet.max() + 1) / 2) == 40, "place: feet on the given point",
+           ((feet.min() + feet.max() + 1) / 2, ys.max() + 1))
+        ok(not r.place((60, 70), (40, 50), "atk", N + 2, hold=False).any(), "place: empty after the animation with hold False")
+        ok(r.place((10, 10), (500, 500), "atk", 0).shape == (10, 10, 4), "place: off-canvas placement clips")
 
         m = r.meta("atk", 20, start=1)
         want = dict(rig="hero", anim="atk", start=1, char_fps=10, frames_per_char_frame=2, char_pivot=[10, 28],
                     contact=[1], layer="front", pixel_scale=1)
         for k, v in want.items():
-            if m.get(k) != v:
-                bad.append(f"meta {k} = {m.get(k)}, want {v}")
-        if [x["turn"] for x in m.get("swing", [])] != ["cw"] or r.swing("atk")[0]["to"] != 150:
-            bad.append(f"side swing: meta {m.get('swing')}, want one cw stroke to 150")
-        if r.arc("atk") != (-60.0, 150.0) or r.check_arc("atk", -60, 150):
-            bad.append(f"arc: {r.arc('atk')} should follow the stroke and pass its own check")
-        if len(r.check_arc("atk", 150, -60)) != 3:
-            bad.append(f"check_arc: a reversed arc should fail turn, start and end: {r.check_arc('atk', 150, -60)}")
-        if r.check_arc("atk", -30, 130) or not r.check_arc("atk", -60, 300):
-            bad.append("check_arc: ends within tol pass, an end 150 deg off fails")
-        if r.root("atk") != [[0, 0]] * N or r.root("dash")[2] != [12, 0]:
-            bad.append(f"root: {r.root('atk')} and {r.root('dash')}, want zeros and the listed travel")
+            ok(m.get(k) == v, f"meta: {k}", m.get(k))
+        ok([x["turn"] for x in m.get("swing", [])] == ["cw"] and r.swing("atk")[0]["to"] == 150, "side swing: one cw stroke to 150",
+           m.get("swing"))
+        ok(r.arc("atk") == (-60.0, 150.0) and not r.check_arc("atk", -60, 150), "arc: follows the stroke and passes its own check",
+           r.arc("atk"))
+        ok(len(r.check_arc("atk", 150, -60)) == 3, "check_arc: a reversed arc fails turn, start and end", r.check_arc("atk", 150, -60))
+        ok(not r.check_arc("atk", -30, 130) and r.check_arc("atk", -60, 300), "check_arc: ends within tol pass, an end 150 deg off fails")
+        ok(r.root("atk") == [[0, 0]] * N and r.root("dash")[2] == [12, 0], "root: zeros, and the listed travel",
+           (r.root("atk"), r.root("dash")))
         moved = r.place((60, 70), (40, 50), "dash", 2, travel=True)
         still = r.place((60, 70), (40, 50), "dash", 2)
-        if np.nonzero(moved[..., 3])[1].min() - np.nonzero(still[..., 3])[1].min() != 12:
-            bad.append("place travel=True should shift the body by its root motion")
+        ok(np.nonzero(moved[..., 3])[1].min() - np.nonzero(still[..., 3])[1].min() == 12, "place: travel=True shifts by the root motion")
         md = r.meta("dash", 10)
-        if md.get("root") != [[0, 0], [5, 0], [12, 0]] or "anchor" not in md or "root" in r.meta("atk", 10):
-            bad.append(f"meta root: {md.get('root')}, anchor {md.get('anchor')}")
+        ok(md.get("root") == [[0, 0], [5, 0], [12, 0]] and "anchor" in md and "root" not in r.meta("atk", 10), "meta: root and anchor",
+           (md.get("root"), md.get("anchor")))
         for call, why in ((lambda: r.meta("atk", 15), "fps not a multiple"),
                           (lambda: r.meta("atk", 20, layer="side"), "bad layer"),
                           (lambda: r.frames("walk"), "unknown anim"),
@@ -105,21 +103,19 @@ def main():
                           (lambda: rig.load("nobody", root), "missing rig")):
             try:
                 call()
-                bad.append(f"no error on {why}")
+                ok(False, f"error on {why}")
             except (ValueError, KeyError, FileNotFoundError):
-                pass
+                ok(True, f"error on {why}")
 
         t = rig.load(str(top))
-        if t.meta("atk", 10)["directions"] != rig.DIRS4:
-            bad.append("top-down meta: directions missing or out of order")
+        ok(t.meta("atk", 10)["directions"] == rig.DIRS4, "top-down meta: directions in order")
         to = t.meta("atk", 10, offset=50)["offset"]
-        if list(to) != rig.DIRS4 or to["south"] != [0, 50] or to["west"] != [-50, 0]:
-            bad.append(f"top-down meta offset: one pair per direction along its facing; got {to}")
+        ok(list(to) == rig.DIRS4 and to["south"] == [0, 50] and to["west"] == [-50, 0], "top-down meta: one offset per direction", to)
         sw = t.meta("atk", 10).get("swing", {})
-        if list(sw) != rig.DIRS4 or sw["west"][0]["from"] != 180 or t.swing("atk", "north")[0]["frames"] != [1, 2]:
-            bad.append(f"top-down swing: one list per direction in order, read per direction; got {sw}")
-        if [int(np.nonzero(t.frames("atk", d)[0][-5, :, 3])[0].mean() + 0.5) for d in rig.DIRS4] != [10, 11, 12, 13]:
-            bad.append("top-down: each direction should read its own sheet")
+        ok(list(sw) == rig.DIRS4 and sw["west"][0]["from"] == 180 and t.swing("atk", "north")[0]["frames"] == [1, 2],
+           "top-down swing: one list per direction, read per direction", sw)
+        ok([int(np.nonzero(t.frames("atk", d)[0][-5, :, 3])[0].mean() + 0.5) for d in rig.DIRS4] == [10, 11, 12, 13],
+           "top-down: each direction reads its own sheet")
 
         # a side rig with its own east and west rows (a game character) and a row at its own fps with uneven ms
         two = root / "casters" / "duo"
@@ -130,23 +126,21 @@ def main():
             "directions": ["east", "west"], "anims": {"cast": {"frame": [W, H], "frames": N, "fps": 20,
             "ms": [50, 100, 50], "sheets": {"east": "cast_east.png", "west": "cast_west.png"}, "contact": [1]}}}))
         u = rig.load("duo", root)
-        if u.fps_of("cast") != 20:
-            bad.append(f"fps_of: a row's own fps should win, got {u.fps_of('cast')}")
+        ok(u.fps_of("cast") == 20, "fps_of: a row's own fps wins", u.fps_of("cast"))
         um = u.meta("cast", 40)
-        if um.get("directions") != ["east", "west"] or um["frames_per_char_frame"] != 2 or um["char_fps"] != 20:
-            bad.append(f"two-row side meta: directions, row fps and frame ratio; got {um}")
+        ok(um.get("directions") == ["east", "west"] and um["frames_per_char_frame"] == 2 and um["char_fps"] == 20,
+           "two-row side meta: directions, row fps and frame ratio", um)
         uo = u.meta("cast", 40, offset=110)
-        if uo.get("offset") != [110, 0] or uo.get("range") != 110 or "offset" not in uo["align"] or "offset" in um:
-            bad.append(f"side meta offset: one pair along east and the range; got {uo.get('offset')}")
-        if um.get("char_ms") != [50, 100, 50]:
-            bad.append("two-row side meta: the row's ms should pass through as char_ms")
-        if [int(np.nonzero(u.frames("cast", d)[0][-5, :, 3])[0].mean() + 0.5) for d in ("east", "west")] != [10, 11]:
-            bad.append("two-row side: west should read its own sheet, not a mirror of east")
+        ok(uo.get("offset") == [110, 0] and uo.get("range") == 110 and "offset" in uo["align"] and "offset" not in um,
+           "side meta: one offset along east and the range", uo.get("offset"))
+        ok(um.get("char_ms") == [50, 100, 50], "two-row side meta: the row's ms pass through as char_ms")
+        ok([int(np.nonzero(u.frames("cast", d)[0][-5, :, 3])[0].mean() + 0.5) for d in ("east", "west")] == [10, 11],
+           "two-row side: west reads its own sheet, not a mirror of east")
         try:
             u.meta("cast", 30)
-            bad.append("meta: an effect fps that is not a whole multiple of the row's fps should be refused")
+            ok(False, "meta: an effect fps that is not a whole multiple of the row's fps is refused")
         except ValueError:
-            pass
+            ok(True, "meta: an effect fps that is not a whole multiple of the row's fps is refused")
 
         # the casters that ship with the skill load by name from a project with none of its own, and carry no
         # trace of where they were built
@@ -154,14 +148,13 @@ def main():
         for name in ("nghich_tien_kiem", "nghich_tien_kiem_topdown", "nghich_tien_truong", "nghich_tien_truong_topdown"):
             try:
                 b = rig.load(name, root)
-                if b.dir.resolve() != (ship / name).resolve():
-                    bad.append(f"bundled {name}: loaded from {b.dir}")
+                ok(b.dir.resolve() == (ship / name).resolve(), f"bundled {name}: loads from the skill's casters/")
             except FileNotFoundError as e:
-                bad.append(f"bundled {name}: {e}")
+                ok(False, f"bundled {name}: loads from the skill's casters/", e)
             spec = json.loads((ship / name / "rig.json").read_text())
-            if not spec.get("source", "").startswith("beanfx bundled") or "/" in spec["source"] or any(
-                    set(a) - SHIP_KEYS for a in spec["anims"].values()):
-                bad.append(f"bundled {name}: rig.json carries build details beyond the rig contract")
+            ok(spec.get("source", "").startswith("beanfx bundled") and "/" not in spec["source"] and not any(
+                set(a) - SHIP_KEYS for a in spec["anims"].values()),
+               f"bundled {name}: rig.json carries only the rig contract")
 
     for b in bad:
         print(b)
