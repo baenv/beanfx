@@ -5,6 +5,11 @@ Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag 
 
 ## Unreleased
 
+- pytest reports each check as its own test (371 of them), not one per script; `tests/checklog.py` records them.
+- CI fails when coverage drops under 60% (`fail_under` in `pyproject.toml`; 64% now).
+- The published example drafts carry their own kit in `drafts/<name>/kit/` (the same files they were drawn with,
+  so their output is byte for byte the same), and the root `kit/` is gone.
+
 ## 0.1.0
 
 First public version (2026-11-08 to 2026-11-10).
@@ -19,8 +24,7 @@ First public version (2026-11-08 to 2026-11-10).
   casters: sword and staff, side and top-down.
 - gitleaks pre-commit hook and CI scan.
 - Tests run under pytest (`pytest --cov` from the repo root); each script still runs alone with python.
-- CI runs every test script (`test_rig.py` and `test_preview.py` were missing), checks that the root `kit/` stays
-  frozen and keeps `docs/` under 8 MB.
+- CI runs every test script (`test_rig.py` and `test_preview.py` were missing) and keeps `docs/` under 8 MB.
 - `setup.sh --kit-status` lists the drafts whose pinned kit is behind the skill's kit; `setup.sh --draft <name>
   --refresh-kit` copies the current kit into one draft.
 - README: demo first, quick start; the layout of the exported JSON in `docs/output-json.md`.

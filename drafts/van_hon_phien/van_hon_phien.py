@@ -20,7 +20,7 @@ import numpy as np
 from PIL import Image
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parents[1] / "kit"))
+sys.path.insert(0, str(HERE / "kit"))
 import caster as cs  # noqa: E402
 import pfx  # noqa: E402
 from fxlib import noise, stroke  # noqa: E402

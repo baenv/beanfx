@@ -18,7 +18,7 @@ from types import SimpleNamespace
 import numpy as np
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE.parents[1] / "kit"))
+sys.path.insert(0, str(HERE / "kit"))
 import fxlib  # noqa: E402
 import light  # noqa: E402
 import pfx  # noqa: E402
