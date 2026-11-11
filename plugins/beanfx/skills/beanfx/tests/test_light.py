@@ -68,5 +68,23 @@ light.glow(L, c, 20, 20, 6, 0.6)
 light.glow_line(L, c, (40, 10), (40, 50), 3, 0.4)
 ok((L > 0.03).mean() < 0.25, "a clear scene lights under a quarter of its box: %.2f" % (L > 0.03).mean())
 
+# stepped light: a few flat values, hard inside, dithered only in the outer step, dark below the floor
+L = light.buffer(c)
+light.glow(L, c, 32.5, 32.5, 24, 1.0)
+S = light.steps(L, levels=4, floor=0.06)
+vals = set(np.round(np.unique(S), 6))
+ok(vals <= {0.0, 0.25, 0.5, 0.75, 1.0}, "steps gives only the step values: %s" % sorted(vals))
+ok(S.max() == 1.0, "steps keeps a white-hot core")
+ok((S[L < 0.06] == 0).all(), "steps is dark below the floor")
+inner = L >= 0.25
+ok((S[inner] == np.floor(L[inner] * 4 + 1e-9) / 4).all(), "steps is hard inside the light, no dither")
+outer = (L >= 0.06) & (L < 0.25)
+lit = S[outer] > 0
+ok(0.1 < lit.mean() < 0.9, "the outer step is dithered: %.2f lit" % lit.mean())
+near = outer & (L > 0.2)
+far = outer & (L < 0.1)
+ok(S[near].mean() > S[far].mean(), "the dither thins out as the light fades")
+ok(not np.array_equal(light.steps(L, phase=(1, 0)), S), "phase moves the dither grid")
+
 print("ok light checks" if not fails else "\n".join("FAIL " + m for m in fails) + "\n%d light checks" % len(fails))
 sys.exit(1 if fails else 0)

@@ -11,14 +11,16 @@ dither, translucent), or an image shows it.
 
 **Ask:** "Which look?" Offer whole looks, never single toggles:
 - "Soft (Recommended): 1 px lines, translucent smoke, smooth glow"
-- "Hard retro: opaque pixels, dark outline, checker dither, smooth glow on top"
+- "Hard retro: opaque pixels, dark outline, checker dither, stepped pixel glow"
 - "Painterly HD: more tones, no outline, soft volumes"
 Ask outline or dither apart only when the owner picked a look and one of them is still open.
 
-The style sets the colour pixels only (opaque or translucent, outline, dither, tone count). The light stays
-smooth in every look: the bloom at a pop or a flash is what makes an effect read as bright, and light cut into
-bands loses it. Cut the light into bands (`light.bands`, `pfx.bands`) only when the owner says so in words such
-as "NES authentic", "no smooth glow", "stepped light" or "banded glow".
+The style sets the colour pixels (opaque or translucent, outline, dither, tone count) and the light that goes with
+them. Soft and painterly keep smooth light: the bloom at a pop reads as bright, at the cost of hundreds of colours
+per frame. Hard retro steps the light (`light.steps`: four flat tones, dither only where it fades out), so the
+whole frame keeps to a few dozen colours and reads as pixel art; pixel artists see smooth bloom over crisp
+sprites as "not pixel". The owner can swap the light either way in words ("smooth glow", "pixel light",
+"stepped light", "no blur").
 
 **Examples:**
 - Soft: Dead Cells, saturated pixels with smooth light on top.
@@ -30,15 +32,19 @@ Outline: none for light and gas; a 1 px dark outline for solid objects (a disc, 
 read on a busy ground (Dead Cells lets players outline projectiles for that reason).
 
 **Preview:** give each option an ASCII `preview` of one small blob in that look (`#` solid, `%` dither,
-`O` dark outline, `.` translucent, `+` glow):
+`O` dark outline, `.` translucent, `+` smooth glow, `,` stepped glow, dithered):
 
 ```
 soft             hard retro          painterly HD
-  . + .           OOOOO               .:::.
- .+###+.          O#%#O              :=###=:
-  . + .           OOOOO               ':::'
+  . + .          , , , ,              .:::.
+ .+###+.          OOOOO              :=###=:
+  . + .          ,O#%#O,              ':::'
+                  OOOOO
+                 , , , ,
 ```
 
 **Default:** soft: 1 px lines and rims with white-hot cores, translucent smoke and mist, smooth additive light.
-The light is smooth in every style unless the owner asks for bands.
+When the prompt asks for a pixel feel in words ("pixel art vibe", "crisp", "no blur", "retro"), recommend hard
+retro, or soft with stepped light. Hard retro steps the light; soft and painterly keep it smooth unless the owner
+says otherwise.
 Pick one look and keep it in every frame.

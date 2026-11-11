@@ -101,6 +101,13 @@ ok(ex.check(shot, light) == [], f"clean one-shot flagged: {ex.check(shot, light)
 pop = shot[:-1] + [disc(9)]
 ok(any("pop off" in p for p in ex.check(pop)), "one-shot that pops off")
 ok(ex.check(pop, hold=True) == [], "a held ending is not a pop")
+noisy = np.zeros((H, W, 4), np.uint8)
+noisy[2:-2, 2:-2, 3] = 255
+noisy[2:-2, 2:-2, 0] = (np.arange((H - 4) * (W - 4)) % 200).reshape(H - 4, W - 4)
+ok(ex.colours(noisy) == min(200, (H - 4) * (W - 4)), f"colours counts distinct opaque colours: {ex.colours(noisy)}")
+ok(ex.colours(np.zeros((H, W, 4), np.uint8)) == 0, "colours leaves out transparent pixels")
+ok(any("colours, more than 32" in p for p in ex.check([noisy], max_colours=32)), "too many colours is flagged")
+ok(not any("colours" in p for p in ex.check([noisy], max_colours=None)), "no colour limit, no colour line")
 ok(any("empty colour" in p for p in ex.check(shot[:-1] + [np.zeros((H, W, 4), np.uint8)])), "empty frame")
 ok(any("colour touches the edge" in p for p in ex.check([disc(3, 1, 16)] + shot[1:])), "colour on the edge")
 hot = [lt.copy() for lt in light]

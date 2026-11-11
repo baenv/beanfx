@@ -135,12 +135,16 @@ a. **Research, then from scratch (default).** Before the brief's beats and carri
    falloff `(1 - d)^2 * k`); output with `kit/pfx.py` (`paint`, `composite`, `strip`, `gif`, `contact`, `takes`). A draft puts its own
    `kit/` on `sys.path` (`sys.path.insert(0, str(HERE / "kit"))`). These are generic; use your own palette and size. Leave other drafts in `drafts/` unread.
 
-   **Light stays smooth in every style.** Sum the glows into one float map `L`, then colour it with
+   **The light follows the style.** Sum the glows into one float map `L`, then colour it with
    `pfx.tint(np.repeat(np.clip(L, 0, 1)[..., None], 3, -1), [deep, hue, pale, "#ffffff"])` and pass that to
-   `pfx.composite` as is. The style knob sets the colour pixels (outline, dither, opaque); it never sets the
-   light. `light.bands`, `light.palette` and hand-made step cuts are only for an owner who asks for stepped light
-   in words ("NES authentic", "no smooth glow"): cut into 3 steps the glow turns into a flat outlined halo, and
-   the bloom at a pop or a flash, the part that makes the moment read as bright, is lost. Light only what
+   `pfx.composite`. Soft and painterly pass `L` as it is: smooth light, a bloom of hundreds of colours. Hard retro
+   passes `light.steps(L, levels=4)`: flat steps with hard edges inside the light and a 4x4 ordered dither only in
+   the outer step, so the halo thins to single pixels and a frame keeps to a few dozen colours, the way a
+   hand-drawn pixel effect does. Smooth bloom over crisp sprites is what reads as "not pixel art" to pixel artists;
+   the stepped light trades some of the brightness at a pop for that read. The owner can swap either way ("smooth
+   glow" on hard retro, "pixel light" on soft). With stepped light keep the pools tight (pool radius at the low end
+   of `light.GLOW`) so the dithered halo stays a few px wide, never a dotted disc round the whole cell, and give the
+   flash its read by a 1 to 2 frame white core instead. Light only what
    emits: hot cores, eyes, bolt heads, blade edges, the landing flash, sparks and embers. Stack two lights on
    each of those, the way pixelfx does: a tight core (r 4 to 15) and a pool along it. Dark space between the
    lit parts is what makes the light read; a glow over the whole cell reads as haze.
@@ -193,7 +197,7 @@ b. **Reuse (only when the owner asks):** the owner says reuse or pixelfx, names 
    It writes `<name>_color.png` and `<name>_light.png` (frames left to right) and `<name>.json` (w, h, fps,
    frames, loop, pivot). In the draft, `kit/pfx.py` loads them (`pfx.load`) and gives `tint` (same glow,
    new hue ramp), `gain`, `keep` (light only under a mask, such as your own shape grown by a few px), `bands`
-   (stepped light, only when the owner asks for it), `paint` (shade map to RGBA), `composite`, `strip` and `gif`. Usual use:
+   (stepped light on the loaded light; for your own `L` use `light.steps`), `paint` (shade map to RGBA), `composite`, `strip` and `gif`. Usual use:
    keep the light, redraw the colour base yourself on the same frames and pivot, follow pixelfx's motion
    (positions, timing) where it is good. Recolour only (`tint` plus `--opts palette`) when the base already reads.
 
@@ -370,7 +374,9 @@ frames, printing every line and exiting 1 when there is one:
 
 - `ex.check(frames, lights, loop, src=__file__, hold=HOLD)`: colour on the cell edge, light above 0.02 on the edge
   (smooth light spreads wide, so the pool radius leaves a margin to the cell), an empty frame, a one-shot that pops
-  off, a loop seam, randomness without a seed.
+  off, a loop seam, randomness without a seed. With stepped light also pass `max_colours=48`: a frame over it
+  has smooth light or stray tones left in. Every draft prints the median colours per frame (`ex.colours(final)`)
+  whatever the style, so the owner sees how pixel the effect reads.
 - `ex.check_seeds(lambda f, sd: render(f, seed=sd)[0], N)`: the edge and empty checks again with seeds 2, 3 and 7,
   every second frame. So `render` takes a `seed` (default `SEED`) and draws every random choice from
   `np.random.default_rng(seed + salt)`; particles a reseed throws further show up here.
@@ -379,7 +385,7 @@ frames, printing every line and exiting 1 when there is one:
 Change one thing per pass; crop one frame to 5x when the grid hides a problem. Go round at least three times
 (look, fix the worst thing, run again) before calling a draft done; a showpiece takes more.
 
-The script also prints the light measure for the glow level and clarity (smooth light only), from each frame's colour `col`
+The script also prints the light measure for the glow level and clarity (on `L` before any `light.steps`), from each frame's colour `col`
 and summed light `L`:
 
 ```
@@ -416,7 +422,8 @@ Usual fixes: mush at 1x, then fewer tones, one focal point, bigger shapes; float
 a 1 to 2 frame white-hot peak; stiff, then vary each particle's size, speed and delay and add secondary motion
 (sparks, smoke, debris); flat, then a lighter top-left step and a darker bottom-right one; washed out, then less
 light and white kept for the hottest core only; glow that floats off the shape, then `pfx.keep` it under a mask of
-the base; glow that looks stepped, outlined or dull, then drop the bands and add flashes and flicker on the sparks;
+the base; glow that reads soft or blurry where the owner wants pixel art, then `light.steps` and tighter pools; stepped glow
+that looks outlined or dull, then fewer steps in the halo, a 1 to 2 frame white core and flicker on the sparks;
 hazy or muddy where the brief says clear, then remove the scene pool, make the colour solid and light emitters only; thick
 saturated strokes, then a 1 px white core with 1 px of tinted edge and let the light carry the brightness;
 choppy, then more frames at 24 to 30 fps; dithered smoke or mist, then translucent puffs lit on top (hazy only);
@@ -459,7 +466,7 @@ second. Judge it in a travel gif; in place it reads as a pole that spins.
 - Build-up and break-down states land on the peak drawing: their points come from `kit/derive.py` on the peak's
   maps, and the frame where a build-up hands over to the solid carrier shows no jump.
 - Light on every hot part (core, heads, landing flash, sparks, embers), each with a wide soft pool and a tight
-  core, smooth in every style unless the owner asked for stepped light; white only at the hottest core.
+  core, smooth or stepped as the style sets (hard retro steps it); white only at the hottest core.
 - Benchmark pass 2 (section 3) shows no column where the reference reads better.
 - Nothing cut by the cell edge in any frame or direction; the pivot is the drawing's origin.
 - The style picked in the brief holds in every frame (dither or translucency, glow strength).
@@ -489,7 +496,7 @@ meta = ex.write(OUT, NAME, finals, FPS, PIVOT, LOOP, light=lights, color=cols, s
   `<name>_p<k>.json` (its frames and the tags clipped to it); `<name>.json` then lists every frame with its `page`
   and the page files in `meta.beanfx.pages`. Frame names stay unique across pages (`<name> 37`).
   `<name>_light.png` (RGB, add it in the engine) and `<name>_color.png` sit on the same grid, so the engine can
-  dim or drop the glow; the light sheet keeps the smooth light.
+  dim or drop the glow; the light sheet holds the light as drawn (smooth, or stepped for hard retro).
 - `<name>.json` is the Aseprite "array" layout: `frames[i]` with `filename`, `frame` {x, y, w, h} and `duration`
   in ms, `meta.frameTags` one tag per state (and per heading row, `east`, `east/strike`), and everything beanfx
   adds under `meta.beanfx`: fps, loop, frames, rows, frameSize, pivot, columns, the files, `blend_light`,

@@ -320,10 +320,21 @@ UNSEEDED = re.compile(r"np\.random\.(rand|randn|randint|random|uniform|normal|ch
                       r"|default_rng\(\s*\)|^\s*import random\b|^\s*from random import", re.M)
 
 
-def check(frames, light=None, loop=False, src=None, hold=False):
+def colours(frame):
+    """The number of distinct colours in one RGBA frame, fully transparent pixels left out: the pixel-art read. Hand
+    pixel effects keep to a few dozen; smooth light pushes a frame into the hundreds."""
+    f = np.asarray(frame)
+    px = f.reshape(-1, f.shape[-1])
+    if f.shape[-1] == 4:
+        px = px[px[:, 3] > 0]
+    return int(len(np.unique(px, axis=0)))
+
+
+def check(frames, light=None, loop=False, src=None, hold=False, max_colours=None):
     """The problems of a finished effect, one line each: colour or light on the cell edge, an empty frame, a
     one-shot that pops off (its last frame keeps more than POP of the peak; hold skips it), a loop seam (the last to first step
-    changes more than twice a normal step), and randomness without a seed in the draft source src."""
+    changes more than twice a normal step), randomness without a seed in the draft source src, and, when max_colours
+    is given, a frame with more distinct colours than that (frames are the composited finals)."""
     bad = []
     lights = _rows(light) if light is not None else None
     for r, row in enumerate(_rows(frames)):
@@ -338,6 +349,9 @@ def check(frames, light=None, loop=False, src=None, hold=False):
                 bad.append(f"{tag}frame {i}: empty colour")
             elif (a & edge).any():
                 bad.append(f"{tag}frame {i}: colour touches the edge")
+            if max_colours is not None and a.any() and colours(row[i]) > max_colours:
+                bad.append(f"{tag}frame {i}: {colours(row[i])} colours, more than {max_colours}: cut the light "
+                           f"into steps (light.steps) or drop tones")
             if lights is not None:
                 L = np.asarray(lights[r][i], float)
                 L = L / 255.0 if lights[r][i].dtype == np.uint8 else L
