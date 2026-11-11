@@ -98,6 +98,22 @@ def shade(m, base):
     return t
 
 
+def bez(p0, c, p1, n=10):
+    """Points of a quadratic Bezier from p0 to p1 bowed toward c."""
+    return [((1 - t) ** 2 * p0[0] + 2 * (1 - t) * t * c[0] + t * t * p1[0],
+             (1 - t) ** 2 * p0[1] + 2 * (1 - t) * t * c[1] + t * t * p1[1]) for t in np.linspace(0, 1, n)]
+
+
+def poly_in(X, Y, pts):
+    """Pixels inside the closed polygon pts (even-odd), for soft cloth outlines built from curves."""
+    inside = np.zeros(X.shape, bool)
+    for (ax, ay), (bx, by) in zip(pts, pts[1:] + pts[:1]):
+        cross = (ay > Y) != (by > Y)
+        xi = (bx - ax) * (Y - ay) / ((by - ay) or 1e-9) + ax
+        inside ^= cross & (X < xi)
+    return inside
+
+
 def tri(X, Y, a, b, c):
     def side(p, q):
         return (X - q[0]) * (p[1] - q[1]) - (p[0] - q[0]) * (Y - q[1])
@@ -150,10 +166,11 @@ def aim_from(foot, sc, target):
     return d[0] / n, d[1] / n
 
 
-def draw(over, shape, foot, sc, pose, f, lift=0.5, flut=0.5, hair="loose", ghost=0.0, palette=BODY):
+def draw(over, shape, foot, sc, pose, f, lift=0.5, flut=0.5, hair="loose", ghost=0.0, palette=BODY, trail=None):
     """Draw the figure with its feet at `foot`, scale sc, through over(ys, xs, rgb, a).
     hair: "loose" (a wild mane past the waist, two locks over the face) or "bun" (pinned bun, four nape locks).
     ghost > 0 draws the translucent avatar: faint fill, bright rim, fading out below the waist.
+    trail: the pose a few frames earlier (pose_at(f - 4, ...)); the sleeve hems follow it, so cloth lags the arm.
     Returns world key points (head, neck, hip, feet, finger, hair polylines) and, for a ghost, its inner mask."""
     rgbs = np.stack([_hexf(c) for c in palette])
     X, Y = _grid(shape)
@@ -164,6 +181,7 @@ def draw(over, shape, foot, sc, pose, f, lift=0.5, flut=0.5, hair="loose", ghost
     ly = (Y[sy, sx] - fy) / sc
     tone = np.full(lx.shape, -1)
     union = np.zeros(lx.shape, bool)
+    folds = np.zeros(lx.shape, bool)                # inner cloth lines: a darker tone, a faint line on a ghost
 
     def put(m, base):
         nonlocal tone
@@ -201,16 +219,35 @@ def draw(over, shape, foot, sc, pose, f, lift=0.5, flut=0.5, hair="loose", ghost
         put(m, 2 if j != 1 else 3)
 
     (fe, fh), (be, bh) = pose
+    (tfe, tfh), (tbe, tbh) = trail if trail is not None else pose
 
-    def arm(sh, e, h, base):
-        """Thin arm with a wide sleeve that drapes below the forearm and trails back."""
+    def arm(sh, e, h, base, te=None, th=None):
+        """Thin arm with a wide sleeve: one piece of cloth from the shoulder along the arm to the wrist, its opening
+        falling from the wrist in a curve and trailing back, its hem sagging in a curve back to the armpit, so the
+        sleeve hangs from the arm with no gap and no straight edge."""
         put((seg_d(lx, ly, sh, e) <= max(1.9, mw)) | (seg_d(lx, ly, e, h) <= max(1.5, mw)), base)
-        a, b = lerp(e, h, 0.1), lerp(e, h, 0.85)
+        b = lerp(e, h, 0.85)
         wv = math.sin(f * 0.7 + sh[0]) * flut
-        tail = (lerp(e, h, 0.5)[0] - 9 - 10 * flut, lerp(e, h, 0.5)[1] + 13 - 6 * lift + 3 * wv)
-        put(tri(lx, ly, a, b, tail) | (seg_d(lx, ly, a, b) <= 2.6) | (seg_d(lx, ly, b, tail) <= mw), base - 1)
+        te, th = (e, h) if te is None else (te, th)
+        tb = lerp(te, th, 0.85)                                   # the hem hangs where the arm was a moment ago
+        mid = lerp(te, th, 0.5)
+        tail = (mid[0] - 9 - 10 * flut, max(mid[1], tb[1]) + 13 - 6 * lift + 3 * wv)
+        pit = (sh[0] - 1.5, sh[1] + 7)                            # where the hem rejoins the body
+        drop = (b[0] - 1 + 2 * wv, max(b[1], tail[1]) + 2)        # the opening falls from the wrist first
+        sag = ((tail[0] + pit[0]) / 2 + 2, max(tail[1], pit[1]) + 4 + 2 * wv)
+        outline = [sh, e, b] + bez(b, drop, tail)[1:] + bez(tail, sag, pit)[1:-1]
+        cloth = poly_in(lx, ly, outline)
+        put(cloth | (seg_d(lx, ly, sh, b) <= 2.6), base - 1)
+        # a fold from the elbow down into the hanging cloth, bowed with the sag
+        fold_pts = bez(lerp(e, b, 0.35), ((e[0] + tail[0]) / 2 - 1, (e[1] + tail[1]) / 2 + 3), lerp(tail, pit, 0.25), 8)
+        fd = np.full(lx.shape, np.inf)
+        for p0, p1 in zip(fold_pts, fold_pts[1:]):
+            fd = np.minimum(fd, seg_d(lx, ly, p0, p1))
+        fm = cloth & (fd <= max(0.45, mw * 0.5))
+        tone[fm] = max(base - 2, 0)
+        folds[fm] = True
 
-    arm((-4.0, -55.0), be, bh, 2)
+    arm((-4.0, -55.0), be, bh, 2, tbe, tbh)
 
     # robe: rows from sloped shoulders to a fluttering hem that trails back when flying
     s = np.clip((ly + 60) / 60, 0, 1)
@@ -233,7 +270,7 @@ def draw(over, shape, foot, sc, pose, f, lift=0.5, flut=0.5, hair="loose", ghost
     else:
         put(np.hypot(lx + 1.5, ly + 76.5) <= 3.2, 2)                # bun
     # front arm, wide sleeve, two-finger sword sign
-    arm((5.0, -55.0), fe, fh, 3)
+    arm((5.0, -55.0), fe, fh, 3, tfe, tfh)
     put(np.hypot(lx - fh[0], ly - fh[1]) <= 1.7, 3)
     dl = math.hypot(fh[0] - fe[0], fh[1] - fe[1]) or 1
     tipl = (fh[0] + (fh[0] - fe[0]) / dl * 4, fh[1] + (fh[1] - fe[1]) / dl * 4)
@@ -253,8 +290,9 @@ def draw(over, shape, foot, sc, pose, f, lift=0.5, flut=0.5, hair="loose", ghost
         er[1:-1, 1:-1] = union[1:-1, 1:-1] & union[:-2, 1:-1] & union[2:, 1:-1] & union[1:-1, :-2] & union[1:-1, 2:]
         rim = (union & ~er)[ys, xs]
         fade = ease_io((-ly[ys, xs] - 12) / 26.0)
-        a = np.where(rim, 0.75, 0.14) * fade * ghost
-        over(ys + sy.start, xs + sx.start, rgbs[np.where(rim, 4, np.minimum(t + 1, 4))], a)
+        fold = folds[ys, xs] & ~rim
+        a = np.where(rim, 0.75, np.where(fold, 0.4, 0.14)) * fade * ghost
+        over(ys + sy.start, xs + sx.start, rgbs[np.where(rim, 4, np.where(fold, 3, np.minimum(t + 1, 4)))], a)
         inner = np.zeros(lx.shape)
         inner[ys, xs] = fade
         mask = (sy, sx, inner)
