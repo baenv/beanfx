@@ -15,6 +15,22 @@ Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag 
 - Preview page: a `caster.chain` segment with `walk` moves the body over the segment, and one with `portal` cuts
   the body at the first rift line and shows it past the second, so a step through a rift plays with the caster.
   Parts placed with an `offset` are no longer drawn a second time on the body.
+- Framing check: `ex.check` now fails a draft whose drawing sits to one side of its cell, so most of every frame
+  ships empty (`ex.framing`: the box holding 96 % of the colour, the px to cut from each side and the share of the
+  sheet that saves; over a third fails, `trim=None` switches it off). Measured on the 17 examples whose sheets could be read: the
+  two arrow rains score 49 and 50 %, every other one 24 % or less.
+- Texture budget: `ex.check` fails sheets that decode to more than 128 MB (`ex.memory_mb`; a full 4096 px page each
+  for colour and light), with `max_mb` to raise or lift it once the owner accepts the size. `ex.write` still notes
+  anything over 64 MB. Existing drafts keep the kit they were drawn with, so none of them changes.
+- Craft gates: repeated parts in three sizes and grouped, one field or shade map per mass, one alpha per
+  translucent layer, clumped noise for surface texture, the subject centred in its cell.
+- `drafts/hoa_cong_v2`: the fire attack redrawn to those gates on the current kit. Seven fire sites in three sizes
+  in place of a flame per 6 px column, the big fires between the palisade and the tents so the tents read against
+  them, smoke as one shade map at one alpha, clumped holes and embers, and a 240 px cell in place of 320 (41 MB
+  decoded, was 55).
+- Tests: `test_shapes.py` draws with every helper in `kit/fxkit.py` and `kit/fxlib.py` and with the mockup caster
+  (each draws, draws the same twice, keeps to its shades). Coverage 72 to 89 %, with `caster.py` now counted; the
+  CI floor moves from 60 to 80 %.
 - README demo: Shrinking the Earth (`caster_sword_suc_dia_thanh_thon.gif`) in one row with the two caster gifs.
 
 ## 0.3.0

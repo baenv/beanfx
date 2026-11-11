@@ -376,7 +376,13 @@ frames, printing every line and exiting 1 when there is one:
   (smooth light spreads wide, so the pool radius leaves a margin to the cell), an empty frame, a one-shot that pops
   off, a loop seam, randomness without a seed. With stepped light also pass `max_colours=48`: a frame over it
   has smooth light or stray tones left in. Every draft prints the median colours per frame (`ex.colours(final)`)
-  whatever the style, so the owner sees how pixel the effect reads.
+  whatever the style, so the owner sees how pixel the effect reads. The same call looks at the whole sheet twice
+  more. Framing: when the drawing sits to one side of its cell (`ex.framing(frames)`: the box holding 96 % of the
+  colour over all frames, and what cutting the lopsided margins would save), a `framing:` line says how many px
+  to cut from which side; move the subject or trim the cell, and pass `trim=None` only when the empty side is
+  wanted. Budget: sheets that decode to more than 128 MB of texture memory (`ex.memory_mb`) give a `budget:`
+  line; cut frames (a lower fps, a held state as a short loop), the cell, or split the effect into parts, and pass
+  `max_mb=None` only after the owner accepts the size (a full-screen cutscene).
 - `ex.check_seeds(lambda f, sd: render(f, seed=sd)[0], N)`: the edge and empty checks again with seeds 2, 3 and 7,
   every second frame. So `render` takes a `seed` (default `SEED`) and draws every random choice from
   `np.random.default_rng(seed + salt)`; particles a reseed throws further show up here.
@@ -452,6 +458,18 @@ second. Judge it in a travel gif; in place it reads as a pole that spins.
 ## 4. Craft gates
 
 - Clean silhouette that reads at 1x; one focal point; a rim or outline where the style uses one.
+- Repeated parts (flames along a wall, puffs in a column, shards, arrows) come in three sizes, grouped: a few big,
+  some medium, many small, with gaps between the groups. A row of the same shape at one size and one spacing reads
+  as wallpaper however good each copy is. Parts of one mass that overlap (the tongues of one fire, the puffs of one
+  cloud) are summed into one field or one shade map first and shaded once, so the mass has one core and one
+  outline, not a rim round every copy.
+- Translucent parts that overlap go into one shade map that is laid once at one alpha. Stacking each copy at its
+  own alpha shows every seam as a stripe.
+- Texture that marks a surface (holes, embers, cracks, moss) comes from clumped noise a few px across, never from
+  one random number per pixel, which reads as static. A structure that burns, freezes or breaks keeps its light
+  and dark faces while it changes, so its shape still reads.
+- The subject sits near the middle of its cell with like margins on both sides of each axis (`ex.check` flags a
+  lopsided cell).
 - The focal point is on screen in every phase, the anticipation included: a build-up shows its core from its
   first frame, and no stretch of frames leaves the eye without a point to hold.
 - Every main part separates from the ground by value: a part near the ground's value (dark on dark, white on a
