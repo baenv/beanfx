@@ -1,5 +1,6 @@
 """Checks kit/export.py: the sheet grid and its Aseprite-style JSON line up, tags and hits hold, and check() catches
-edge contact, empty frames, a one-shot that pops off, a loop seam and unseeded randomness.
+edge contact, empty frames, a one-shot that pops off, a loop seam, unseeded randomness, a drawing parked in one corner
+of its cell and sheets over the texture budget.
 
     .venv/bin/python <skill>/tests/test_export.py      # exits 0 when every check passes
 """
@@ -113,6 +114,35 @@ ok(any("colour touches the edge" in p for p in ex.check([disc(3, 1, 16)] + shot[
 hot = [lt.copy() for lt in light]
 hot[2][0, 10] = 0.5
 ok(any("light touches the edge" in p for p in ex.check(shot, hot)), "light on the edge")
+
+# framing: a small centred drawing is fine, one parked in a corner is flagged, a few stray pixels do not count as use
+fr = ex.framing(shot)
+ok(fr["trim"] < 0.1 and fr["cell"] == (W, H), f"a centred drawing has nothing to trim: {fr}")
+corner = [disc(r, 31, 24) for r in (2, 4, 5, 6, 5, 4, 3, 2, 1.5, 1.2, 1, 0.8)]
+got = [p for p in ex.check(corner) if p.startswith("framing")]
+ok(len(got) == 1 and "off the left" in got[0] and "off the top" in got[0], f"a drawing in one corner is flagged: {got}")
+ok(not any(p.startswith("framing") for p in ex.check(corner, trim=None)), "trim=None switches the framing check off")
+stray = [f.copy() for f in corner]
+for k, f in enumerate(stray[:6]):
+    f[3 + k, 3 + 2 * k] = (255, 255, 255, 255)      # one spark a frame crossing the empty side
+ok(any(p.startswith("framing") for p in ex.check(stray)), "a few pixels crossing the empty side do not hide it")
+ok(ex.framing([np.zeros((H, W, 4), np.uint8)]) is None, "framing of an empty sheet is None")
+rows8 = [[disc(4, 20 + 9 * np.cos(a), 16 + 9 * np.sin(a))] * 4 for a in np.arange(8) * 0.785]
+ok(ex.framing(rows8)["trim"] < 0.1, "heading rows are framed together, not one by one")
+
+# budget: decoded texture memory, twice with a light sheet; over max_mb it is a problem unless the owner lifts it
+big = [np.zeros((512, 512, 4), np.uint8)] * 70
+ok(abs(ex.memory_mb(big) - 73.4) < 0.1 and abs(ex.memory_mb(big, big) - 146.8) < 0.1,
+   f"memory is frames x w x h x 4, twice with light: {ex.memory_mb(big):.1f}, {ex.memory_mb(big, big):.1f}")
+lit = [np.zeros((512, 512, 3))] * 70
+over = [np.zeros((512, 512, 4), np.uint8) for _ in range(2)]
+for f in over:
+    f[200:300, 200:300] = 255
+over = over * 35
+ok(any(p.startswith("budget") for p in ex.check(over, lit, hold=True)), "sheets over the budget are flagged")
+ok(not any(p.startswith("budget") for p in ex.check(over, hold=True)), "the same frames without a light sheet fit")
+ok(not any(p.startswith("budget") for p in ex.check(over, lit, hold=True, max_mb=None)), "max_mb=None lifts the budget")
+ok(not any(p.startswith("budget") for p in ex.check(over, lit, hold=True, max_mb=200)), "a higher max_mb lifts it too")
 
 smooth = [disc(4, 20 + 6 * np.cos(k / 10 * 6.283), 16 + 6 * np.sin(k / 10 * 6.283)) for k in range(10)]
 ok(not any("seam" in p for p in ex.check(smooth, loop=True)), f"seamless loop flagged: {ex.check(smooth, loop=True)}")

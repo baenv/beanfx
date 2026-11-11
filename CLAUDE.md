@@ -30,7 +30,8 @@ skills, kits and drafts stay local and are gitignored until they are ready.
   inner lines, spine and scatter points taken from the finished peak drawing for build-up and break-down states)
   `sfx.py` (optional sound synthesised from the effect's JSON: hit cues by weight, charge, whoosh, tail, hum; WAV plus `meta.beanfx.sound`)
   and `export.py` (the sheet grid with pages, its Aseprite-style JSON with the act, and the checks: edge, empty
-  frame, pop off, loop seam, unseeded randomness, other seeds, act).
+  frame, pop off, loop seam, unseeded randomness, other seeds, act, framing (the drawing parked to one side of its
+  cell) and the texture budget).
 - `drafts/<name>/`: one draft per effect, `<name>.py`, its `kit/` and `out/`. Only the drafts listed in `.gitignore` are tracked; new ones stay local. `*_v2`, `*_v3` are the redraws to the pixelfx bar.
 - `docs/output-json.md`: the fields of the exported JSON, linked from the README.
 - `docs/media/`: the README preview gifs (CI budget: `docs/` at most 8 MB, one file at most 5 MB).
@@ -84,7 +85,7 @@ node plugins/beanfx/skills/beanfx/tools/layers.mjs <id> --out <draft>/src --pixe
   is installed) in one call which knobs the prompt leaves open; without it the model decides from the files. Each open knob is one
   AskUserQuestion question, and no draft file is written before the brief is in the reply.
   Tests (`S=plugins/beanfx/skills/beanfx`): `python3 $S/tests/test_gate.py`, `.venv/bin/python $S/tests/test_facing.py`,
-  `test_derive.py`, `test_export.py`, `test_rig.py`, `test_ref.py`, `test_light.py`, `test_impact.py`, `test_sfx.py` and `test_kit.py`; `python3 $S/tests/test_preview.py`; `node $S/tests/test_runtime.mjs`. All of them in one run with coverage: `pytest --cov` from the repo root
+  `test_derive.py`, `test_export.py`, `test_rig.py`, `test_ref.py`, `test_light.py`, `test_impact.py`, `test_sfx.py`, `test_kit.py` and `test_shapes.py`; `python3 $S/tests/test_preview.py`; `node $S/tests/test_runtime.mjs`. All of them in one run with coverage: `pytest --cov` from the repo root
   (`tests/conftest.py` runs each script once and reports every check it records through `tests/checklog.py` as its
   own test; CI does the same and fails under the coverage floor in `pyproject.toml`). Plugin check: `claude plugin validate plugins/beanfx` and `claude plugin validate .`.
 - Glow levels are subtle, medium and strong. Clarity is clear (default), balanced or hazy: how far light and

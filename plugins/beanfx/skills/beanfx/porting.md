@@ -45,7 +45,8 @@ The rest, when the JSON has it:
   frames come from the page each frame names.
 
 - **Budget.** A sheet costs its decoded size in texture memory: frames x w x h x 4 bytes, twice that with the
-  colour and light pair. `export.write` prints a note above 64 MB. Over it on phones: load the effect only when it
+  colour and light pair. `export.write` prints a note above 64 MB, and `export.check` fails a draft above 128 MB (a full 4096 px page each
+  for colour and light) unless it passes a higher `max_mb`. Over the note on phones: load the effect only when it
   plays and free it after, drop the light sheet and play `<name>.png`, or for a full-screen cutscene play a video.
 
 ### Browser, no engine

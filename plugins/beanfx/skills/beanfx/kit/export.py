@@ -3,6 +3,7 @@ checks that catch what eyes miss.
 
     import export as ex
     bad = ex.check(frames, lights, loop=False, src=__file__)       # list of problems, empty when clean
+                                                                    # (trim=None, max_mb=None switch two of them off)
     bad += ex.check_seeds(lambda f, sd: render(f, sd)[0], N)       # the same with seeds 2, 3 and 7
     bad += ex.check_act(meta["meta"]["beanfx"].get("act", {}), N, FPS)
     gif = ex.hitstop(previews, hits, FPS)                           # previews hold each freeze, for the gif
@@ -30,6 +31,9 @@ from PIL import Image
 
 MAX_EDGE = 4096  # a texture side most GPUs and WebGL2 phones take
 VRAM_NOTE = 64e6  # bytes of decoded sheets above which write() prints a texture memory note
+BUDGET_MB = 128  # check() fails past this: one full MAX_EDGE page each for the colour and the light sheet
+TRIM = 1 / 3  # check() fails when cutting the lopsided margins off the cell would save more than this share of it
+FILL_MASS = 0.96  # the share of the colour (pixels over all frames) the framing box holds, 2 % cut from each end
 LIGHT_EDGE = 0.02  # light below this may reach the cell edge (a smooth pool fades past it)
 POP = 0.05  # the last frame of a one-shot may keep at most this share of the peak frame's pixels
 
@@ -330,12 +334,66 @@ def colours(frame):
     return int(len(np.unique(px, axis=0)))
 
 
-def check(frames, light=None, loop=False, src=None, hold=False, max_colours=None):
+def memory_mb(frames, light=None):
+    """Decoded texture memory of the sheets in MB (1e6 bytes): frames x w x h x 4 bytes, twice that when the light
+    ships as its own sheet next to the colour."""
+    flat = _flat(frames)
+    h, w = flat[0].shape[:2]
+    return len(flat) * w * h * 4 * (2 if light is not None else 1) / 1e6
+
+
+def framing(frames):
+    """Where the drawing sits in its cell. box (x0, y0, x1, y1, inclusive) holds FILL_MASS of the colour, counted
+    as pixels over every frame and row with the outer 2 % cut from each end of both axes, so a few arrows or
+    sparks that cross the cell do not count as using it. cut is the px that could come off the (left, top, right,
+    bottom) to leave the box with the same margin on both sides of each axis, and trim the share of the cell those
+    cuts save: near 0 for a centred drawing however small, high when the subject sits in one corner and the rest
+    of every frame ships empty. None when no frame has colour."""
+    flat = _flat(frames)
+    h, w = flat[0].shape[:2]
+    occ = np.zeros((h, w))
+    for f in flat:
+        occ += f[..., 3] > 0
+    if not occ.any():
+        return None
+    q = (1 - FILL_MASS) / 2
+
+    def span(m):
+        c = np.cumsum(m) / m.sum()
+        return int(np.searchsorted(c, q)), int(np.searchsorted(c, 1 - q))
+
+    (x0, x1), (y0, y1) = span(occ.sum(axis=0)), span(occ.sum(axis=1))
+    left, right, top, bottom = x0, w - 1 - x1, y0, h - 1 - y1
+    cut = (max(left - right, 0), max(top - bottom, 0), max(right - left, 0), max(bottom - top, 0))
+    trim = 1 - (w - cut[0] - cut[2]) * (h - cut[1] - cut[3]) / (w * h)
+    return dict(box=(x0, y0, x1, y1), cell=(w, h), cut=cut, trim=trim)
+
+
+def check(frames, light=None, loop=False, src=None, hold=False, max_colours=None, trim=TRIM, max_mb=BUDGET_MB):
     """The problems of a finished effect, one line each: colour or light on the cell edge, an empty frame, a
     one-shot that pops off (its last frame keeps more than POP of the peak; hold skips it), a loop seam (the last to first step
     changes more than twice a normal step), randomness without a seed in the draft source src, and, when max_colours
-    is given, a frame with more distinct colours than that (frames are the composited finals)."""
+    is given, a frame with more distinct colours than that (frames are the composited finals).
+
+    Two more look at the whole sheet. Framing: the drawing sits to one side of its cell, so cutting the lopsided
+    margins (`framing`) would save more than trim of the sheet; move the subject or trim the cell (trim=None when
+    the space is wanted, such as the run-in of a projectile). Budget: the sheets decode to more than max_mb of
+    texture memory (`memory_mb`); cut frames, the cell or split the effect into parts (max_mb=None, or a higher
+    number, when the owner accepts the size, such as a full-screen cutscene)."""
     bad = []
+    fr = framing(frames) if trim is not None else None
+    if fr and fr["trim"] > trim:
+        (x0, y0, x1, y1), (cw, ch) = fr["box"], fr["cell"]
+        cuts = " and ".join(f"{px} px off the {side}" for side, px in zip(("left", "top", "right", "bottom"), fr["cut"])
+                            if px)
+        bad.append(f"framing: {100 * FILL_MASS:.0f} % of the colour sits in x {x0}..{x1}, y {y0}..{y1} of the "
+                   f"{cw}x{ch} cell; cutting {cuts} would save {100 * fr['trim']:.0f} % of the sheet with the "
+                   f"drawing centred: move the subject or trim the cell (trim=None when the space is wanted)")
+    mb = memory_mb(frames, light)
+    if max_mb is not None and mb > max_mb:
+        bad.append(f"budget: about {mb:.0f} MB of texture memory decoded, over {max_mb} MB: fewer frames (a lower "
+                   f"fps, a held state as a short loop), a smaller cell, or parts; max_mb=None when the owner "
+                   f"accepts the size (porting.md, Budget)")
     lights = _rows(light) if light is not None else None
     for r, row in enumerate(_rows(frames)):
         tag = f"row {r} " if len(_rows(frames)) > 1 else ""
