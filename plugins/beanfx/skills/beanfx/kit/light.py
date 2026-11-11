@@ -1,13 +1,15 @@
 """The light pass of an effect: an additive glow drawn on its own sheet `<name>_light`, which the engine adds over
 the colour sheet at the same frame and row (or drops). Learnt from the pixelfx light buffer (a falloff
-(1 - d)^2 * k summed per pixel). Smooth light is the default in every style; `bands` cuts it into three hard steps only when the owner
-asks for stepped light ("NES authentic", "no smooth glow"), so that sheet keeps hard alpha and stepped tones.
+(1 - d)^2 * k summed per pixel). The light follows the style: smooth for soft and painterly, `steps` for hard retro
+(a few flat tones, an ordered dither only where the light fades out, so the glow keeps to a handful of colours and
+reads as pixel art). `bands` is the older three-step cut to a shade map, for a separate stepped light sheet.
 
     L = buffer(c)                          # c: a canvas with world px grids x, y (wgrid)
     glow(L, c, x, y, r, k)                 # a round light, k at the centre
     glow_line(L, c, (x0, y0), (x1, y1), r, k)   # light round a segment: beams, bolts, trails
     glow_ring(L, c, x, y, R, r, k, flat)   # light hugging a ring: shock waves, ground seals
-    m = bands(L, phase)                    # stepped light on request only: shade map 0 outer (dithered), 1 middle, 2 inner, -1 none
+    L = steps(L, levels=4)                 # pixel light: flat steps, Bayer dither in the outer step, 0 below floor
+    m = bands(L, phase)                    # older stepped cut: shade map 0 outer (dithered), 1 middle, 2 inner, -1 none
     cols = palette("#ff9a40")              # the three colours of those bands
 
     fl = Flashes()                         # short lights: a spark landing, a sword entering the cloud, a hit
@@ -59,6 +61,27 @@ def glow_line(L, c, p0, p1, r, k=0.4):
 def glow_ring(L, c, x, y, R, r, k=0.4, flat=1.0):
     d = np.abs(np.hypot(c.x - x, (c.y - y) / flat) - R) / r
     L += np.where(d < 1, (1 - np.minimum(d, 1)) ** 2 * k, 0.0)
+
+
+BAYER4 = np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]) / 16.0
+
+
+def steps(L, levels=4, floor=0.06, phase=(0, 0)):
+    """The summed light cut into `levels` flat steps of 1/levels each, the pixel-art light. Inside the light the steps
+    are hard edges; the outer step (below 1/levels) fades out by a 4x4 ordered dither whose density follows the light,
+    so the halo thins to single pixels instead of a ring; below `floor` the light is 0. Returns a float map the same
+    shape as L, ready for the usual pfx.tint ramp, which then gives one colour per step. phase shifts the dither grid
+    (x, y) when it must stay put on a moving object."""
+    v = np.clip(np.asarray(L, float), 0, 1)
+    h, w = v.shape
+    ys, xs = np.mgrid[0:h, 0:w]
+    t = BAYER4[(ys + phase[1]) % 4, (xs + phase[0]) % 4]
+    step = 1.0 / levels
+    out = np.floor(v * levels + 1e-9) * step
+    outer = (v >= floor) & (v < step)
+    fade = (v - floor) / max(step - floor, 1e-6)
+    out = np.where(outer & (fade > t), step, out)
+    return np.where(v < floor, 0.0, out)
 
 
 def bands(L, phase=0):

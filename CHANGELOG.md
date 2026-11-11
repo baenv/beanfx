@@ -5,6 +5,13 @@ Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag 
 
 ## Unreleased
 
+- Pixel light: the light now follows the style. Hard retro cuts it with `light.steps` (four flat tones, a 4x4
+  ordered dither only where it fades out, dark below a floor), so a frame keeps to a few dozen colours instead of
+  the hundreds a smooth bloom gives; soft and painterly stay smooth, and the owner can swap either way. A prompt
+  asking for a pixel feel gets hard retro or stepped light recommended. Feedback from pixel artists was that smooth
+  glow over crisp sprites "doesn't check the pixel vibe".
+- Colour count: `ex.colours(frame)` counts a frame's distinct colours, every draft prints the median, and
+  `ex.check(..., max_colours=N)` flags a frame over N (48 with stepped light).
 - Preview page: a `caster.chain` segment with `walk` moves the body over the segment, and one with `portal` cuts
   the body at the first rift line and shows it past the second, so a step through a rift plays with the caster.
   Parts placed with an `offset` are no longer drawn a second time on the body.

@@ -121,7 +121,9 @@ saturated element for the same reason [V, O].
 
 - Soft (1 px lines, translucent smoke, smooth glow). Fits: modern indie. Example: Dead Cells, saturated, "dynamic
   particles, normal maps and 3D lighting" over pixels [V, O].
-- Hard retro (opaque pixels, dark outline, dither). Effect: strict, readable on any ground, needs a locked palette.
+- Hard retro (opaque pixels, dark outline, dither, stepped light). Effect: strict, readable on any ground, needs a
+  locked palette. The light is cut into a few flat tones with dither at its edge (`light.steps`); smooth bloom
+  over crisp sprites is the common "looks good but not pixel" complaint from pixel artists.
   Example: Shovel Knight limits itself to the NES palette and four extra colours [V, P]. Fits: 8-bit and 16-bit
   looks.
 - 1-bit or two-tone dither. Effect: texture from pixel patterns, no glow. Example: Return of the Obra Dinn,
