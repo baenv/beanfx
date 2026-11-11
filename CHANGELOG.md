@@ -5,6 +5,10 @@ Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag 
 
 ## Unreleased
 
+## 0.4.0
+
+Pixel light, and checks for framing and texture size (2026-11-11).
+
 - Pixel light: the light now follows the style. Hard retro cuts it with `light.steps` (four flat tones, a 4x4
   ordered dither only where it fades out, dark below a floor), so a frame keeps to a few dozen colours instead of
   the hundreds a smooth bloom gives; soft and painterly stay smooth, and the owner can swap either way. A prompt
