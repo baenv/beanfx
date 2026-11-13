@@ -202,7 +202,7 @@ b. **Reuse (only when the owner asks):** the owner says reuse or pixelfx, names 
    (positions, timing) where it is good. Recolour only (`tint` plus `--opts palette`) when the base already reads.
 
 Drafts live in `drafts/<name>/` of the project (`src/main.rs`, output in `out/`, run with
-`cd drafts/<name> && cargo run --release -q`). Overlapping parts (two dragons in a helix, a body over a palm): give each part a depth per pixel, keep the
+`cd drafts/<name> && cargo run --release -q`). Write each draft on the runner `dr` (`kit/DRAFTS.md`, signatures in `kit/API.md`; read those two, not the kit source): main.rs holds the `Spec` and `Effect::draw` only, and `dr::main` takes every step of section 3 and 5. Write it in pieces (spec and one element, `look`, then add elements with Edit), never as one large Write. Overlapping parts (two dragons in a helix, a body over a palm): give each part a depth per pixel, keep the
 nearest, and rim each part where it meets empty space or a part behind it, so the crossing reads at 1x.
 
 **Peak first, then derive.** Draw the carrier whole at its peak pose before any other state, and judge that frame
@@ -362,7 +362,7 @@ read, learnt on a sword-rain effect with a caster:
 
 ## 3. Draft loop
 
-The draft script writes, each run: the sheet and JSON (section 5), a 4x strip on a dark and on a mid ground, a
+`dr::main` does all of this section; `cargo run --release -q -- look <frames>` and `-- glow` give quick looks. The draft script writes, each run: the sheet and JSON (section 5), a 4x strip on a dark and on a mid ground, a
 4x gif at its fps (`pfx::gif`, through `ex::hitstop` when there are hits) and `out/contact.png`
 (`pfx::contact(path, &frames, fps, Default::default())`: 12 moments labelled with frame and time, so timing reads without the gif),
 a preview page per sheet, `ex::page(out.join("sheets").join("<name>.json"), Default::default())`: `out/<name>.html`, the skill's `tools/preview.html`

@@ -24,9 +24,70 @@ the unit and integration tests. Writing a draft: DRAFTS.md.
 | `rig` | a game character as the caster (`rig::load(name, None)`) |
 | `rf` | an object traced from a reference image (`rf::trace`, `rf::paint`) |
 | `dv` | points taken from a finished drawing (outline, simplify, spine, scatter, local, world) |
+| `dr` | the draft runner: `Spec`, `Effect`, `Canvas`, `dr::main` (previews, sheet, JSON, page, checks, `look`, `glow`, `bench`) |
 
-`use beanfx::{np, rng::default_rng, ex, fc, sfx, pfx};` brings in the usual set. The crate re-exports `ndarray` and
+A draft on the runner starts with `use beanfx::dr::{self, Canvas, Effect, Layer, Spec};`; the lower modules are for
+shapes the canvas does not draw. The crate re-exports `ndarray` and
 `serde_json`, so a draft's Cargo.toml needs only `beanfx` (`use beanfx::ndarray::{s, Array2, Array3};`).
+
+## Signatures a draft calls
+
+Read these before opening the kit source. `P = [f64; 2]` world px (y down), `Rgb = [f64; 3]` 0..1.
+
+### dr
+
+- `dr::main(fx: &dyn Effect, env!("CARGO_MANIFEST_DIR")) -> ExitCode`. Args: none (full run), `look [frames]`
+  (out/look.png at 3x on dark, look_1x.png), `glow` (out/glow_takes.png at gains 0.6, 1.0, 1.3), `bench <id>`
+  (out/bench.png against out/ref from tools/layers.mjs).
+- `trait Effect { fn spec(&self) -> Spec; fn draw(&self, cv: &mut Canvas, f: usize, seed: u64, layer: Layer) -> Result<(), String>; }`.
+  `draw` is pure in (f, seed, layer); return `Ok(())` untouched for a layer the effect lacks. Pass kit errors on with
+  `?` (an `Err` stops the run with exit 2), never `let _ =`, which hides a missing caster.
+- `Layer::{Effect, Caster, AuraBack, AuraFront}`. The sheet is `Effect`. Previews stack AuraBack, Caster, AuraFront,
+  Effect over the dummy. Aura parts are cut round `caster_foot` with `Canvas::at`, so draw in world px.
+- `Spec::new(name, w, h, n, fps)`; fields and defaults: `pivot` [w/2, h/2], `seed` 7, `looped` false, `hold` false,
+  `view` "side", `dirs: fc::Meta` (`facing` "east" or "west" for one row), `glow` "medium", `clarity` "clear", `light_ramp: Vec<String>` (dark to white),
+  `steps: Option<lt::Steps>` (hard retro light, also caps colours at 48), `edge_fade` 0.0 px, `hits: Vec<Value>`
+  (`ex::hit`), `states: Vec<(String, [i64; 2])>`, `poses: Vec<Value>` (`ex::pose`), `windup` 0.0,
+  `target: Option<Value>`, `dummy: Option<P>` (preview dummy foot), `caster_foot: Option<P>`,
+  `aura: Option<Aura { frames, w, h, pivot }>`, `extra: Map` (more meta.beanfx), `trim: Option<f64>` (`ex::TRIM`;
+  None when the cell keeps room on purpose, such as the caster's side of a cast), `pick`, `takes` (frame lists).
+- Aura parts and the sheet pass the same checks: every frame needs colour (light alone is an empty frame) and a
+  one-shot's last frame keeps at most 5 % of the peak pixels.
+- `Canvas` fields `w, h, ox, oy, col: Array3<f64>` (straight RGBA) and `l: Array2<f64>` (summed light). Draw calls
+  take world px: `put(x, y, c, a)`, `px(yi, xi, c, a)`, `line(p0, p1, c, a)`, `thick(p0, p1, wd, c, a)`,
+  `ellipse(cx, cy, rx, ry, c, a)`, `poly(&[P], c, a)`, `paint(&Array2<i8>, &[Rgb], x0, y0, a)` (a shade map),
+  `over_img(&Array3<u8>)` (a `Rig::place` frame), `glow(x, y, r, k)`, `glow_flat(x, y, r, k, flat)`,
+  `glow_line(p0, p1, r, k)`, `glow_ring(x, y, big_r, r, k, flat)`, `flash_at(f, f0, x, y, r, k, life)`,
+  `caster(foot, sc, pose, f: f64, cs::Draw, charge) -> Result<cs::Figure>` (pass `f as f64`), `win(x0, x1, y0, y1)` (pixel ranges),
+  `world(yi, xi) -> P` (pixel centre) for per-pixel fields.
+- Helpers: `hex("#rrggbb")`, `ramp(&[..])`, `seg_d(x, y, a, b)`, `hash01(a, b)`, `vnoise(x, y, seed)`,
+  `span(f, f0, f1)` (clipped 0..1), `ease_io`, `ease_out`, `ease_in`, `measure(col, l)`,
+  `write_part(out, name, &[Cel], ramp, fps, pivot, looped, anchor, more, glow)` for cast, travel or impact sheets.
+
+### cs, tg, rig
+
+- `cs::pose_at(f, front_keys: &[(f64, &str)], back_keys, aim: Option<P>, jab) -> Result<Pose>`; front arm keys `rest`,
+  `chest`, `raise`, `pull`, and `point` when aim is set (`cs::aim_from(foot, sc, target)`); back arm keys `rest`,
+  `out`, `behind`. Another name is an error.
+- `cs::Draw { lift: 0.5, flut: 0.5, hair: "loose", ghost: 0.0, palette: &BODY, trail: None }`. The figure is about
+  78 units tall; `sc` 0.44 is 34 px. `cs::Figure { sc, head, neck, hip, feet, finger, hair, .. }` in canvas px.
+  `cs::finger_light(&mut cv.l, &g, point, jab)` lights the pointing hand.
+- `tg::draw((h, w), (x, y), f, &hits, fps, tg::Draw { facing: -1.0, height })` and `tg::under(effect, dummy)`: the
+  runner does both when `dummy` is set.
+- `rig::load(name, None)?` then `rig.place((h, w), pivot, anim, k, rig::Place { direction, start, hold, travel })`
+  gives an RGBA frame for `cv.over_img`; `rig.meta(anim, fps, Default::default())?` goes in `extra`.
+
+### ex, fc, lt
+
+- `ex::hit(frame: i64, fps, ex::Hit { freeze, shake, push, react, weight, dir, shake_time, flash, .. })`,
+  `ex::pose(t, name, how)`.
+- `fc::Meta { directions, facing, mirror, target }`: `facing` is "east" or "west" for a one-row sheet.
+- `lt::glow_level(name) -> Option<GlowLevel { core, pool_r, pool_k, mean }>`; the runner prints the light mean
+  against `mean`. `lt::Steps { levels: 4.0, floor: 0.06, phase: (0, 0) }`; stepped light reads brighter, so
+  start the pools at about half the smooth gains.
+- Shade-map shapes for `cv.paint`: `fk::lumpy`, `fk::ball`, `fk::puff`, `fk::streaks`, `fk::facets`, `fk::kite`,
+  `fk::leaf`, `fk::hit_burst`, `fk::ground_impact` on grids from `fl::grid(w, h, cx, cy)`; `fl::noise`,
+  `fl::outline`, `fl::ramp(base)`.
 
 ## Conventions
 

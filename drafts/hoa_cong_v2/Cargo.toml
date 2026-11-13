@@ -5,7 +5,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
-beanfx = { path = "kit" }
+beanfx = { path = "kit", package = "beanfx-hoa_cong_v2" }
 
 [profile.release]
 opt-level = 3

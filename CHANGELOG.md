@@ -3,6 +3,23 @@
 Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag `v<version>` on `main`; see
 `CONTRIBUTING.md`.
 
+## 2.1.0
+
+The draft runner: a draft holds only the effect (2026-11-13).
+
+- New kit module `dr`. A draft fills a `Spec` and implements `Effect::draw` on a `Canvas` (shapes, shade maps, the
+  mockup caster and additive light in world px); `dr::main` writes the previews, strips, gif, contact sheet, sheet,
+  JSON, aura parts and preview page and runs every check. A new draft drops from about 1000 lines to a few hundred,
+  so writing it costs far fewer output tokens.
+- Quick looks without the full run: `cargo run --release -q -- look <frames>`, `-- glow` (three gain takes),
+  `-- bench <id>`.
+- `kit/API.md` lists the signatures a draft calls, so a draft is written without reading the kit source.
+- The `setup.sh --draft` starter runs on `dr` (36 lines). Existing drafts keep their pinned kit and run as before.
+- Fix: every draft's kit built into one `libbeanfx` in the shared `.beanfx/target` (cargo names a path crate by
+  its path relative to the draft, `kit` for all), so a draft could link another draft's kit and cargo called it
+  fresh. `setup.sh --draft` now names each draft's kit package `beanfx-<draft>` (library name still `beanfx`, so
+  draft code is unchanged); run it once on an existing draft to apply it. `--kit-status` ignores that name line.
+
 ## 2.0.0
 
 Everything in Rust; Python leaves the plugin (2026-11-13).

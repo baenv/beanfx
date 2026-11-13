@@ -34,7 +34,8 @@ S = `plugins/beanfx/skills/beanfx`.
   glowing mockup caster and avatar), `tg` (a preview target dummy that reacts to hits), `rig` (a game character as
   the caster), `rf` (an object traced from a reference image), `fc` (view, facing, mirror, heading rows, the cast,
   travel and impact split in the JSON), `dv` (outline, inner lines, spine and scatter points taken from a finished
-  drawing), `sfx` (sound synthesised from the effect's JSON), `ex` (the sheet grid with pages, its Aseprite-style
+  drawing), `dr` (the draft runner: a draft fills a `Spec` and draws an `Effect`, `dr::main` writes every output
+  and runs the checks), `sfx` (sound synthesised from the effect's JSON), `ex` (the sheet grid with pages, its Aseprite-style
   JSON with the act, the checks, the preview page), and `np`, `rng`, `img` for numbers, the seeded generator and PNG
   files. `gate.rs` is the brief gate. The source of truth for the kit is S/kit; every draft carries its own copy.
 - `S/casters/`: bundled casters `nghich_tien_kiem`, `_kiem_topdown`, `_truong` and `_truong_topdown` (a sword and a

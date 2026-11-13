@@ -1,10 +1,11 @@
 //! beanfx: the /beanfx kit in Rust. Short module names (see API.md):
 //! `np` numpy helpers, `rng` numpy's Generator, `img` PNG and PIL, `ex` export, `fc` facing, `sfx` sound,
 //! `pfx` preview writers and layers, `fl` fxlib, `lt` light, `fk` fxkit, `cs` caster, `tg` target, `rig`, `rf` ref,
-//! `dv` derive.
+//! `dv` derive, `dr` the draft runner.
 
 pub mod color;
 pub mod cs;
+pub mod dr;
 pub mod dv;
 pub mod ex;
 pub mod fc;

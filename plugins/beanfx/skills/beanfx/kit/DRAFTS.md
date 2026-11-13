@@ -12,30 +12,38 @@ drafts/<name>/kit/                the pinned copy of the kit crate (setup.sh --d
 drafts/<name>/src/main.rs         the effect; Cargo.lock is tracked, out/ and the target dir are not
 ```
 
-`bash <skill>/setup.sh --draft <name>` writes all of it, with a starter `main.rs` (a square that crosses a 24x16 cell
-in 8 frames) that already writes the sheet and runs the checks. Run it:
+`bash <skill>/setup.sh --draft <name>` writes all of it, with a starter `main.rs` on the runner (a spark that swells and
+fades in a 32x32 cell over 10 frames) that already writes the sheet and runs the checks. Run it:
 
 ```
 cd drafts/<name> && cargo run --release -q     # writes out/, exits 1 when a check fails, 2 on an error
+cargo run --release -q -- look 20 30 44         # just those frames, 3x, in a second
+cargo run --release -q -- glow                  # the three glow takes round the first hit
 ```
 
 The first build of a project takes about a minute; every later draft reuses the shared target folder.
 
 ## Shape of main.rs
 
-1. A module doc (`//!` or `#![doc = r#"..."#]`) with the brief: what it shows, size, frames, fps, loop, style, glow,
-   clarity, and a state table when there are states.
-2. Constants for the brief (`W`, `H`, `N`, `FPS`, `PIVOT`, `SEED`, `GLOW`, state starts) and the palette ramps.
-3. `render(f, seed)` draws frame f as a pure function of the frame index and the seed: shade maps (`Array2<i8>`) painted
-   with `pfx::paint`, light summed into one `Array2<f64>` with `lt::glow*`, stacked to `Array3` and coloured with `pfx::tint`, both
-   composited by `pfx::composite`.
-4. `run()` renders every frame, prints the light and colour measures, writes the strips, contact sheet and gif,
-   calls `fc::meta` and `fc::check`, then `ex::write`, `ex::page`, `ex::check` and `ex::check_seeds`, prints each
-   problem and returns the exit code. `main` maps `Ok(code)` to `ExitCode::from(code)` and an error to 2.
+A draft holds only the effect: the brief and the drawing. `dr` (API.md) writes previews, strips, gif, sheet, JSON,
+parts and page and runs every check, so a new draft is about 150 to 350 lines.
+
+1. A two-line module doc with the brief (what it shows, size, frames, fps, loop, style, glow, clarity); states go in
+   `Spec.states`, so the table lives in code.
+2. Palette constants (hex) and timing constants (frame of each beat).
+3. `impl Effect for Fx`: `spec()` fills `Spec` (size, fps, pivot, light ramp, hits, poses, target, dummy,
+   caster foot, aura, extra); `draw(cv, f, seed, layer)` paints one layer with the canvas calls and `cv.glow*`.
+   Split `draw` into one function per element (core, rocks, ring, sparks) when it passes about 60 lines.
+4. `fn main() -> ExitCode { dr::main(&Fx, env!("CARGO_MANIFEST_DIR")) }`.
+
+Write main.rs in pieces: the spec and one element first, run `look`, then add elements with Edit. A shape the
+canvas does not draw comes from `fk` as a shade map and goes in with `cv.paint`. A draft that needs a step the
+runner does not take (heading rows, a custom sheet) writes its own `run()` on `ex`, `fc` and `pfx` as before; the
+worked example `drafts/hoa_cong_v2` predates the runner and shows that route.
 
 ## Rules that keep the output stable
 
-- Draw every random choice from `default_rng(seed + salt)`. `ex::check` scans the source for unseeded randomness:
+- Draw every random choice from `default_rng(seed + salt)` or `dr::hash01(seed, i)`. `ex::check` scans the source for unseeded randomness:
   pass `src: Some(concat!(env!("CARGO_MANIFEST_DIR"), "/src/main.rs").into())`.
 - The draw order of random calls is part of the output. Keep it fixed once the effect looks right.
 - Use `np::round` (half to even), `np::pymod` and `np::floordiv` for rounding and modulo, `x * x` for a square, and

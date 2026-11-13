@@ -85,6 +85,15 @@ if [ -n "$draft" ]; then
   fi
   # where the preview page template lives (ex::page); a pointer, not part of the pinned kit, so it is rewritten
   [ -d "$DKIT" ] && printf '%s\n' "$SKILL" > "$DKIT/skill.txt"
+  # each draft's kit is its own package (library name stays beanfx): cargo names a path crate's build by its path
+  # relative to the draft, so every draft's `kit` shared one libbeanfx in the shared target and linked a stale one
+  if [ -f "$DKIT/Cargo.toml" ]; then
+    sed -i.bak "1,/^name = /s/^name = .*/name = \"beanfx-$draft\"/" "$DKIT/Cargo.toml" && rm -f "$DKIT/Cargo.toml.bak"
+    if [ -f "$DDIR/Cargo.toml" ] && ! grep -q "package = \"beanfx-$draft\"" "$DDIR/Cargo.toml"; then
+      sed -i.bak "s|^beanfx = { path = \"kit\" }|beanfx = { path = \"kit\", package = \"beanfx-$draft\" }|" "$DDIR/Cargo.toml" \
+        && rm -f "$DDIR/Cargo.toml.bak"
+    fi
+  fi
   if [ ! -f "$DDIR/Cargo.toml" ]; then
     mkdir -p "$DDIR/src" "$DDIR/.cargo"
     cat > "$DDIR/Cargo.toml" <<TOML
@@ -95,7 +104,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
-beanfx = { path = "kit" }
+beanfx = { path = "kit", package = "beanfx-$draft" }
 
 [profile.release]
 opt-level = 3
@@ -111,53 +120,41 @@ TOML
   fi
   if [ ! -f "$DDIR/src/main.rs" ]; then
     cat > "$DDIR/src/main.rs" <<'RS'
-//! Starter draft: a square that crosses a 24x16 cell in 8 frames. Replace it with the effect.
-//! Run: cargo run --release -q (writes out/, exits 1 when a check fails).
+//! Starter draft: a spark that swells and fades in a 32x32 cell over 10 frames. Replace it with the effect.
+//! Run: cargo run --release -q (out/, exit 1 on a failed check); `look 2 5`, `glow` for quick looks.
 
-use beanfx::ndarray::Array3;
-use beanfx::{ex, pfx};
-use std::path::PathBuf;
+use beanfx::dr::{self, ease_out, hex, span, Canvas, Effect, Layer, Spec};
 use std::process::ExitCode;
 
-const NAME: &str = env!("CARGO_PKG_NAME");
-const FPS: f64 = 12.0;
-const W: usize = 24;
-const H: usize = 16;
-const N: usize = 8;
+const CORE: &str = "#fff4c0";
+const RIM: &str = "#ff9a30";
 
-fn render(f: usize) -> Array3<u8> {
-    let mut cell = Array3::<u8>::zeros((H, W, 4));
-    for y in 5..11 {
-        for x in (3 + 2 * f)..(9 + 2 * f) {
-            for (c, v) in [255, 160 + 10 * f as u8, 40, 255].into_iter().enumerate() {
-                cell[[y, x, c]] = v;
-            }
+struct Fx;
+
+impl Effect for Fx {
+    fn spec(&self) -> Spec {
+        let mut sp = Spec::new(env!("CARGO_PKG_NAME"), 32, 32, 10, 12.0);
+        sp.light_ramp = vec!["#5a2008".into(), "#ff8a30".into(), "#ffe0a0".into(), "#ffffff".into()];
+        sp
+    }
+
+    fn draw(&self, cv: &mut Canvas, f: usize, _seed: u64, layer: Layer) -> Result<(), String> {
+        if layer != Layer::Effect {
+            return Ok(());
         }
+        let t = f as f64;
+        let grow = ease_out(span(t, 0.0, 4.0));
+        let fade = 1.0 - 0.85 * span(t, 5.0, 9.0);
+        let r = (3.0 + 8.0 * grow) * fade;
+        cv.ellipse(16.0, 16.0, r, r, hex(RIM), 0.9 * fade);
+        cv.ellipse(16.0, 16.0, r * 0.55, r * 0.55, hex(CORE), fade);
+        cv.glow(16.0, 16.0, r + 2.0, 0.3 * fade);
+        Ok(())
     }
-    cell
-}
-
-fn run() -> Result<u8, String> {
-    let out = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("out");
-    let frames: Vec<Array3<u8>> = (0..N).map(render).collect();
-    pfx::strip(&frames, out.join(format!("{NAME}_1x.png")))?;
-    ex::write(out.join("sheets"), NAME, &frames, FPS, [(W / 2) as f64, (H / 2) as f64], false, Default::default())?;
-    let bad = ex::check(&frames, ex::Check { hold: true, ..Default::default() })?;
-    for line in &bad {
-        println!("{line}");
-    }
-    println!("{}", if bad.is_empty() { "checks: clean".to_string() } else { format!("{} problems", bad.len()) });
-    Ok(u8::from(!bad.is_empty()))
 }
 
 fn main() -> ExitCode {
-    match run() {
-        Ok(code) => ExitCode::from(code),
-        Err(e) => {
-            eprintln!("error: {e}");
-            ExitCode::from(2)
-        }
-    }
+    dr::main(&Fx, env!("CARGO_MANIFEST_DIR"))
 }
 RS
     say "draft: wrote drafts/$draft/src/main.rs"
@@ -173,6 +170,10 @@ if [ $kit_status -eq 1 ]; then
     name="$(basename "$(dirname "$DK")")"
     changed=""
     while IFS= read -r f; do
+      if [ "$f" = "./Cargo.toml" ]; then
+        cmp -s <(sed '1,/^name = /s/^name = .*//' "$SKILL/kit/$f") <(sed '1,/^name = /s/^name = .*//' "$DK/$f") || changed="$changed Cargo.toml"
+        continue
+      fi
       cmp -s "$SKILL/kit/$f" "$DK/$f" || changed="$changed ${f#./}"
     done < <(kit_files)
     # files the draft's kit has and the skill's kit dropped

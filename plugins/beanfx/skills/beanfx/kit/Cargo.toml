@@ -1,6 +1,6 @@
 [package]
 name = "beanfx"
-version = "2.0.0"
+version = "2.1.0"
 edition = "2021"
 description = "The /beanfx kit: numpy-exact arrays and random draws, PNG, sheet export and checks, sound, preview writers"
 license = "MIT"
