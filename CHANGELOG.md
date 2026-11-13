@@ -3,6 +3,18 @@
 Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag `v<version>` on `main`; see
 `CONTRIBUTING.md`.
 
+## 2.2.1
+
+Drawing rules learnt on solid bodies and hazy light (2026-11-14).
+
+- `SKILL.md` and `craft.md`: a solid body (stone, wood, bone, metal) keeps its material's mid to dark value, with
+  the palest tone as a highlight only; a part that grows over the focal point leaves it showing through gaps; a
+  mass that forms is built by its pieces landing (`dv::scatter`), never faded or scaled in.
+- `light.md` and `SKILL.md`: balanced and hazy clarity get the scene pool on the first pass, so the cover lands in
+  its row; a solid body round a lit core keeps its clarity row.
+- `kit/API.md`: a worked caster with aura parts and a cast landing `RANGE` px in front; `lt::Steps` caps colours at
+  48 a frame; argument types for `flash_at` and `hash01`.
+
 ## 2.2.0
 
 A short `SKILL.md` core with reference files, and an eval suite (2026-11-13).

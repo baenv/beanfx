@@ -27,6 +27,17 @@ into another round.
   first frame, and no stretch of frames leaves the eye without a point to hold.
 - Every main part separates from the ground by value: a part near the ground's value (dark on dark, white on a
   light ground) is a filled volume with a contrasting rim.
+- A solid body keeps its material's value. Stone, wood, bone and metal sit in the mid to dark tones of their ramp:
+  the fill is a mid tone, the top-left faces one step lighter, the far rim the darkest step, and the palest tone
+  is a highlight on a few facets only. A body filled with its palest tone reads as a lamp or a moon (learnt on a
+  stone seal sphere that read as a moon). A body made of pieces (packed rocks, scales, plates) shows the dark
+  joints between them.
+- A part that grows over the focal point leaves it showing: gaps, cracks or seams carry the focal colour and its
+  light until the last frame, so the eye keeps its point when a shell closes round a core.
+- A mass that forms (a sphere packed from rocks, a wall of ice, a figure from motes) is built by its pieces
+  landing on it. Take the landing spots from the peak drawing (`dv::scatter`), fill each spot when its piece
+  arrives, and spread the arrivals across the whole build. A finished drawing that fades or scales in reads as a
+  pop.
 - A named object or creature matches its researched part list and proportions (or its traced reference).
 - 3 to 5 hue-shifted tones per material; the base reads without the light.
 - Anticipation, peak, dissolve. A one-shot dissolves to wisps: no empty frame, and its last frame keeps at most 5 %

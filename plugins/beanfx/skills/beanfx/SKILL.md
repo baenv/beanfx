@@ -146,6 +146,11 @@ frames. States that build up to that shape or break down from it take their poin
 - Repeated parts in three sizes, grouped, with gaps. Overlapping parts of one mass are one shade map, shaded once.
 - Separate parts that cross (two dragons in a helix, a body over a palm): give each a depth per pixel, keep the
   nearest, and rim each part where it meets empty space or a part behind it.
+- A solid body keeps its material's value: stone, wood and metal sit in mid to dark tones, lightest top-left and
+  darkest at the far rim; the palest tone is a highlight on a small part of the body, never its fill.
+- A part that grows over the focal point leaves it showing through gaps, cracks or seams in its colour and light.
+- A mass that forms is built by its pieces landing on it (`dv::scatter` spots on the peak drawing) across the
+  whole build; never fade or scale the finished drawing in.
 - Anticipation, peak, dissolve. A one-shot ends on wisps (its last frame keeps at most 5 % of the peak's pixels);
   a loop has no seam.
 - Nothing cut by the cell edge; the subject sits near the middle of its cell.
@@ -155,7 +160,8 @@ frames. States that build up to that shape or break down from it take their poin
 flash, sparks and embers. Each gets a tight core and a pool; dark space between the lit parts is what makes the
 light read. Soft and painterly styles keep the light smooth; hard retro steps it (`lt::steps`) and starts at
 about half the gains. Sparks and hits are light that lives 3 to 8 frames (`flash_at`). Set `Spec.glow` and the
-clarity from the brief.
+clarity from the brief; balanced and hazy also get the scene pool of the clarity table in `light.md` on the
+first pass, so the cover lands in its row.
 
 **Caster and target.** The sheet is the effect alone: the game draws its own character. A mockup caster, a game
 character (`rig`) and the target dummy go into the previews only, and the binding goes into the JSON. Read

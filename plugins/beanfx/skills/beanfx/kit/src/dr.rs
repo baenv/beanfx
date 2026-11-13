@@ -506,7 +506,7 @@ impl Ctx<'_> {
     }
 }
 
-/// Cover and mean of the light inside the colour's box (None for an empty frame); SKILL.md section 3.
+/// Cover and mean of the light inside the colour's box (None for an empty frame); `light.md`, the light measure.
 pub fn measure(col: &Array3<u8>, l: &Array2<f64>) -> Option<(f64, f64)> {
     let nz = np::nonzero(&col.slice(s![.., .., 3]).mapv(|a| a > 0));
     if nz[0].is_empty() {

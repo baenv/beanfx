@@ -42,8 +42,12 @@ bright the lit parts are (`lt::glow_level(name)` holds the table):
 | balanced | 0.05 (0.2), r 1.5x the focal part | mist at 0.3 to 0.7 | 20 to 40 % |
 | hazy | 0.12 (0.4), r 50 to 70 | translucent volumes | 40 to 80 % |
 
+On the runner the scene pool is one `cv.glow(x, y, r, k)` at the focal part in `Layer::Effect`, its k rising from
+the first number to the peak one with the effect's energy. Add it on the first pass for balanced and hazy; the
+printed cover then says whether r needs one change.
+
 When the effect is itself the light source (a torch, a portal, an orb, an aura round a body), its cover runs
-60 to 100 % at any clarity; then judge clarity by the dark ground round it and by solid colour pixels.
+60 to 100 % at any clarity (a solid body round a lit core is not one and keeps its clarity row); then judge clarity by the dark ground round it and by solid colour pixels.
 
 Cover is the share of the drawing's box (the colour alpha's bounding box, per frame, median over frames) with
 light above 0.03; mean is the median light of those pixels. Measured on pixelfx: myriad-swords 15 % at 0.09,
