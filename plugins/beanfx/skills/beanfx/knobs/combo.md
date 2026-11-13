@@ -46,4 +46,4 @@ one press per hit      P    P    P            whole string     P
 finisher or a mockup caster.
 
 Each hit's smear follows the blade on the character's own contact frame (the tip measured from the sprite, see
-"Follow the sword" in SKILL.md), so the clip lines up however the player times the presses.
+"Follow the sword" in the skill's `caster.md`), so the clip lines up however the player times the presses.

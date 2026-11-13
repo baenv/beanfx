@@ -15,7 +15,8 @@ bash plugins/beanfx/skills/beanfx/setup.sh           # builds the beanfx binary 
 | change | place |
 |---|---|
 | the drawing kit, export and checks, sound, preview page, gate | `plugins/beanfx/skills/beanfx/kit/src/` (one Rust crate; `kit/API.md` lists the modules) |
-| the skill and its knobs | `plugins/beanfx/skills/beanfx/` (`SKILL.md`, `knobs/`) |
+| the skill and its knobs | `plugins/beanfx/skills/beanfx/` (`SKILL.md` is the short core every run loads; detail goes in `craft.md`, `light.md`, `caster.md`, `export.md`, `pixelfx.md`, `knobs/`) |
+| eval cases | `plugins/beanfx/evals/<case>/` (`prompt.md`, `graders/`) |
 | the browser runtime | `plugins/beanfx/skills/beanfx/runtime/beanfx.js`, then copy it to `docs/beanfx.js` and paste it into `tools/preview.html` between the RUNTIME START and RUNTIME END markers (`export ` removed); `cargo test` in `kit/` checks the copy |
 
 Each draft keeps its own copy of the kit, so a kit fix does not change a
@@ -32,6 +33,12 @@ bash plugins/beanfx/skills/beanfx/setup.sh --draft <name> --refresh-kit   # then
 (cd plugins/beanfx/skills/beanfx/kit && cargo test --locked)   # the crate's unit and integration tests
 node plugins/beanfx/skills/beanfx/tests/test_runtime.mjs       # the browser runtime
 claude plugin validate plugins/beanfx && claude plugin validate .
+# the skill end to end (spends tokens). The eval refuses a plugin folder that holds hard links, and cargo's
+# kit/target has them, so run it on a copy. Each run gets a fresh home folder and cannot read ~/.rustup, so the
+# draw cases (tag draw) pass only where cargo runs without a per-user toolchain (a system install); the
+# brief-only case (tag brief) runs anywhere:
+rsync -a --exclude target --exclude results plugins/beanfx /tmp/beanfx-eval/ && (cd /tmp/beanfx-eval/beanfx && \
+  claude plugin eval . --tag brief --ablation none --allow-tools Bash Write Edit WebSearch WebFetch)
 ```
 
 A kit change comes with a test in the matching module or in `kit/tests/`. Give each test a name that says what

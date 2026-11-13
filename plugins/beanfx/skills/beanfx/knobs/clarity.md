@@ -7,7 +7,7 @@ stated: Does the request or a reference image say how clear or hazy the effect i
 # Clarity
 
 How much of the cell stays empty and dark, and how solid the colour pixels are. Glow sets how bright the light is;
-clarity sets where it is allowed to spread. The light rules and the measured targets per level are in SKILL.md 2a.
+clarity sets where it is allowed to spread. The light rules and the measured targets per level are in `light.md` in the skill folder.
 
 **Fixed when** the prompt names it ("crisp", "clean", "sparkling", "misty", "hazy", "foggy", "dreamy bloom") or an
 image shows it. "Sparkling" or "shimmering" is clear.

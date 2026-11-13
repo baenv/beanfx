@@ -49,18 +49,21 @@ Read these before opening the kit source. `P = [f64; 2]` world px (y down), `Rgb
   `steps: Option<lt::Steps>` (hard retro light, also caps colours at 48), `edge_fade` 0.0 px, `hits: Vec<Value>`
   (`ex::hit`), `states: Vec<(String, [i64; 2])>`, `poses: Vec<Value>` (`ex::pose`), `windup` 0.0,
   `target: Option<Value>`, `dummy: Option<P>` (preview dummy foot), `caster_foot: Option<P>`,
-  `aura: Option<Aura { frames, w, h, pivot }>`, `extra: Map` (more meta.beanfx), `trim: Option<f64>` (`ex::TRIM`;
+  `aura: Option<dr::Aura { frames, w, h, pivot }>`, `extra: Map` (more meta.beanfx), `trim: Option<f64>` (`ex::TRIM`;
   None when the cell keeps room on purpose, such as the caster's side of a cast), `pick`, `takes` (frame lists).
 - Aura parts and the sheet pass the same checks: every frame needs colour (light alone is an empty frame) and a
-  one-shot's last frame keeps at most 5 % of the peak pixels.
+  one-shot's last frame keeps at most 5 % of the peak pixels. `hold` does not exempt an aura: it starts with colour
+  in frame 0 and fades out by its last frame even when the effect ends held.
 - `Canvas` fields `w, h, ox, oy, col: Array3<f64>` (straight RGBA) and `l: Array2<f64>` (summed light). Draw calls
   take world px: `put(x, y, c, a)`, `px(yi, xi, c, a)`, `line(p0, p1, c, a)`, `thick(p0, p1, wd, c, a)`,
   `ellipse(cx, cy, rx, ry, c, a)`, `poly(&[P], c, a)`, `paint(&Array2<i8>, &[Rgb], x0, y0, a)` (a shade map),
   `over_img(&Array3<u8>)` (a `Rig::place` frame), `glow(x, y, r, k)`, `glow_flat(x, y, r, k, flat)`,
   `glow_line(p0, p1, r, k)`, `glow_ring(x, y, big_r, r, k, flat)`, `flash_at(f, f0, x, y, r, k, life)`,
   `caster(foot, sc, pose, f: f64, cs::Draw, charge) -> Result<cs::Figure>` (pass `f as f64`), `win(x0, x1, y0, y1)` (pixel ranges),
-  `world(yi, xi) -> P` (pixel centre) for per-pixel fields.
-- Helpers: `hex("#rrggbb")`, `ramp(&[..])`, `seg_d(x, y, a, b)`, `hash01(a, b)`, `vnoise(x, y, seed)`,
+  `world(yi, xi) -> P` (pixel centre) for per-pixel fields. `put(x, y, ..)` floors world px to its pixel (no `+ 0.5`).
+  JSON in a draft is `beanfx::serde_json::json!`.
+- Helpers: `hex("#rrggbb")`, `ramp(&[..])`, `seg_d(x, y, a, b)`, `hash01(a, b)` (0..1), `vnoise(x, y, seed)` (0..1, one cell per unit, so pass `x / 8.0` for
+  8 px lumps),
   `span(f, f0, f1)` (clipped 0..1), `ease_io`, `ease_out`, `ease_in`, `measure(col, l)`,
   `write_part(out, name, &[Cel], ramp, fps, pivot, looped, anchor, more, glow)` for cast, travel or impact sheets.
 

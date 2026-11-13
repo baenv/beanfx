@@ -19,7 +19,10 @@ S = `plugins/beanfx/skills/beanfx`.
 
 - `plugins/beanfx/`: the plugin (`.claude-plugin/plugin.json`, `skills/beanfx/`). `.claude/skills/beanfx` is a
   symlink to the skill folder so /beanfx runs here without an install.
-- `S/SKILL.md`, `S/knobs/` (one file per brief knob), `S/research.md`, `S/vfx_notes.md`, `S/porting.md` (engine import
+- `S/SKILL.md` (the short core: the run in order, the brief, drawing once, delivery; about 200 lines), its reference
+  files read only when a run needs them: `S/craft.md` (gates, derived states, fixes, takes), `S/light.md`, `S/caster.md`,
+  `S/export.md`, `S/pixelfx.md` (reuse and the benchmark). `plugins/beanfx/evals/`: eval cases for `claude plugin eval`.
+- `S/knobs/` (one file per brief knob), `S/research.md`, `S/vfx_notes.md`, `S/porting.md` (engine import
   and porting the draw code), `S/runtime/beanfx.js` (browser runtime), `S/tools/preview.html` (browser preview;
   each draft run embeds it with its sheets as `out/<name>.html` via `ex::page`, opened with a double click),
   `S/tools/layers.mjs` (pixelfx colour and light layers).

@@ -8,7 +8,7 @@ applies: Does the effect travel, aim, face a way, or go from a caster to a targe
 # View and directions
 
 The camera of the game the sheet goes into, and how the engine gets every side or heading from the sheet
-(section 5, `kit/src/fc.rs`): side view is 1 direction facing east plus mirror; top-down and 3/4 are 8 or 16
+(`export.md`, `kit/src/fc.rs`): side view is 1 direction facing east plus mirror; top-down and 3/4 are 8 or 16
 heading rows, never rotated at runtime. A caster to target effect also splits into cast, travel and impact parts.
 
 **Fixed when** the prompt names the view or the game genre with a known camera (platformer, fighting game is side;

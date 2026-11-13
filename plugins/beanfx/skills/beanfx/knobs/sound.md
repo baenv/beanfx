@@ -34,8 +34,8 @@ a sword is metal, a thunder strike is lightning.
 - Soft: cosy and ambient games keep magic quiet so it sits under the score.
 
 **How it ships:** `sfx::write(out, name, Some(&mut meta), sfx::Write { seed, voice, element, .. })` after `ex::write`, then `sfx::check(out, &meta)` with the other checks. Files: `<name>_sound.wav` (the whole effect from frame 0) and one WAV per cue; each
-act hit names its cue in `sound`. The first pass always brings two or three takes in `out/sound_takes/` for the
-owner to pick by ear (SKILL.md, Sound).
+act hit names its cue in `sound`. The first pass writes one sound; two or three takes in `out/sound_takes/` for the
+owner to pick by ear are a suggested upgrade (`export.md`, Sound).
 Recordings: `sounds/` in the project (or `BEANFX_SOUNDS`) with `<element>_<kind>[_<weight>]*.wav`, such as
 `metal_hit_heavy_01.wav`, `lightning_hit.wav`, `metal_whoosh.wav`; a matching cue uses the file (picked by seed,
 onset on the hit, pitched by weight) and `sound.samples` lists the files. Only CC0 or the owner's own recordings

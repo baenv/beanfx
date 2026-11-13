@@ -3,6 +3,21 @@
 Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag `v<version>` on `main`; see
 `CONTRIBUTING.md`.
 
+## 2.2.0
+
+A short `SKILL.md` core with reference files, and an eval suite (2026-11-13).
+
+- `SKILL.md` is a short core (about 200 lines, from 615): the run in order with the one-pass rule first, the brief,
+  drawing once, delivery and follow-ups. The detail moved, word for word, into reference files a run reads only
+  when it needs them: `craft.md`, `light.md`, `caster.md`, `export.md`, `pixelfx.md`; what a run writes and checks
+  is in `kit/DRAFTS.md`, and the trace from a reference image in `research.md`.
+- New eval suite `plugins/beanfx/evals/` for `claude plugin eval`: a brief-only case and three draw cases that grade
+  the sheet, the preview page, the number of draft runs and the suggested upgrades. The draw cases need cargo
+  reachable from the eval's fresh home folder (`CONTRIBUTING.md`).
+- Doc fixes from a test run on the short core: `Spec.caster_foot`, `dr::Aura`, the aura first and last frame rule,
+  `vnoise` and `put` units in `kit/API.md`, and a light measure that still misses after one retune becomes a
+  suggested upgrade.
+
 ## 2.1.1
 
 One generate pass, then suggested upgrades (2026-11-13).

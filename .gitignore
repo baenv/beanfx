@@ -63,3 +63,6 @@ target/
 
 # draft Rust builds share one target dir (drafts/<name>/.cargo/config.toml)
 .beanfx/
+
+# Eval runs
+plugins/beanfx/evals/results/

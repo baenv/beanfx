@@ -1,4 +1,4 @@
-# Research the subject (step 2a)
+# Research the subject
 
 Look the subject up on the open web before the `shape` question and before the brief's beats and carrier are
 fixed. The goal is how the subject is known and how it moves, so the shapes and beats come from it.
@@ -35,7 +35,7 @@ true one:
   double-edged blade about three quarters of the length, a guard, a grip and a pommel.
 - **The silhouette that reads.** Which parts carry recognition at small size (the dragon's head and antlers, the
   sword's guard and tip); those get the pixels.
-- **A reference image** for the skeleton step (SKILL.md 2a): a clear side or three-quarter view on a plain ground,
+- **A reference image** for the skeleton step (below): a clear side or three-quarter view on a plain ground,
   from the owner, a photo, a reference sheet or public-domain art. Note its link.
 
 ## Read and check
@@ -50,3 +50,17 @@ true one:
 
 Put 3 to 5 findings in the reply, each one line with its link, then build the brief and the `shape` options from
 them. Mark anything single-sourced. Never present recall as a search result.
+
+## Skeleton from a reference image
+
+When the owner asks for the skeleton, the true structure, or gives a
+detailed image of the object, reverse the image with `rf` (`kit/src/rf.rs`) instead of drawing the structure by eye.
+`let t = rf::trace(path, rf::Trace { height: Some(<the object's size in the cell>), tones: <the style's tones>, ..Default::default() })?`
+takes the derivative of the image (Sobel gradient) for the outline and the inner lines (`t.edges`), the value
+levels for how light each part is (`t.shade`, 0 darkest), and the skeleton (`t.spine`, centre lines). Then fill
+by it: `rf::paint(&t, rf::Paint { ramp_index, edge, .. })` maps the levels onto the effect's own ramp and inks
+the edges, the light goes on top, and `t.outline` and `t.spine` feed `dv` (`kit/src/dv.rs`) for the build-up and
+break-down states. Use a reference the
+owner gave, a photo of the real thing, an anatomy or reference sheet, or public-domain art, and put its link
+in the reply. Clean the traced map by hand where the trace is noisy at the target size (stray pixels, broken
+lines), keeping its proportions.

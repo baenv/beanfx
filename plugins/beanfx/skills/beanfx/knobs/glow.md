@@ -7,7 +7,7 @@ stated: Does the request say how strong the glow or light of the effect is (subt
 # Glow level
 
 subtle, medium or strong: how bright the lit parts are. How far the light spreads is the `clarity` knob. The k
-values and the measured mean are in SKILL.md 2a.
+values and the measured mean are in `light.md` in the skill folder.
 
 **Fixed when** the prompt names the strength ("faint", "blinding", "no glow") or an image shows it. "Sparkling"
 implies glints and stronger point light but is open.
