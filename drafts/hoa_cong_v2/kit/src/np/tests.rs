@@ -9,10 +9,19 @@ fn inp(seed: u64, n: usize) -> Vec<f64> {
     (0..n).map(|_| r.random() * 10.0 - 5.0).collect()
 }
 
+/// Bit for bit on macOS arm64, where the vectors were made; elsewhere fused multiply-add and the platform's libm may
+/// move the last bits, so a few ulps are allowed.
+const EXACT: bool = cfg!(all(target_arch = "aarch64", target_os = "macos"));
+
 fn same(got: &[f64], want: &[u64], what: &str) {
     assert_eq!(got.len(), want.len(), "{what}: length");
     for (i, (g, w)) in got.iter().zip(want).enumerate() {
-        assert_eq!(g.to_bits(), *w, "{what} {i}: {g} vs {}", f64::from_bits(*w));
+        let wf = f64::from_bits(*w);
+        if EXACT || !g.is_finite() || !wf.is_finite() {
+            assert_eq!(g.to_bits(), *w, "{what} {i}: {g} vs {wf}");
+        } else {
+            assert!((g - wf).abs() <= 1e-12 * wf.abs().max(1.0), "{what} {i}: {g} vs {wf}");
+        }
     }
 }
 
