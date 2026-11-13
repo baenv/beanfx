@@ -3,6 +3,14 @@
 Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag `v<version>` on `main`; see
 `CONTRIBUTING.md`.
 
+## 2.1.1
+
+One generate pass, then suggested upgrades (2026-11-13).
+
+- `/beanfx` generates one pass from the brief: write the draft, run it, fix only failing checks or a missing or
+  cut-off part, then deliver with 3 to 5 suggested upgrades. The look-fix loop, benchmark passes, shape takes and
+  glow takes become upgrades the owner picks. Glow is asked with the other knobs.
+
 ## 2.1.0
 
 The draft runner: a draft holds only the effect (2026-11-13).

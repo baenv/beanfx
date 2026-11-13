@@ -67,8 +67,7 @@ PROMPT
 2 to 4 concrete values, the recommended one first and marked "(Recommended)", each saying what it does to the
 result. Send them with AskUserQuestion, at most 4 per call, in the gate's order; the next call goes after the
 answers when its options depend on them (a top-down view changes which shapes read). `states` may take more
-than one question. An open `glow` is the exception: it is picked on the drawing (Glow takes, section 2), so the
-brief carries medium for now and says the glow is picked on the peak.
+than one question. An open `glow` is asked like any other knob, with its ASCII preview.
 
 **Explain for an owner new to VFX.** A thin prompt (a subject only, no words like fps, loop, glow or palette)
 means the owner may not know the terms. Then each question gets one plain line saying why it matters, each
@@ -105,10 +104,9 @@ a. **Research, then from scratch (default).** Before the brief's beats and carri
    parts it is known by. For a plain effect (fire, lightning, ice, smoke): how the real thing moves, breaks up and
    changes colour. Put 3 to 5 findings with links in the reply and build the brief from them.
 
-   **Find the reference in the same pass** (when `setup.sh --pixelfx` is set up), per "Benchmark" in section 3:
-   the pixelfx effect nearest the prompt. When the prompt matches one closely (its words or its description in
-   `docs/CATALOG.md`), say so in the reply before the questions: "This reads like pixelfx `<id>`; I will
-   benchmark against it." Its size and length are data for the size and timing options, never a shape to copy.
+   When the prompt closely matches a pixelfx effect (its words or its description in `docs/CATALOG.md`, when
+   `setup.sh --pixelfx` is set up), name it in the reply; its size and length are data for the size and timing
+   options, never a shape to copy. Benchmarking against it is an upgrade the owner may pick (section 3).
 
    **Objects get their true shape.** When the prompt names an object or creature (a dragon, a sword, a phoenix,
    a lotus, a tiger), research its structure before drawing, per "Objects" in `research.md`: the parts in order,
@@ -157,7 +155,7 @@ a. **Research, then from scratch (default).** Before the brief's beats and carri
    a white heart). A big move wants dozens of these at its peak; pixelfx myriad-swords carries 400 to 800 bright
    points a frame and its light changes about three times as much between frames as a draft lit by still pools.
 
-   **Glow level** (a brief knob: subtle, medium, strong; medium when open, then picked on the glow takes) sets how
+   **Glow level** (a brief knob: subtle, medium, strong; medium when the owner leaves it open) sets how
    bright the lit parts are (`lt::glow_level(name)` holds the table):
 
    | level | core k | pool along a part | mean |
@@ -205,8 +203,8 @@ Drafts live in `drafts/<name>/` of the project (`src/main.rs`, output in `out/`,
 `cd drafts/<name> && cargo run --release -q`). Write each draft on the runner `dr` (`kit/DRAFTS.md`, signatures in `kit/API.md`; read those two, not the kit source): main.rs holds the `Spec` and `Effect::draw` only, and `dr::main` takes every step of section 3 and 5. Write it in pieces (spec and one element, `look`, then add elements with Edit), never as one large Write. Overlapping parts (two dragons in a helix, a body over a palm): give each part a depth per pixel, keep the
 nearest, and rim each part where it meets empty space or a part behind it, so the crossing reads at 1x.
 
-**Peak first, then derive.** Draw the carrier whole at its peak pose before any other state, and judge that frame
-at 1x and 4x until it reads, then run benchmark pass 1 (section 3) on it before drawing any other frame. Give its draw function a trace mode (a flag, or a second function) that returns the shade map and a part-id
+**Peak first, then derive.** Draw the carrier whole at its peak pose before any other state and look at it once
+(`look <peak>`) before drawing the other frames. Give its draw function a trace mode (a flag, or a second function) that returns the shade map and a part-id
 map (skull 0, jaw 1, horn 2, and so on; -1 empty) in the carrier's own frame. Every state that builds up to that
 shape or breaks down from it then takes its points from those maps with `dv`, never from hand-placed
 points, so a change to the drawing moves every state with it:
@@ -223,22 +221,20 @@ Store the points with `dv::local(&p, anchor, ang, scale)` and place them each fr
 the carrier's pose for that frame. Learnt on a dragon constellation: the constellation traced from the solid
 head lands on it exactly.
 
-**Takes when the direction is open.** When the owner did not pick the shape (it went to its default after "just
-do it", or the owner asks for options), draw 2 to 3 genuinely different takes of the peak frame only, each from a
-different reading in the research (a coiled dragon, a dragon in a dive, a dragon head alone). Put them side by
+**Takes only on request.** When the owner did not pick the shape, draw the strongest reading from the research
+and name the other readings (a coiled dragon, a dragon in a dive, a dragon head alone) in the suggested upgrades.
+When the owner asks for options, draw 2 to 3 genuinely different takes of the peak frame only, put them side by
 side at 4x on the dark ground in `out/takes.png`, show it, and ask which one with AskUserQuestion before drawing
 any other frame. Write the board with `pfx::takes(out.join("takes.png"), &[(label, vec![peak]), ..], Default::default())?`. Delete the code
 of the takes not kept.
 
-**Glow takes when the glow is open.** When `glow` was open in the brief, pick it on the drawing, not in words:
-once the peak reads, render the peak and the frames round it (about 6 before to 12 after) at each level, with
+**Glow takes only on request** (an upgrade after delivery, `cargo run --release -q -- glow` on the runner): render the peak and the frames round it (about 6 before to 12 after) at each level, with
 `render(f, seed, glow)` drawing its cores and pools from `lt::glow_level(level)`, and lay them side by side with
 `pfx::takes(out.join("glow_takes.png"), &[("subtle", fr), ("medium", fr), ("strong", fr)], pfx::Takes { fps: Some(FPS), ..Default::default() })?`. It writes the
 png and a gif that plays the three in step. Show both, then ask one AskUserQuestion: "How strong is the glow?",
 options "Medium (Recommended)", "Strong", "Subtle", each with its line from `knobs/glow.md` and the take number
 it matches; say the light still ships as its own sheet with `light_gain`, so the game can tune it later. Keep
-the picked level as `GLOW` and draw the other frames with it. Skip the takes when the prompt set the glow, the
-owner wants flat pixels with no glow, or said "just do it" (then medium).
+the picked level in `Spec.glow` and rerun.
 
 **Mockup caster** (only when the brief says yes): `cs` (`kit/src/cs.rs`) draws a golden robed silhouette with no face,
 glowing at max, plus an optional avatar. The style: 5 gold tones (`cs::BODY`) shaded by neighbour (a step up
@@ -386,8 +382,11 @@ frames, printing every line and exiting 1 when there is one:
   `default_rng(seed + salt)`; particles a reseed throws further show up here.
 - `ex::check_act(&act, N, FPS, looped)?` when the JSON has an act (below).
  Judge at 1x for read, 4x for detail, the gif for timing.
-Change one thing per pass; crop one frame to 5x when the grid hides a problem. Go round at least three times
-(look, fix the worst thing, run again) before calling a draft done; a showpiece takes more.
+**One pass, then suggest.** Generate what the brief asks for in one pass: write the draft, run it, and fix only
+what fails (a check that exits 1, an error that exits 2, a part missing or cut off at 1x). Then deliver. Do not
+start an upgrade loop (more look-and-fix rounds, benchmark passes, takes, polish against the craft gates): every
+round costs minutes of generation. Put what would make it better in the report as suggested upgrades instead, and
+do one only when the owner picks it (section 6).
 
 The script also prints the light measure for the glow level and clarity (on `l` before any `lt::steps`), from each frame's colour `col`
 and summed light `l`:
@@ -401,12 +400,11 @@ let lit: Array1<f64> = bx.iter().copied().filter(|&v| v > 0.03).collect();
 let (cover, mean) = (lit.len() as f64 / bx.len() as f64, np::mean(&lit));    // median of each over frames, printed
 ```
 
-When mean falls outside the glow row or cover outside the clarity row, retune the pools. These numbers are a
-floor: a draft inside both rows can still lose by eye (void_pop had cover 19 % and mean 0.118 and lost to pixelfx
-implosion). The draft is done when it passes the benchmark below, and every other number in this skill (the
-5 % last frame, the edge margin) works the same way.
+When mean falls outside the glow row or cover outside the clarity row, retune the pools once in the same pass.
+These numbers are a floor: a draft inside both rows can still lose by eye (void_pop had cover 19 % and mean 0.118
+and lost to pixelfx implosion), which is what the benchmark upgrade below finds.
 
-**Benchmark** (when `setup.sh --pixelfx` is set up). A quality check only: take nothing from its code, shapes or
+**Benchmark** (an upgrade, run when the owner picks it; needs `setup.sh --pixelfx`). A quality check only: take nothing from its code, shapes or
 motion.
 
 - Find the reference with more than one search: `list.mjs` matches plain substrings, so `implode` misses
@@ -414,15 +412,15 @@ motion.
   the noun and the verb, implosion and implode; synonyms, collapse and suck), then two or three distinctive words
   from the owner's prompt as it stands, and read the matching category table in `docs/CATALOG.md` (explosions,
   impacts, arcane, and so on). Take the one or two closest; say which and why in the reply.
-- Pass 1, the peak, before any other frame is drawn: render the reference (`node tools/render.mjs <id> --gif`),
+- Pass 1, the peak: render the reference (`node tools/render.mjs <id> --gif`),
   and put its peak frame and the draft's side by side at the same zoom on the same dark ground. Fix the base,
   size and light of the peak here, while it costs one frame.
-- Pass 2, the timeline, before calling the draft done: load the reference with `node $LAYERS <id> --out
+- Pass 2, the timeline: load the reference with `node $LAYERS <id> --out
   <draft>/ref --pixelfx $PIXELFX` and `pfx::load`, composite its frames, and write `pfx::contact(out.join("bench.png"), &draft_frames, FPS, pfx::Contact { r#ref: Some((&ref_frames, ref_fps)), .. Default::default() })`: the same moments of both, row over row (`by: "phase"`,
   the default, lines up the same share of each length; `by: "time"` the same seconds). Read it column by column:
   the focal point in every phase, the anticipation, the peak frame count, the dissolve. A peak frame alone hides
   timeline faults, such as a dark centre for 25 frames before the pop.
-- If the reference shows more detail, clearer light or more life at any column, the draft is not done. Note what
+- Where the reference shows more detail, clearer light or more life at a column, that column is the next upgrade. Note what
   beanfx does better too (a one-shot that ends on a near-empty frame, where pixelfx can waste blank frames).
 
 Usual fixes: mush at 1x, then fewer tones, one focal point, bigger shapes; floaty, then fast in and slow out with
@@ -458,6 +456,9 @@ second. Judge it in a travel gif; in place it reads as a pole that spins.
 
 ## 4. Craft gates
 
+Draw the first pass with these in mind. A gate the delivered draft misses goes into the suggested upgrades, not
+into another round.
+
 - Clean silhouette that reads at 1x; one focal point; a rim or outline where the style uses one.
 - Repeated parts (flames along a wall, puffs in a column, shards, arrows) come in three sizes, grouped: a few big,
   some medium, many small, with gaps between the groups. A row of the same shape at one size and one spacing reads
@@ -486,7 +487,6 @@ second. Judge it in a travel gif; in place it reads as a pole that spins.
   maps, and the frame where a build-up hands over to the solid carrier shows no jump.
 - Light on every hot part (core, heads, landing flash, sparks, embers), each with a wide soft pool and a tight
   core, smooth or stepped as the style sets (hard retro steps it); white only at the hottest core.
-- Benchmark pass 2 (section 3) shows no column where the reference reads better.
 - Nothing cut by the cell edge in any frame or direction; the pivot is the drawing's origin.
 - The style picked in the brief holds in every frame (dither or translucency, glow strength).
 - Every heading row reads as the same effect: draw the shape in the rotated frame (`fk::rot`, u along travel)
@@ -592,9 +592,10 @@ With no sound in the brief, write no audio.
 For a game that cannot load a sheet as it is, or needs the effect to follow a moving target or recolour per
 instance at runtime, `porting.md` also covers porting the draw code to the engine's own language.
 
-Report in English with the path of the preview page `out/<name>.html` and the other paths, the brief, the state table for a multi-state effect, the "Suggestions" list
-(knobs the owner can turn next: speed or the length of one state, frame count, glow, light hue, density, size)
-and what is left.
+Report in English with the path of the preview page `out/<name>.html` and the other paths, the brief, the state table for a multi-state effect, and the
+"Suggested upgrades" list: 3 to 5 concrete changes, most effective first, each naming the part or knob, the value and
+why (from the usual fixes in section 3, a craft gate the draft misses, glow takes, shape takes, the benchmark,
+or knobs such as speed, frame count, light hue, density, size). Apply none until the owner picks.
 
 ## 6. Follow-up requests (after a draft is delivered)
 
