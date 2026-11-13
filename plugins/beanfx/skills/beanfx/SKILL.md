@@ -1,40 +1,40 @@
 ---
 name: beanfx
-description: Design and draw a pixel-art effect from a description or a reference image (/beanfx <description | image>), for any game, engine or video. Researches the subject on the open web, then draws the base in Python (fxlib and fxkit shapes, own palette and size); only when the owner asks for reuse does it start from a pixelfx effect or an earlier draft, keeping its light (the glow) while redrawing or recolouring its base. Previews as strips and gifs, and exports a sprite sheet with JSON. Use when the owner asks for a new effect, a redraw of one, or a pixelfx effect made better.
+description: Design and draw a pixel-art effect from a description or a reference image (/beanfx <description | image>), for any game, engine or video. Researches the subject on the open web, then draws the base in Rust on the beanfx kit crate (shade-map shapes, own palette and size); only when the owner asks for reuse does it start from a pixelfx effect or an earlier draft, keeping its light (the glow) while redrawing or recolouring its base. Previews as strips and gifs, and exports a sprite sheet with JSON. Use when the owner asks for a new effect, a redraw of one, or a pixelfx effect made better.
 argument-hint: <description | image path>
 ---
 
 # /beanfx: an effect from words or a picture
 
-Effects are code. The base (shapes, colour) is drawn in Python as shade maps of palette indices; the light (glow)
+Effects are code. The base (shapes, colour) is drawn in Rust as shade maps of palette indices; the light (glow)
 is a separate additive layer. The default start is research on the subject, then a base and light drawn from
 scratch. pixelfx and earlier drafts in `drafts/<name>/` are reused only when the owner asks; then
 take pixelfx's light (it reads well) and redraw its base (often weak: blobs, flat fills, smooth teardrops).
 
 Paths: the skill is self-contained in the project you run in (its git root, else the current folder). This
-skill's folder is `${CLAUDE_SKILL_DIR}` and holds `setup.sh`, `gate.py`, `knobs/`, `research.md`, `vfx_notes.md`, `porting.md`, `runtime/beanfx.js`, `tools/layers.mjs` and the source of the drawing
-kit. `setup.sh --draft <name>` copies the kit into the draft's own `drafts/<name>/kit/` (`fxkit.py`, `fxlib.py`, `light.py`, `pfx.py`, `caster.py`
-the mockup caster, `target.py` the preview target dummy, `ref.py` an object traced from a reference image, `facing.py` the direction fields for the JSON, `derive.py` points taken from a finished
-drawing, `rig.py` the owner's game character as the caster, `export.py` the sheet, its Aseprite-style JSON and the checks). Each `--draft` run also writes `kit/skill.txt`, the skill path `ex.page` takes the preview template from, so pages always use the current `tools/preview.html`. The copy is made once and never overwritten, so a plugin update leaves each existing draft on the kit
+skill's folder is `${CLAUDE_SKILL_DIR}` and holds `setup.sh`, `knobs/`, `research.md`, `vfx_notes.md`, `porting.md`, `runtime/beanfx.js`, `tools/layers.mjs` and `kit/`, the Rust crate that is the drawing
+kit (library `beanfx` plus the `beanfx` binary that runs the gate). `kit/API.md` lists every module and call; `kit/DRAFTS.md` is the guide to writing a draft. The modules, in `kit/src/`: `fk` shapes, `fl` ramps and shade-map helpers, `lt` additive light, `pfx` layers, tint, composite and the strip, gif and contact writers, `cs` the mockup caster, `tg` the preview target dummy, `rf` an object traced from a reference image, `fc` the direction fields for the JSON, `dv` points taken from a finished
+drawing, `rig` the owner's game character as the caster, `ex` the sheet, its Aseprite-style JSON, the checks and the preview page, `sfx` sound, plus `np`, `rng` and `img` for numbers, the seeded generator and PNG files.
+`setup.sh --draft <name>` makes the draft crate `drafts/<name>/` (`Cargo.toml`, `.cargo/config.toml`, `src/main.rs`) and copies the kit into its own `drafts/<name>/kit/`. Each `--draft` run also writes `kit/skill.txt`, the skill path `ex::page` takes the preview template from, so pages always use the current `tools/preview.html`. The copy is made once and never overwritten, so a plugin update leaves each existing draft on the kit
 it was drawn with. A kit fix goes into the skill copy first, then into the current draft's `kit/` by hand; other
-drafts get it only when the owner names them (`setup.sh --kit-status` lists the drafts whose kit is behind; `setup.sh --draft <name> --refresh-kit` copies the current kit into a named one, then run that draft and compare). Drafts are `drafts/<name>/` in the project, Python is
-`.venv/bin/python` there. Older drafts without their own `kit/` import the project's root `kit/`; leave it as it is.
+drafts get it only when the owner names them (`setup.sh --kit-status` lists the drafts whose kit is behind; `setup.sh --draft <name> --refresh-kit` copies the current kit into a named one, then run that draft and compare). A draft runs with `cd drafts/<name> && cargo run --release -q`; every draft builds into the project's one `.beanfx/target`, so the kit compiles once.
 
 ## Setup (first, every run)
 
 ```
-bash ${CLAUDE_SKILL_DIR}/setup.sh             # .venv with numpy, pillow and the beanfx binary (cargo), checks the kit imports
-bash ${CLAUDE_SKILL_DIR}/setup.sh --draft <name>   # once the draft is named, before its first file: drafts/<name>/kit/
+bash ${CLAUDE_SKILL_DIR}/setup.sh             # builds the beanfx binary (cargo) into .beanfx/bin/beanfx
+bash ${CLAUDE_SKILL_DIR}/setup.sh --draft <name>   # once the draft is named, before its first file: drafts/<name>/ with its kit/
 bash ${CLAUDE_SKILL_DIR}/setup.sh --pixelfx   # reuse (2b) and the benchmark: also node 18+ and pixelfx
 ```
 
-It checks each tool and installs only what is missing, in the project: the venv (uv, else `python3 -m venv`),
-with `--draft <name>` the draft's `kit/` copied from this skill's `kit/` (only when that folder is missing), and pixelfx, a clone of
+It checks each tool and installs only what is missing, in the project: the binary at `.beanfx/bin/beanfx` (built by
+cargo from this skill's `kit/`, rebuilt when the kit changes; the first build takes about a minute), with
+`--draft <name>` the draft crate and its `kit/` copied from this skill's `kit/` (only when that folder is missing), and pixelfx, a clone of
 `https://github.com/patch-gg/pixelfx` into the project's `pixelfx/`. With `--pixelfx` it checks each use apart:
 the benchmark needs `render.mjs` and `list.mjs` and prints `PIXELFX=<dir>` (run them from that dir); reuse needs
 this skill's `tools/layers.mjs`, which runs on pixelfx's `tools/lib/fxlib.mjs`, and prints `LAYERS=<script>`.
-`BEANFX_PROJECT` overrides the project folder. On exit 1, report the line it printed and stop; node itself is
-never installed by the script.
+`BEANFX_PROJECT` overrides the project folder. On exit 1, report the line it printed and stop; cargo (install Rust
+from https://rustup.rs) and node are never installed by the script.
 
 An effect is for any game, engine or video. Size, palette, view, density, alpha and style come from the brief;
 no house style applies unless the owner gives one.
@@ -51,7 +51,7 @@ asks for sound).
 there is one:
 
 ```
-python3 ${CLAUDE_SKILL_DIR}/gate.py - --context "<what the image shows, or nothing>" <<'PROMPT'
+<project>/.beanfx/bin/beanfx gate - --context "<what the image shows, or nothing>" <<'PROMPT'
 <the owner's prompt, verbatim>
 PROMPT
 ```
@@ -117,48 +117,48 @@ a. **Research, then from scratch (default).** Before the brief's beats and carri
    sword with a wrong guard or blade, is not done however good its light.
 
    **Skeleton from a reference image** (when the owner asks for the skeleton, the true structure, or gives a
-   detailed image of the object): reverse the image with `kit/ref.py` instead of drawing the structure by eye.
-   `t = ref.trace(path, height=<the object's size in the cell>, tones=<the style's tones>)` takes the derivative
-   of the image (Sobel gradient) for the outline and the inner lines (`t.edges`), the value levels for how light
-   each part is (`t.shade`, 0 darkest), and the skeleton (`t.spine`, centre lines). Then fill by it: `ref.paint(t,
-   ramp_index, edge)` maps the levels onto the effect's own ramp and inks the edges, the light goes on top, and
-   `t.outline` and `t.spine` feed `kit/derive.py` for the build-up and break-down states. Use a reference the
+   detailed image of the object): reverse the image with `rf` (`kit/src/rf.rs`) instead of drawing the structure by eye.
+   `let t = rf::trace(path, rf::Trace { height: Some(<the object's size in the cell>), tones: <the style's tones>, ..Default::default() })?`
+   takes the derivative of the image (Sobel gradient) for the outline and the inner lines (`t.edges`), the value
+   levels for how light each part is (`t.shade`, 0 darkest), and the skeleton (`t.spine`, centre lines). Then fill
+   by it: `rf::paint(&t, rf::Paint { ramp_index, edge, .. })` maps the levels onto the effect's own ramp and inks
+   the edges, the light goes on top, and `t.outline` and `t.spine` feed `dv` (`kit/src/dv.rs`) for the build-up and
+   break-down states. Use a reference the
    owner gave, a photo of the real thing, an anatomy or reference sheet, or public-domain art, and put its link
    in the reply. Clean the traced map by hand where the trace is noisy at the target size (stray pixels, broken
    lines), keeping its proportions.
 
-   Then shapes come from
-   `kit/fxkit.py` (`lumpy`, `ball`, `trail_puffs`, `streaks`, `puff`, `facets`, `kite`, `leaf`, `drop`,
-   `twinkle`, `hit_burst`, `claw_tracks`) and `kit/fxlib.py` (`stroke`, `outline`, `checker`,
-   `ground_ring`, `ramp`, `wgrid`, `noise`, and `Pen(px, py, density)`, whose `put` and `line` take the same
-   world px as `grid` and `wgrid`, so no draft converts to sheet px by hand); light from `kit/light.py` (`glow`, `glow_line`, `glow_ring`,
-   falloff `(1 - d)^2 * k`); output with `kit/pfx.py` (`paint`, `composite`, `strip`, `gif`, `contact`, `takes`). A draft puts its own
-   `kit/` on `sys.path` (`sys.path.insert(0, str(HERE / "kit"))`). These are generic; use your own palette and size. Leave other drafts in `drafts/` unread.
+   Then shapes come from `fk` (`lumpy`, `ball`, `trail_puffs`, `streaks`, `puff`, `facets`, `kite`, `leaf`, `drop`,
+   `twinkle`, `hit_burst`, `claw_tracks`) and `fl` (`stroke`, `outline`, `checker`,
+   `ground_ring`, `ramp`, `wgrid`, `noise`, and `Pen::new(px, py, density)`, whose `put` and `line` take the same
+   world px as `grid` and `wgrid`, so no draft converts to sheet px by hand); light from `lt` (`glow`, `glow_line`, `glow_ring`,
+   falloff `(1 - d)^2 * k`); output with `pfx` (`paint`, `composite`, `strip`, `gif`, `contact`, `takes`). A draft
+   depends on its own `kit/` through `Cargo.toml` (`beanfx = { path = "kit" }`) and calls it as `beanfx::fk::...`. These are generic; use your own palette and size. Leave other drafts in `drafts/` unread.
 
-   **The light follows the style.** Sum the glows into one float map `L`, then colour it with
-   `pfx.tint(np.repeat(np.clip(L, 0, 1)[..., None], 3, -1), [deep, hue, pale, "#ffffff"])` and pass that to
-   `pfx.composite`. Soft and painterly pass `L` as it is: smooth light, a bloom of hundreds of colours. Hard retro
-   passes `light.steps(L, levels=4)`: flat steps with hard edges inside the light and a 4x4 ordered dither only in
+   **The light follows the style.** Sum the glows into one float map `l` (`Array2<f64>`), repeat it to three
+   channels (`l3`), then colour it with `pfx::tint(&l3, &[deep, hue, pale, "#ffffff"])?` and pass that to
+   `pfx::composite`. Soft and painterly pass `l` as it is: smooth light, a bloom of hundreds of colours. Hard retro
+   passes `lt::steps(&l, lt::Steps { levels: 4.0, ..Default::default() })`: flat steps with hard edges inside the light and a 4x4 ordered dither only in
    the outer step, so the halo thins to single pixels and a frame keeps to a few dozen colours, the way a
    hand-drawn pixel effect does. Smooth bloom over crisp sprites is what reads as "not pixel art" to pixel artists;
    the stepped light trades some of the brightness at a pop for that read. The owner can swap either way ("smooth
    glow" on hard retro, "pixel light" on soft). With stepped light keep the pools tight (pool radius at the low end
-   of `light.GLOW`) so the dithered halo stays a few px wide, never a dotted disc round the whole cell, and give the
+   of `lt::glow_level`) so the dithered halo stays a few px wide, never a dotted disc round the whole cell, and give the
    flash its read by a 1 to 2 frame white core instead. Light only what
    emits: hot cores, eyes, bolt heads, blade edges, the landing flash, sparks and embers. Stack two lights on
    each of those, the way pixelfx does: a tight core (r 4 to 15) and a pool along it. Dark space between the
    lit parts is what makes the light read; a glow over the whole cell reads as haze.
 
-   **Sparkle is light that lives a few frames.** Give every spark, glint, sword entry and hit a `light.Flashes`
-   light that starts at its k and dies in 3 to 8 frames (`light.flash_at(L, c, f, f0, x, y, r, k, life)` draws it
-   from the frame alone, so `render(f, seed)` stays per frame for `check_seeds`; `Flashes` keeps state between
+   **Sparkle is light that lives a few frames.** Give every spark, glint, sword entry and hit a `lt::Flashes`
+   light that starts at its k and dies in 3 to 8 frames (`lt::flash_at(&mut l, &c, f, f0, x, y, r, k, life)` draws it
+   from the frame alone, so `render(f, seed)` stays per frame for `ex::check_seeds`; `Flashes` keeps state between
    frames and suits only a loop that draws frames in order), and multiply the k of lasting glints by
-   `light.flicker(i, f, seed)` so they blink out of step. Draw the glint itself as opaque pixels (`fxkit.twinkle`,
+   `lt::flicker(i, f, lt::Flicker { seed, ..Default::default() })` so they blink out of step. Draw the glint itself as opaque pixels (`fk::twinkle`,
    a white heart). A big move wants dozens of these at its peak; pixelfx myriad-swords carries 400 to 800 bright
    points a frame and its light changes about three times as much between frames as a draft lit by still pools.
 
    **Glow level** (a brief knob: subtle, medium, strong; medium when open, then picked on the glow takes) sets how
-   bright the lit parts are (`light.GLOW` holds the table):
+   bright the lit parts are (`lt::glow_level(name)` holds the table):
 
    | level | core k | pool along a part | mean |
    |---|---|---|---|
@@ -180,9 +180,9 @@ a. **Research, then from scratch (default).** Before the brief's beats and carri
    Cover is the share of the drawing's box (the colour alpha's bounding box, per frame, median over frames) with
    light above 0.03; mean is the median light of those pixels. Measured on pixelfx: myriad-swords 15 % at 0.09,
    lightning-call 6 % at 0.06, meteor-call 8 % at 0.07, hit-spark 5 % at 0.06; torch 97 % at 0.19 and portal
-   100 % at 0.12 are light sources. `van_kiem_quy_tong_v4`, lit by the old single table, read hazy at 70 % and 0.13.
+   100 % at 0.12 are light sources. A sword-rain draft lit by one old table for every level read hazy at 70 % and 0.13.
    Strength above medium goes into the pools round emitters, never the core or the pool along a stroke: past about
-   0.45 x core along a 1 px line the light sums to white and buries the line (tested on `drafts/aura_thunder_v3`).
+   0.45 x core along a 1 px line the light sums to white and buries the line (tested on a thunder aura).
 
 b. **Reuse (only when the owner asks):** the owner says reuse or pixelfx, names a pixelfx id, or names
    an earlier draft. For a named draft, read it and build on it. For pixelfx, find the nearest effect in
@@ -195,68 +195,69 @@ b. **Reuse (only when the owner asks):** the owner says reuse or pixelfx, names 
    ```
 
    It writes `<name>_color.png` and `<name>_light.png` (frames left to right) and `<name>.json` (w, h, fps,
-   frames, loop, pivot). In the draft, `kit/pfx.py` loads them (`pfx.load`) and gives `tint` (same glow,
+   frames, loop, pivot). In the draft, `pfx::load(folder, name)` loads them and `pfx` gives `tint` (same glow,
    new hue ramp), `gain`, `keep` (light only under a mask, such as your own shape grown by a few px), `bands`
-   (stepped light on the loaded light; for your own `L` use `light.steps`), `paint` (shade map to RGBA), `composite`, `strip` and `gif`. Usual use:
+   (stepped light on the loaded light; for your own `l` use `lt::steps`), `paint` (shade map to RGBA), `composite`, `strip` and `gif`. Usual use:
    keep the light, redraw the colour base yourself on the same frames and pivot, follow pixelfx's motion
    (positions, timing) where it is good. Recolour only (`tint` plus `--opts palette`) when the base already reads.
 
-Drafts live in `drafts/<name>/` of the project (`<name>.py`, output in `out/`, run with
-`cd drafts/<name> && ../../.venv/bin/python <name>.py`). Overlapping parts (two dragons in a helix, a body over a palm): give each part a depth per pixel, keep the
+Drafts live in `drafts/<name>/` of the project (`src/main.rs`, output in `out/`, run with
+`cd drafts/<name> && cargo run --release -q`). Overlapping parts (two dragons in a helix, a body over a palm): give each part a depth per pixel, keep the
 nearest, and rim each part where it meets empty space or a part behind it, so the crossing reads at 1x.
 
 **Peak first, then derive.** Draw the carrier whole at its peak pose before any other state, and judge that frame
-at 1x and 4x until it reads, then run benchmark pass 1 (section 3) on it before drawing any other frame. Give its draw function a `trace=True` mode that returns the shade map and a part-id
+at 1x and 4x until it reads, then run benchmark pass 1 (section 3) on it before drawing any other frame. Give its draw function a trace mode (a flag, or a second function) that returns the shade map and a part-id
 map (skull 0, jaw 1, horn 2, and so on; -1 empty) in the carrier's own frame. Every state that builds up to that
-shape or breaks down from it then takes its points from those maps with `kit/derive.py`, never from hand-placed
+shape or breaks down from it then takes its points from those maps with `dv`, never from hand-placed
 points, so a change to the drawing moves every state with it:
 
 | state | from the peak drawing |
 |---|---|
-| constellation, trace, outline flash, sketch-in | `simplify(outline(m), n)`: n corners round the silhouette, in order |
-| inner lines (jaw, eye, horn roots, armour seams) | `part_lines(parts)`, each chain through `simplify(c, n, closed=False)` |
-| a body that uncoils or grows along its length | `spine(m)`: ordered centre lines |
-| gather, assemble, motes landing | `scatter(m, n)`: even landing spots inside |
-| shatter, dissolve, break into motes | `scatter(m, n)` for the start points, so the pieces leave from what was on screen |
+| constellation, trace, outline flash, sketch-in | `dv::simplify(&dv::outline(&m)?, n, true)`: n corners round the silhouette, in order |
+| inner lines (jaw, eye, horn roots, armour seams) | `dv::part_lines(&parts, min_len)`, each chain through `dv::simplify(&c, n, false)` |
+| a body that uncoils or grows along its length | `dv::spine(&m, min_len)`: ordered centre lines |
+| gather, assemble, motes landing | `dv::scatter(&m, n, seed)`: even landing spots inside |
+| shatter, dissolve, break into motes | `dv::scatter` for the start points, so the pieces leave from what was on screen |
 
-Store the points with `derive.local(P, anchor, ang, scale)` and place them each frame with `derive.world(...)` at
-the carrier's pose for that frame. Learnt on `drafts/tinh_long_chuong`: the constellation traced from the solid
+Store the points with `dv::local(&p, anchor, ang, scale)` and place them each frame with `dv::world(..)` at
+the carrier's pose for that frame. Learnt on a dragon constellation: the constellation traced from the solid
 head lands on it exactly.
 
 **Takes when the direction is open.** When the owner did not pick the shape (it went to its default after "just
 do it", or the owner asks for options), draw 2 to 3 genuinely different takes of the peak frame only, each from a
 different reading in the research (a coiled dragon, a dragon in a dive, a dragon head alone). Put them side by
 side at 4x on the dark ground in `out/takes.png`, show it, and ask which one with AskUserQuestion before drawing
-any other frame. Write the board with `pfx.takes(out / "takes.png", [(label, [peak]), ...])`. Delete the code
+any other frame. Write the board with `pfx::takes(out.join("takes.png"), &[(label, vec![peak]), ..], Default::default())?`. Delete the code
 of the takes not kept.
 
 **Glow takes when the glow is open.** When `glow` was open in the brief, pick it on the drawing, not in words:
 once the peak reads, render the peak and the frames round it (about 6 before to 12 after) at each level, with
-`render(f, seed, glow=level)` drawing its cores and pools from `light.GLOW[level]`, and lay them side by side with
-`pfx.takes(out / "glow_takes.png", [("subtle", fr), ("medium", fr), ("strong", fr)], fps=FPS)`. It writes the
+`render(f, seed, glow)` drawing its cores and pools from `lt::glow_level(level)`, and lay them side by side with
+`pfx::takes(out.join("glow_takes.png"), &[("subtle", fr), ("medium", fr), ("strong", fr)], pfx::Takes { fps: Some(FPS), ..Default::default() })?`. It writes the
 png and a gif that plays the three in step. Show both, then ask one AskUserQuestion: "How strong is the glow?",
 options "Medium (Recommended)", "Strong", "Subtle", each with its line from `knobs/glow.md` and the take number
 it matches; say the light still ships as its own sheet with `light_gain`, so the game can tune it later. Keep
 the picked level as `GLOW` and draw the other frames with it. Skip the takes when the prompt set the glow, the
 owner wants flat pixels with no glow, or said "just do it" (then medium).
 
-**Mockup caster** (only when the brief says yes): `kit/caster.py` draws a golden robed silhouette with no face,
-glowing at max, plus an optional avatar. The style: 5 gold tones (`cs.BODY`) shaded by neighbour (a step up
+**Mockup caster** (only when the brief says yes): `cs` (`kit/src/cs.rs`) draws a golden robed silhouette with no face,
+glowing at max, plus an optional avatar. The style: 5 gold tones (`cs::BODY`) shaded by neighbour (a step up
 where the top-left is empty, a step down at the bottom-right), wide sleeves and three robe flaps that trail back,
 hair and flaps that lift with `lift` and flap with `flut`, and a two-finger sword sign whose tip glows. Use:
 
 ```
-import caster as cs
-pose = cs.pose_at(f, [(0, "chest"), (28, "raise"), (98, "pull"), (103, "point")],
-                  [(0, "rest"), (28, "out"), (103, "behind")], cs.aim_from(foot, sc, target), jab)
-g = cs.draw(fr.over, (H, W), foot, sc, pose, f, lift, flut, hair="loose")   # over(ys, xs, rgb, a)
-cs.body_light(L, g, charge); cs.finger_light(L, g, point, jab)
-gg = cs.draw(fr.over, (H, W), (foot[0] - 4, foot[1] - 6), sc * 1.27, pose, f * 0.7, lift * 0.6, flut * 0.7,
-             ghost=k)                                                     # avatar, drawn first (behind)
-cs.ghost_light(fr.over, L, gg, k, f, point)
+use beanfx::cs;
+let pose = cs::pose_at(f, &[(0.0, "chest"), (28.0, "raise"), (98.0, "pull"), (103.0, "point")],
+                       &[(0.0, "rest"), (28.0, "out"), (103.0, "behind")], Some(cs::aim_from(foot, sc, target)), jab)?;
+let g = cs::draw(&mut over, (H, W), foot, sc, pose, f, cs::Draw { lift, flut, hair: "loose", ..Default::default() })?;
+// over(ys, xs, rgb, a) is a closure that lays the caster's pixels on the frame
+cs::body_light(&mut l, &g, charge); cs::finger_light(&mut l, &g, point, jab);
+let gg = cs::draw(&mut over, (H, W), [foot[0] - 4.0, foot[1] - 6.0], sc * 1.27, pose, f * 0.7,
+                  cs::Draw { lift: lift * 0.6, flut: flut * 0.7, ghost: k, ..Default::default() })?;  // avatar, drawn first (behind)
+cs::ghost_light(&mut over, &mut l, &gg, k, f, point)?;
 ```
 
-**Game character caster** (the brief picks "Game character"): `kit/rig.py` reads the owner's sprite sheets from
+**Game character caster** (the brief picks "Game character"): `rig` (`kit/src/rig.rs`) reads the owner's sprite sheets from
 `casters/<name>/rig.json` in the project (frame size, fps, pivot at the feet, animations with frame counts and
 contact frames, and per direction the sheet of each row). Four casters ship with the skill in its own
 `casters/` and load by name with no setup when the project has none of that name: `nghich_tien_kiem` and
@@ -266,25 +267,25 @@ in `casters/` are the owner's licensed art: they stay local (gitignored) and nev
 Draw the effect in the character's frame space, so it drops into that game as it is:
 
 ```
-import rig
-r = rig.load("knight_side")                       # casters/knight_side/rig.json
-PIVOT = (56, 84)                                  # the character's feet on the effect canvas
-K = FPS // r.fps_of(anim)                         # effect frames per character frame (a row may set its own fps)
-t = START + f / K                                 # character time of effect frame f; r.contact(anim) for the hits
-char = r.place((H, W), PIVOT, anim, f // K, direction, start=START)   # preview only
-prev = pfx.composite(rig.over(color, char), light)
-a0, a1 = r.arc(anim, direction, 0)                # the slash runs with the blade
-problems += r.check_arc(anim, a0, a1, direction, 0)
-meta["caster"] = r.meta(anim, FPS, start=START)  # into ex.write(extra=...)
+use beanfx::rig;
+let r = rig::load("knight_side", None)?;           // casters/knight_side/rig.json
+const PIVOT: [f64; 2] = [56.0, 84.0];              // the character's feet on the effect canvas
+let k = (FPS / r.fps_of(anim)?) as i64;            // effect frames per character frame (a row may set its own fps)
+// character time of effect frame f is START + f / k; r.contact(anim)? lists the hits
+let ch = r.place((H, W), PIVOT, anim, f as i64 / k, rig::Place { direction: Some(dir), start: START, ..Default::default() })?;  // preview only
+let prev = pfx::composite(&rig::over(&color, &ch), &light, None)?;
+let (a0, a1) = r.arc(anim, Some(dir), 0)?;         // the slash runs with the blade
+problems.extend(r.check_arc(anim, a0, a1, rig::CheckArc { direction: Some(dir), ..Default::default() })?);
+let caster = r.meta(anim, FPS, rig::Meta { start: START, ..Default::default() })?;   // into ex::Write's extra
 ```
 
 - The effect fps is a whole multiple of the animation's fps (`r.fps_of(anim)`); `r.meta` refuses any other. A row
   with uneven frame times (rig.json `ms`, from a game) goes into the JSON as `char_ms`, and the engine holds the
   effect frames by those times.
 - Directions of a game caster: a side (horizontal) effect uses 2 rows, east and west, each drawn on the
-  character's own row of that name (`fc.rows(draw, 2, n)`, `fc.meta("side", ..., directions=2)`), since the
+  character's own row of that name (`fc::rows(draw, 2, n)`, `fc::meta("side", .., fc::Meta { directions: 2, .. })`), since the
   character holds its weapon in one hand and west is not a mirror. A top-down effect uses all 8 rows
-  (`fc.rows(draw, 8, n)`, order `facing.NAMES8`). A rig with one side row (`facing` only) keeps the mirrored
+  (`fc::rows(draw, 8, n)`, order `fc::NAMES8`). A rig with one side row (`facing` only) keeps the mirrored
   single row.
 - Time the blows on the character's contact frames, not on a guess. Character sheets come without baked smears
   (white arcs in the attack frames), so the effect's slash is the only one; strip them from a bought pack first
@@ -292,39 +293,38 @@ meta["caster"] = r.meta(anim, FPS, start=START)  # into ex.write(extra=...)
 - A combo on a game character follows the `combo` knob. One press per hit: draw one clip per stroke and weight,
   each from its animation's frame 0 to wisps, write `caster.combo.steps` (state, anim, char_from, char_to the
   frame the swing ends on, contact, weight) and `caster.chain` (each clip on its animation, for the viewer), and
-  preview the whole string with every press on time by laying the clips on the timeline. `drafts/thap_tram` is
-  the reference.
+  preview the whole string with every press on time by laying the clips on the timeline.
 - Follow the sword. rig.json `swing` gives each stroke's turn (cw or ccw on screen), `from` and `to` angles
-  (0 east, 90 south, y down) and frames. Take a slash arc from `a0, a1 = r.arc(anim, direction, stroke)` (a1 - a0
-  carries the turn), never from a guess, and add `r.check_arc(anim, a0, a1, direction, stroke)` to the draft's
+  (0 east, 90 south, y down) and frames. Take a slash arc from `let (a0, a1) = r.arc(anim, direction, stroke)?` (a1 - a0
+  carries the turn), never from a guess, and add `r.check_arc(anim, a0, a1, rig::CheckArc { direction, stroke, .. })` to the draft's
   problems so a wrong turn or an end over 60 deg off exits 1. Time the arc's head on the stroke's frames.
   `r.meta` carries `swing` and `pixel_scale` into the JSON. `swing` fixes the turn and the ends, not where the
   blade is on the contact frame: put the smear's head on the blade tip measured from that frame of the sprite (the
-  weapon's own colour, the pixel farthest from the hand; `measure_blade` in `drafts/thap_tram`) and the hit spark
+  weapon's own colour, the pixel farthest from the hand; write a small `measure_blade` helper in the draft) and the hit spark
   on rig.json `emit` (the weapon tip). A smear placed by eye or toward the target runs ahead of or behind the
   blade. A stroke near 180 deg (an overhead chop) swings in the upright plane of the heading: squash it across by
-  |cos heading|, and facing away, end it at the ground in front (`plane` in the same draft).
+  |cos heading|, and facing away, end it at the ground in front.
   Top-down, the way round comes from the camera: when the blade jumps from `from` to `to` in one character frame
   the sprite cannot show which way it went, and rig.json's turn is only the shorter screen path. A cut sweeps the
   side the character faces, so draw the way round that passes the heading (the other way when the rig's way runs
   behind the body, as on a character facing the camera), and check that the blade's tip on the contact frame
   lies on the drawn arc in place of `r.check_arc`. Record the drawn way in `caster.swing_drawn`.
 - A cast that lands away from the body (a summon, a strike from the sky, a ground blast) follows the `placement`
-  knob: the sheet's pivot is the struck spot and `r.meta(anim, fps, start, offset=range)` writes
+  knob: the sheet's pivot is the struck spot and `r.meta(anim, fps, rig::Meta { start, offset: Some(range), .. })` writes
   `caster.offset` (per direction the `[dx, dy]` from the character's pivot to the effect's pivot) and `range`.
   Never leave such a cast on the character's own pivot: the engine then plays it on the caster's feet. Learnt on
-  `drafts/thien_kiep`, whose first cut struck under the caster in the game.
+  a heavenly-tribulation strike, whose first cut struck under the caster in the game.
 - The caster shows the power it calls, per the `aura` knob: `aura_back` and `aura_front` parts in
   `meta.beanfx.parts` (anchor caster, layer behind and front), each its own sheet from `ex.write` on the effect's
   frames and palette, its JSON named in the part's `json`. A part that follows the hand or weapon (rig.json
-  `emit`) takes one row per caster direction. `drafts/thien_kiep` is the reference.
+  `emit`) takes one row per caster direction.
 - Moving animations (a dash): frames stay in place and rig.json `root` gives the body's travel per frame
   (`r.root(anim, direction)`). The effect stays where the move began: size the canvas for the whole travel, preview
-  with `r.place(..., travel=True)`, and put trails and afterimages at earlier `root` points; `r.meta` carries `root`.
+  with `r.place(.., rig::Place { travel: true, .. })`, and put trails and afterimages at earlier `root` points; `r.meta` carries `root`.
 - The example casters (`knight_side`, `adventurer_topdown`) are references to learn from: proportions, cell size,
   pivot, frame counts, fps, contact frames, swing and root motion. A caster that needs a new look or a missing
   animation is an original character built to the same rig.json contract (the `/char` route), never a recolour,
-  edit or composite of the example sheets; `casters/build.py` only cleans the local references.
+  edit or composite of the example sheets; the local `chars/` build script only cleans the references.
 - A caster composed from the owner's game sheets builds each row the way the game draws it, never from the baked
   layers alone. Take the game's own row for the weapon (a staff runs on the staff's own run row, not the generic
   run). On rows where the game draws the weapon in the fist (its swing sprite on a per-frame hand track), draw it
@@ -332,10 +332,10 @@ meta["caster"] = r.meta(anim, FPS, start=START)  # into ex.write(extra=...)
   the body as the game splits it. Check every moving row at 4x, and fail the build when a held weapon leaves the
   fist: a weapon that holds still while the body bobs is a baked pose for another grip, and the hand slides off it.
   Learnt on `nghich_tien_truong`, whose staff floated beside the hand in the run.
-- Top-down: draw rows with `fc.rows(draw, len(r.directions), n)`; their order is the rig's directions.
+- Top-down: draw rows with `fc::rows(draw, r.directions.len(), n)`; their order is the rig's directions.
 - A held weapon can dip below the feet, so check each animation's pivot with `r.place` over a ground line before
-  drawing; rig.json pivots override the measured ones (`python kit/rig.py <name>` prints both).
-- Review in the browser: every draft run writes its own page, `out/<name>.html` (`ex.page`, section 3), that
+  drawing; rig.json pivots override the measured ones (`r.pivot(anim)` is the rig.json one, `rig::measure(&frames)` the measured one).
+- Review in the browser: every draft run writes its own page, `out/<name>.html` (`ex::page`, section 3), that
   opens straight from disk. `<skill>/tools/preview.html` is the template and also opens from disk
   on its own (pick the project folder) to browse every result. The page shows directions, actions (states, tags,
   caster animations), frame stepping, speed, light layer, pivot, cell box, swing arc and root motion; Control mode
@@ -345,14 +345,12 @@ meta["caster"] = r.meta(anim, FPS, start=START)  # into ex.write(extra=...)
   segment may add `walk` (`[[x0, y0], [x1, y1]]` px, eased over the segment) to move the body, and `portal`
   (`{in, out}` px from the pivot along the facing) to cut the body at `in` and show it past `out`, for a step
   through a rift. A part with an `offset` is already in the joined sheet, so the page does not draw it on the body. It
-  carries `runtime/beanfx.js` inline: after a runtime change run `python3 <skill>/tests/test_preview.py --write`.
-- `drafts/rig_slash` is the reference: a side slash on `knight_side` attack1 and a top-down slash in 4 directions
-  on `adventurer_topdown` attack1, for the frame space, pivot and timing. Its arcs predate `swing` and run against
-  the blade (`check_arc` fails both knight strokes), so take arcs from `r.arc`, not from it.
+  carries `runtime/beanfx.js` inline: after a runtime change paste it into `tools/preview.html` between its RUNTIME START and RUNTIME END markers with `export ` removed; `cargo test` in `kit/` checks that the copy matches.
+- A slash drawn by eye, before rig.json `swing` existed, ran against the blade and `check_arc` failed it; take arcs from `r.arc`.
 
 Draw the avatar before everything else and the caster after the swords behind it. Move the caster with a
 `foot_at(f)` path (rise, hover with a 2 px bob, land) and feed `lift` and `flut` from its speed. What made it
-read, learnt on `drafts/van_kiem_quy_tong_v2` and `v3` (v3 is the reference draft):
+read, learnt on a sword-rain effect with a caster:
 - Keep it shorter than the main carrier; at 104 px and a 270 px avatar the caster took over the effect.
 - Keep the core light on a small body low (`body_light` is tuned for 34 px); the pools from the scene, the
   avatar and the hip stack on it, and at core k 0.3 the figure burnt to a white blob.
@@ -365,38 +363,42 @@ read, learnt on `drafts/van_kiem_quy_tong_v2` and `v3` (v3 is the reference draf
 ## 3. Draft loop
 
 The draft script writes, each run: the sheet and JSON (section 5), a 4x strip on a dark and on a mid ground, a
-4x gif at its fps (`pfx.gif`, through `ex.hitstop` when there are hits) and `out/contact.png`
-(`pfx.contact(path, frames, fps)`: 12 moments labelled with frame and time, so timing reads without the gif),
-a preview page per sheet, `ex.page(<out>/sheets/<name>.json)`: `out/<name>.html`, the skill's `tools/preview.html`
+4x gif at its fps (`pfx::gif`, through `ex::hitstop` when there are hits) and `out/contact.png`
+(`pfx::contact(path, &frames, fps, Default::default())`: 12 moments labelled with frame and time, so timing reads without the gif),
+a preview page per sheet, `ex::page(out.join("sheets").join("<name>.json"), Default::default())`: `out/<name>.html`, the skill's `tools/preview.html`
 with the sheets, the JSON and the caster's rig and sheets embedded, so it opens with no folder to pick (it embeds
 the owner's caster sprites, so it stays in the gitignored `out/` and is never shipped), and runs the checks on the effect
 frames, printing every line and exiting 1 when there is one:
 
-- `ex.check(frames, lights, loop, src=__file__, hold=HOLD)`: colour on the cell edge, light above 0.02 on the edge
+- `ex::check(&frames, ex::Check { light, looped, src, hold, .. })` (`src` is the draft's `src/main.rs`): colour on the cell edge, light above 0.02 on the edge
   (smooth light spreads wide, so the pool radius leaves a margin to the cell), an empty frame, a one-shot that pops
-  off, a loop seam, randomness without a seed. With stepped light also pass `max_colours=48`: a frame over it
-  has smooth light or stray tones left in. Every draft prints the median colours per frame (`ex.colours(final)`)
+  off, a loop seam, randomness without a seed. With stepped light also pass `max_colours: Some(48.0)`: a frame over it
+  has smooth light or stray tones left in. Every draft prints the median colours per frame (`ex::colours(&last)`)
   whatever the style, so the owner sees how pixel the effect reads. The same call looks at the whole sheet twice
-  more. Framing: when the drawing sits to one side of its cell (`ex.framing(frames)`: the box holding 96 % of the
+  more. Framing: when the drawing sits to one side of its cell (`ex::framing(frames)`: the box holding 96 % of the
   colour over all frames, and what cutting the lopsided margins would save), a `framing:` line says how many px
-  to cut from which side; move the subject or trim the cell, and pass `trim=None` only when the empty side is
-  wanted. Budget: sheets that decode to more than 128 MB of texture memory (`ex.memory_mb`) give a `budget:`
+  to cut from which side; move the subject or trim the cell, and pass `trim: None` only when the empty side is
+  wanted. Budget: sheets that decode to more than 128 MB of texture memory (`ex::memory_mb`) give a `budget:`
   line; cut frames (a lower fps, a held state as a short loop), the cell, or split the effect into parts, and pass
-  `max_mb=None` only after the owner accepts the size (a full-screen cutscene).
-- `ex.check_seeds(lambda f, sd: render(f, seed=sd)[0], N)`: the edge and empty checks again with seeds 2, 3 and 7,
+  `max_mb: None` only after the owner accepts the size (a full-screen cutscene).
+- `ex::check_seeds(|f, sd| render(f, sd).0, N, &[2, 3, 7], 2)`: the edge and empty checks again with seeds 2, 3 and 7,
   every second frame. So `render` takes a `seed` (default `SEED`) and draws every random choice from
-  `np.random.default_rng(seed + salt)`; particles a reseed throws further show up here.
-- `ex.check_act(act, N, FPS, loop)` when the JSON has an act (below).
+  `default_rng(seed + salt)`; particles a reseed throws further show up here.
+- `ex::check_act(&act, N, FPS, looped)?` when the JSON has an act (below).
  Judge at 1x for read, 4x for detail, the gif for timing.
 Change one thing per pass; crop one frame to 5x when the grid hides a problem. Go round at least three times
 (look, fix the worst thing, run again) before calling a draft done; a showpiece takes more.
 
-The script also prints the light measure for the glow level and clarity (on `L` before any `light.steps`), from each frame's colour `col`
-and summed light `L`:
+The script also prints the light measure for the glow level and clarity (on `l` before any `lt::steps`), from each frame's colour `col`
+and summed light `l`:
 
 ```
-ys, xs = np.nonzero(col[..., 3]); box = np.clip(L[ys.min():ys.max() + 1, xs.min():xs.max() + 1], 0, 1)
-cover = (box > 0.03).mean(); mean = box[box > 0.03].mean()     # median of each over frames, printed
+let nz = np::nonzero(&col.slice(s![.., .., 3]).mapv(|a| a > 0));            // rows, columns of the colour
+let span = |v: &[usize]| (*v.iter().min().unwrap(), *v.iter().max().unwrap());
+let ((y0, y1), (x0, x1)) = (span(&nz[0]), span(&nz[1]));
+let bx = l.slice(s![y0..=y1, x0..=x1]);                                       // l is clipped to 0..1
+let lit: Array1<f64> = bx.iter().copied().filter(|&v| v > 0.03).collect();
+let (cover, mean) = (lit.len() as f64 / bx.len() as f64, np::mean(&lit));    // median of each over frames, printed
 ```
 
 When mean falls outside the glow row or cover outside the clarity row, retune the pools. These numbers are a
@@ -416,9 +418,8 @@ motion.
   and put its peak frame and the draft's side by side at the same zoom on the same dark ground. Fix the base,
   size and light of the peak here, while it costs one frame.
 - Pass 2, the timeline, before calling the draft done: load the reference with `node $LAYERS <id> --out
-  <draft>/ref --pixelfx $PIXELFX` and `pfx.load`, composite its frames, and write `pfx.contact(out /
-  "bench.png", draft_frames, FPS, ref=(ref_frames, ref_fps))`: the same moments of both, row over row (`by="phase"`,
-  the default, lines up the same share of each length; `by="time"` the same seconds). Read it column by column:
+  <draft>/ref --pixelfx $PIXELFX` and `pfx::load`, composite its frames, and write `pfx::contact(out.join("bench.png"), &draft_frames, FPS, pfx::Contact { r#ref: Some((&ref_frames, ref_fps)), .. Default::default() })`: the same moments of both, row over row (`by: "phase"`,
+  the default, lines up the same share of each length; `by: "time"` the same seconds). Read it column by column:
   the focal point in every phase, the anticipation, the peak frame count, the dissolve. A peak frame alone hides
   timeline faults, such as a dark centre for 25 frames before the pop.
 - If the reference shows more detail, clearer light or more life at any column, the draft is not done. Note what
@@ -427,8 +428,8 @@ motion.
 Usual fixes: mush at 1x, then fewer tones, one focal point, bigger shapes; floaty, then fast in and slow out with
 a 1 to 2 frame white-hot peak; stiff, then vary each particle's size, speed and delay and add secondary motion
 (sparks, smoke, debris); flat, then a lighter top-left step and a darker bottom-right one; washed out, then less
-light and white kept for the hottest core only; glow that floats off the shape, then `pfx.keep` it under a mask of
-the base; glow that reads soft or blurry where the owner wants pixel art, then `light.steps` and tighter pools; stepped glow
+light and white kept for the hottest core only; glow that floats off the shape, then `pfx::keep` it under a mask of
+the base; glow that reads soft or blurry where the owner wants pixel art, then `lt::steps` and tighter pools; stepped glow
 that looks outlined or dull, then fewer steps in the halo, a 1 to 2 frame white core and flicker on the sparks;
 hazy or muddy where the brief says clear, then remove the scene pool, make the colour solid and light emitters only; thick
 saturated strokes, then a 1 px white core with 1 px of tinted edge and let the light carry the brightness;
@@ -468,7 +469,7 @@ second. Judge it in a travel gif; in place it reads as a pole that spins.
 - Texture that marks a surface (holes, embers, cracks, moss) comes from clumped noise a few px across, never from
   one random number per pixel, which reads as static. A structure that burns, freezes or breaks keeps its light
   and dark faces while it changes, so its shape still reads.
-- The subject sits near the middle of its cell with like margins on both sides of each axis (`ex.check` flags a
+- The subject sits near the middle of its cell with like margins on both sides of each axis (`ex::check` flags a
   lopsided cell).
 - The focal point is on screen in every phase, the anticipation included: a build-up shows its core from its
   first frame, and no stretch of frames leaves the eye without a point to hold.
@@ -478,17 +479,17 @@ second. Judge it in a travel gif; in place it reads as a pole that spins.
 - 3 to 5 hue-shifted tones per material; the base reads without the light.
 - Anticipation, peak, dissolve. A one-shot dissolves to wisps: no empty frame, and its last frame keeps at most 5 %
   of the peak's pixels, so it neither pops off nor wastes a blank cell. A loop has no seam.
-  An effect that ends on a held state (an eye that stays open, a seal that stays) passes `hold=True` to
-  `ex.check` and `ex.write`; the JSON's `end: hold` tells the engine to keep the last frame or hand over to a loop.
-- Randomness only from a seeded `np.random.default_rng(seed)`, so every run draws the same frames.
-- Build-up and break-down states land on the peak drawing: their points come from `kit/derive.py` on the peak's
+  An effect that ends on a held state (an eye that stays open, a seal that stays) passes `hold: true` to
+  `ex::check` and `ex::write`; the JSON's `end: hold` tells the engine to keep the last frame or hand over to a loop.
+- Randomness only from a seeded `default_rng(seed)`, so every run draws the same frames.
+- Build-up and break-down states land on the peak drawing: their points come from `dv` on the peak's
   maps, and the frame where a build-up hands over to the solid carrier shows no jump.
 - Light on every hot part (core, heads, landing flash, sparks, embers), each with a wide soft pool and a tight
   core, smooth or stepped as the style sets (hard retro steps it); white only at the hottest core.
 - Benchmark pass 2 (section 3) shows no column where the reference reads better.
 - Nothing cut by the cell edge in any frame or direction; the pivot is the drawing's origin.
 - The style picked in the brief holds in every frame (dither or translucency, glow strength).
-- Every heading row reads as the same effect: draw the shape in the rotated frame (`fxkit.rot`, u along travel)
+- Every heading row reads as the same effect: draw the shape in the rotated frame (`fk::rot`, u along travel)
   but keep the shading light fixed in the world (the lighter step stays top-left in every row), and look at the
   sheet with all rows at 4x. A row that looks thinner or stair-stepped (often the diagonals) gets its own pass.
 - A mirrored side sheet still reads when flipped: no text or glyph, no part that must stay on one side. When it
@@ -499,17 +500,21 @@ opens with a double click (file://), no server and no folder to pick.
 
 ## 5. Export
 
-Write the sheets with `kit/export.py` (`import export as ex`):
+Write the sheets with `ex` (`kit/src/ex.rs`, `use beanfx::{ex, fc, pfx}`):
 
 ```
-meta = ex.write(OUT, NAME, finals, FPS, PIVOT, LOOP, light=lights, color=cols, states=STATES,
-                hits=[ex.hit(PEAK, FPS, weight="heavy", dir=0)],
-                poses=[ex.pose(-0.3, "windup"), ex.pose(0.0, "release", "snap"), ex.pose(0.6, "recover")],
-                target={"x": 72, "react": "knockback"}, hold=False,
-                extra=dict(fc.meta("side", W, H, PIVOT), glow="medium"))
+let mut extra = fc::meta("side", W as f64, H as f64, PIVOT, Default::default())?;
+extra.insert("glow".into(), "medium".into());
+let meta = ex::write(out, NAME, &finals, FPS, PIVOT, LOOP, ex::Write {
+    light: Some((&lights).into()), color: Some((&cols).into()), states: states(), hold: false,
+    hits: vec![ex::hit(PEAK, FPS, ex::Hit { weight: Some("heavy".into()), dir: Some(0.0), ..Default::default() })],
+    poses: vec![ex::pose(-0.3, "windup", ""), ex::pose(0.0, "release", "snap"), ex::pose(0.6, "recover", "")],
+    target: Some(json!({"x": 72, "react": "knockback"})), extra: Some(Value::Object(extra)),
+    ..Default::default()
+})?;
 ```
 
-- `<name>.png` is colour plus light (`pfx.composite` over transparency), frames in a near-square grid, row-major.
+- `<name>.png` is colour plus light (`pfx::composite` over transparency), frames in a near-square grid, row-major.
   A sheet that would pass 4096 px a side splits into pages `<name>_p<k>.png`, each with its own Aseprite JSON
   `<name>_p<k>.json` (its frames and the tags clipped to it); `<name>.json` then lists every frame with its `page`
   and the page files in `meta.beanfx.pages`. Frame names stay unique across pages (`<name> 37`).
@@ -523,14 +528,14 @@ meta = ex.write(OUT, NAME, finals, FPS, PIVOT, LOOP, light=lights, color=cols, s
   import for each engine, and `runtime/beanfx.js` plays it in a browser game with no engine.
 - **The act** for a blow, a strike, a cast or an impact: plain data in `meta.beanfx.act` that the game's own
   character and target follow.
-  - `hits`: one `ex.hit(frame, fps, weight=..., dir=...)` per contact. **Weight sells the hit**: pick it from
-    `ex.WEIGHTS` (light, heavy, finisher, blast) to match how hard the blow looks, and it sets the freeze (hit-stop,
+  - `hits`: one `ex::hit(frame, fps, ex::Hit { weight, dir, .. })` per contact. **Weight sells the hit**: pick it from
+    `ex::WEIGHTS` (light, heavy, finisher, blast) to match how hard the blow looks, and it sets the freeze (hit-stop,
     past 0.3 s it reads as a stall), the shake and how long it lasts, the push, the react (none, flinch, stagger,
     knockback, launch), how long the target flashes white and the sound cue `hit_<weight>`; any field given
     explicitly wins. `dir` is the way the blow travels (degrees, y down, 0 along the facing): the shake and the push
     follow it, so a downward smash shakes up and down and a rising uppercut lifts. A combo escalates: light, light,
     heavy, finisher.
-  - `poses`: keys `ex.pose(t, name, how)` from `ex.POSES` (idle, guard, windup, cast, channel, release, follow,
+  - `poses`: keys `ex::pose(t, name, how)` from `ex::POSES` (idle, guard, windup, cast, channel, release, follow,
     recover), t in s from frame 0, negative before it; "snap" jumps on the key. The game maps each name to its own
     animation. A wind-up the opposite way to the blow, the release on the contact frame or just before, a recovery.
   - `windup`: the seconds the character starts before frame 0; taken from the first pose key when that is earlier.
@@ -538,49 +543,49 @@ meta = ex.write(OUT, NAME, finals, FPS, PIVOT, LOOP, light=lights, color=cols, s
   The game starts the character `windup` s early, plays the poses, and at each hit freezes everything for
   `freeze` s, shakes along `dir` for `shake_time`, flashes the target for `flash` s, pushes, plays the react and
   the `sound` cue on the contact frame (sound, freeze, flash and shake within one frame of each other).
-- **The ground answers a blow that lands on it.** `fk.ground_impact(m, X, Y, f - contact, FPS, tones, dust, cx, cy,
-  r, weight)` adds dust kicked out along the ground, debris that arcs, bounces once and rests where it lands, and
+- **The ground answers a blow that lands on it.** `fk::ground_impact(&mut m, &x, &y, f - contact, FPS, &tones, &dust,
+  fk::GroundImpact { cx, cy, r, weight, .. })` adds dust kicked out along the ground, debris that arcs, bounces once and rests where it lands, and
   cracks for heavy, finisher and blast weights; use the same weight as the hit. Put it under the blow for a ground
   strike, a slam, a landing or an explosion; leave it out for a hit in the air or on a body.
 - **The sheet is the effect alone.** The game draws its own character, so the mockup caster and the target dummy
-  go into the previews only (the 4x strips and the gif), and so does a game character (`kit/rig.py`); its JSON
+  go into the previews only (the 4x strips and the gif), and so does a game character (`rig`); its JSON
   binding goes in `meta.beanfx.caster`. `render(f, seed, caster)` draws with or without the
-  caster; export and check the frames without it. For a hit, put `kit/target.py` under the preview at the
-  target's foot (`tg.under(frame, tg.draw((H, W), foot, f, hits, FPS, facing=-1))`), so the gif shows the body
+  caster; export and check the frames without it. For a hit, put `tg` (`kit/src/tg.rs`) under the preview at the
+  target's foot (`tg::under(&frame, &tg::draw((H, W), (foot[0], foot[1]), f, &hits, FPS, tg::Draw { facing: -1.0, .. Default::default() })?)`), so the gif shows the body
   taking the blow.
 
 **Directions in the JSON (every sheet).** The engine plays the effect from any side, so the JSON says how. Build
-the fields with `kit/facing.py` (`import facing as fc`) and pass the whole meta through `fc.check` before writing:
+the fields with `fc` (`kit/src/fc.rs`) and pass the whole meta through `fc::check` before writing:
 
-- `fc.meta(view, w, h, pivot, directions, facing, mirror, target)` writes `view`, `directions` and, for one
+- `fc::meta(view, w, h, pivot, fc::Meta { directions, facing, mirror, target })` writes `view`, `directions` and, for one
   direction, `facing` (east by default), `mirror`, `mirror_pivot` and `mirror_target` (x becomes w - x). With
-  `mirror` False, draw the west sheet (`fc.mirror(frames)` as the start, then fix what reads wrong) and list it
+  `mirror` False, draw the west sheet (`fc::mirror(&frames)` as the start, then fix what reads wrong) and list it
   as `sheets.west`.
-- With 8 or 16 directions, draw each heading with `fc.rows(draw, n, frames)` (draw(a, f), a the heading) and
-  pass the rows to `ex.write`, which lays heading k after heading k - 1 and tags each: row k faces `tau * k / n`, y down (0 east, n/4 south); the JSON tells the engine
+- With 8 or 16 directions, draw each heading with `fc::rows(draw, n, frames)` (draw(a, f), a the heading) and
+  pass the rows to `ex::write`, which lays heading k after heading k - 1 and tags each: row k faces `tau * k / n`, y down (0 east, n/4 south); the JSON tells the engine
   `row = round(atan2(dy, dx) / tau * n) mod n`.
 - **Caster to target** (a projectile that lands, a beam, a strike on a foe): the distance between them changes in
-  play, so never only bake it into one sheet. Export three parts in `parts`, each from `fc.part`: `cast`
+  play, so never only bake it into one sheet. Export three parts in `parts`, each from `fc::part(sheet, w, h, frames, fps, pivot, looped, anchor, extra)`: `cast`
   (anchor caster, one-shot, the charge and release), `travel` (anchor travel, a loop the engine moves at `speed`
   px/s from the caster to the target, with its own direction rows for top-down or `facing` for side) and
   `impact` (anchor target, one-shot, the hit and dissolve). Keep the joined preview sheet and gif too, for review. When the owner wants one fixed-range sheet, record `target` and its mirror and say the range is
   fixed in the report.
 
-**Sound (only when the brief asks for it; `knobs/sound.md`).** After `ex.write`, `sfx.write(OUT, NAME, meta,
-seed=1, voice="retro", element=...)` (`kit/sfx.py`) synthesises the sound from the effect's own data and adds
+**Sound (only when the brief asks for it; `knobs/sound.md`).** After `ex::write`, `sfx::write(out, NAME, Some(&mut meta),
+sfx::Write { seed: 1, voice: "retro".into(), element, .. Default::default() })` (`kit/src/sfx.rs`) synthesises the sound from the effect's own data and adds
 `meta.beanfx.sound`: a hit cue per act hit by its weight, a charge, whoosh, tail or boom per state by its name, a
-hum for a bare loop. Look at `sfx.layers(meta)` first and fix a state the names map wrong (pass the edited list as
-`layers=`). Pick the element from the subject (a sword is metal). voice "real" models metal (a blade that lands: thud,
-short chink, grit; a hit layer with `clash=True` for blade on blade rings at the bar modes) and thunder (N-wave
+hum for a bare loop. Look at `sfx::layers(&meta)?` first and fix a state the names map wrong (pass the edited list as
+`layers: Some(..)`). Pick the element from the subject (a sword is metal). voice "real" models metal (a blade that lands: thud,
+short chink, grit; a hit layer with `clash` set for blade on blade rings at the bar modes) and thunder (N-wave
 crack and rumble); recordings in the project's `sounds/` replace a cue whose name they match.
-Many things that land (a sword rain, an arrow volley, hail) are many sounds: add `sfx.volley(landing frames, FPS,
-fall_frames=..., weight=..., gain=...)` from the draft's own plan, a fall that whistles down and a quiet landing
+Many things that land (a sword rain, an arrow volley, hail) are many sounds: add `sfx::volley(&landing_frames, FPS,
+sfx::Volley { fall_frames, weight, gain, .. Default::default() })?` from the draft's own plan, a fall that whistles down and a quiet landing
 per projectile, and drop the broad state whoosh; one sound per wave reads as a few blows, not a rain. Sound is
 judged by ear, so every sound starts with takes: on the first pass write two or three into `out/sound_takes/`
-(`sfx.save(path, sfx.track(meta, seed, voice, element, layers)[0])`, each a different balance or voice, the one
-you recommend also written by `sfx.write`) and ask which with one AskUserQuestion, naming each file. Before handing
+(`sfx::save(path, &sfx::track(&meta, seed, voice, element, layers, sounds)?.0)`, each a different balance or voice, the one
+you recommend also written by `sfx::write`) and ask which with one AskUserQuestion, naming each file. Before handing
 them over, rule out the two known misses: a bell (most of the energy above 500 Hz in a few long tones) and a drum
-(a pitched low thud, most of the energy under 300 Hz). After a second miss, offer CC0 recordings in `sounds/`. Add `sfx.check(OUT, meta)` to the checks; the
+(a pitched low thud, most of the energy under 300 Hz). After a second miss, offer CC0 recordings in `sounds/`. Add `sfx::check(out, &meta)` to the checks; the
 preview page plays the track with the effect, and the report says the sound is synthesised and lists its files.
 With no sound in the brief, write no audio.
 

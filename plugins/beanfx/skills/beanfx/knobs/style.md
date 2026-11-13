@@ -17,7 +17,7 @@ Ask outline or dither apart only when the owner picked a look and one of them is
 
 The style sets the colour pixels (opaque or translucent, outline, dither, tone count) and the light that goes with
 them. Soft and painterly keep smooth light: the bloom at a pop reads as bright, at the cost of hundreds of colours
-per frame. Hard retro steps the light (`light.steps`: four flat tones, dither only where it fades out), so the
+per frame. Hard retro steps the light (`lt::steps`: four flat tones, dither only where it fades out), so the
 whole frame keeps to a few dozen colours and reads as pixel art; pixel artists see smooth bloom over crisp
 sprites as "not pixel". The owner can swap the light either way in words ("smooth glow", "pixel light",
 "stepped light", "no blur").

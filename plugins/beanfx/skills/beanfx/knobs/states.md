@@ -23,7 +23,7 @@ when the owner adds a state or changes how one plays.
 4. Put the state table in the script's docstring and keep each state's start and length as named constants, so
    one state can be re-timed alone and the later ones shift with it. Report the table with the frames used.
 
-Learnt on `drafts/van_kiem_quy_tong`: a gather of 0.45 s per sword read as a jump, and "strike" was drawn as four
+Learnt on a sword-rain effect: a gather of 0.45 s per sword read as a jump, and "strike" was drawn as four
 clusters when the owner meant a rain. Neither state had been asked about.
 
 **Examples** (name one when explaining what a state is):

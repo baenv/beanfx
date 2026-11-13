@@ -9,13 +9,14 @@ kit_scene/
 scenes/
 
 # Generated
-.venv/
-__pycache__/
-*.pyc
 .DS_Store
 out/
 pixelfx/
 .wrangler/
+# Python leftovers from before 2.0.0 and the local /char and /scene kits
+__pycache__/
+*.pyc
+.venv/
 .coverage
 .pytest_cache/
 
@@ -29,7 +30,7 @@ pixelfx/
 *.webm
 *.wav
 
-# Recordings a project layers into its effect sounds (kit/sfx.py); their licences vary
+# Recordings a project layers into its effect sounds (kit/src/sfx.rs); their licences vary
 /sounds/
 
 # Local only
@@ -46,6 +47,8 @@ drafts/*/kit/skill.txt
 !docs/media/*.gif
 !docs/media/*.png
 !docs/demo/*.png
+# the kit's image test fixtures (small PNGs read by kit/src/img.rs tests)
+!plugins/beanfx/skills/beanfx/kit/tests/fixtures/**
 
 # Personal task tracking
 tasks/
@@ -53,27 +56,10 @@ PROGRESS.md
 
 # Drafts: only the published examples are tracked; new drafts stay local (git add -f to publish one)
 drafts/*
-!drafts/aura_long_bang_v2/
-!drafts/aura_thunder_v3/
-!drafts/dai_hoang_tu_thien_chi/
-!drafts/dot_pha_hoa_than/
-!drafts/hoa_cong/
 !drafts/hoa_cong_v2/
-!drafts/loc_gio_v2/
-!drafts/meteor_rite/
-!drafts/mua_bang_v2/
-!drafts/nam_man_nhap_xam/
-!drafts/phat_no_hoa_lien/
-!drafts/phi_long_tai_thien/
-!drafts/sigil_thunder_strike/
-!drafts/star_dragon_strike/
-!drafts/su_tu_hong/
-!drafts/tinh_long_chuong/
-!drafts/van_hon_phien/
-!drafts/van_kiem_quy_tong_v3/
-!drafts/van_kiem_quy_tong_v5/
-!drafts/van_tien/
-!drafts/wind_burst/
 
-# the Rust tooling build (plugins/beanfx/skills/beanfx/rust)
+# cargo build output of the kit crate (plugins/beanfx/skills/beanfx/kit)
 target/
+
+# draft Rust builds share one target dir (drafts/<name>/.cargo/config.toml)
+.beanfx/

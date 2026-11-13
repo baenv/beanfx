@@ -1,0 +1,24 @@
+[package]
+name = "beanfx"
+version = "2.0.0"
+edition = "2021"
+description = "The /beanfx kit: numpy-exact arrays and random draws, PNG, sheet export and checks, sound, preview writers"
+license = "MIT"
+publish = false
+
+[lib]
+name = "beanfx"
+path = "src/lib.rs"
+
+[[bin]]
+name = "beanfx"
+path = "src/main.rs"
+
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
+png = "0.17"
+gif = "0.13"
+ndarray = "0.16"
+
+[profile.release]
+opt-level = 3

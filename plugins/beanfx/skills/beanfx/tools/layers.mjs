@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Split a pixelfx effect into its colour and light layers, for reuse in a beanfx draft (kit/pfx.py load).
+// Split a pixelfx effect into its colour and light layers, for reuse in a beanfx draft (pfx::load).
 // pixelfx 0.3 dropped its own tools/layers.mjs; this one keeps the same output on top of its renderFrames.
 //
 //   node <skill>/tools/layers.mjs <id> --out <dir> [--pixelfx DIR] [--opts JSON] [--seed N] [--fps N]

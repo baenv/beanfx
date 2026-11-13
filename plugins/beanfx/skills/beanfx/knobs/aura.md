@@ -31,7 +31,7 @@ Follow-ups when open: when it starts (the release frame by default) and how long
 **How it ships:** two parts in `meta.beanfx.parts`, both `anchor: caster` on the character's pivot, locked to the
 effect's frames: `aura_back` (`layer: behind`: the ring's far half, motes behind the body, the glow) and
 `aura_front` (`layer: front`: the ring's near half, arcs over the body, the flash at the hand). Each is its own
-sheet and JSON (`json` in the part), drawn with `ex.write`; a part that follows the hand or weapon (the emit point
+sheet and JSON (`json` in the part), drawn with `ex::write`; a part that follows the hand or weapon (the emit point
 in rig.json) has one row per caster direction. Preview it with the caster; it is checked like any sheet.
 
 **Preview:** give each option an ASCII `preview` of the caster while it casts (`o` the caster, `~` light,

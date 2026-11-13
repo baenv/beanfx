@@ -9,7 +9,7 @@ applies: Does the request ask for sound, audio, SFX or a sound effect for the ef
 
 An optional sound that sits on the effect's own timing: a hit cue on every act hit (its weight sets how heavy it
 sounds), a charge over a gather or cast state, a whoosh over a swing or travel state, a tail over a dissolve, a hum
-for a loop. Synthesised in numpy by `kit/sfx.py`, seeded, written as WAV next to the sheet and listed in
+for a loop. Synthesised in Rust by `kit/src/sfx.rs`, seeded, written as WAV next to the sheet and listed in
 `meta.beanfx.sound`. The sheet and JSON stay the main output; sound never changes the drawing.
 
 **Fixed when** the prompt describes the sound ("8-bit clang", "soft magical chime", "crackling thunder") or says
@@ -33,8 +33,7 @@ a sword is metal, a thunder strike is lightning.
 - Real: a sword clash or a thunder strike that should sound like the thing, as in most modern action games.
 - Soft: cosy and ambient games keep magic quiet so it sits under the score.
 
-**How it ships:** `sfx.write(OUT, NAME, meta, seed=, voice=, element=)` after `ex.write`, then `sfx.check(OUT,
-meta)` with the other checks. Files: `<name>_sound.wav` (the whole effect from frame 0) and one WAV per cue; each
+**How it ships:** `sfx::write(out, name, Some(&mut meta), sfx::Write { seed, voice, element, .. })` after `ex::write`, then `sfx::check(out, &meta)` with the other checks. Files: `<name>_sound.wav` (the whole effect from frame 0) and one WAV per cue; each
 act hit names its cue in `sound`. The first pass always brings two or three takes in `out/sound_takes/` for the
 owner to pick by ear (SKILL.md, Sound).
 Recordings: `sounds/` in the project (or `BEANFX_SOUNDS`) with `<element>_<kind>[_<weight>]*.wav`, such as

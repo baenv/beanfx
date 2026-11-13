@@ -3,6 +3,30 @@
 Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag `v<version>` on `main`; see
 `CONTRIBUTING.md`.
 
+## 2.0.0
+
+Everything in Rust; Python leaves the plugin (2026-11-13).
+
+- The drawing kit is the Rust crate in the skill's `kit/` (library `beanfx` plus the `beanfx` binary). The Python
+  modules keep their short names as Rust modules (`fl`, `fk`, `lt`, `pfx`, `cs`, `tg`, `rig`, `rf`, `dv`, `fc`,
+  `ex`, `sfx`), `img` replaces PIL and `np` and `rng` give the numpy behaviour the drafts relied on, bit for bit
+  on macOS arm64. Keyword arguments became options structs with `Default`.
+- A draft is now a small Cargo crate: `drafts/<name>/Cargo.toml`, `src/main.rs` and its pinned `kit/`, run with
+  `cargo run --release -q`. Drafts share one build folder in `.beanfx/target`, so the kit builds once per project.
+- `setup.sh` no longer makes `.venv`; it builds the binary into `.beanfx/bin/beanfx` (with a `.gitignore` in
+  `.beanfx/`) and `--draft <name>` scaffolds a draft crate that runs as written. `--kit-status` and
+  `--refresh-kit` work as before.
+- The brief gate is `beanfx gate`, with the same JSON. Jev stays optional and is the only part that runs Python.
+- Tests are `cargo test` (the Python tests became Rust tests), and CI runs them under `cargo llvm-cov` with an
+  85 percent line floor, checks the example draft and runs the runtime test. `pyproject.toml` is gone.
+- The old Python example drafts are removed (they stay in the git history); `drafts/hoa_cong_v2` is the one
+  example, now in Rust.
+- Breaking: Python drafts made with 1.x no longer run with this setup. Keep them on a 1.x install, or redraw them
+  as Rust drafts (`setup.sh --draft <name>`; the module names above map one to one, and `kit/API.md` lists the
+  conventions).
+- Known differences from the Python kit: gifs with more than 256 colours quantise differently from Pillow, and the
+  contact and takes label rows use a bitmap font.
+
 ## 1.0.0
 
 - The fixed tooling moves to Rust: the `beanfx` binary (the skill's `rust/`) writes the sheets, pages, Aseprite JSON

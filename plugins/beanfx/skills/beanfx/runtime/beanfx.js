@@ -50,7 +50,7 @@ export function fromJson(json, images = {}) {
   return { meta: bfx, tags, frames, images };
 }
 
-// The heading row for a direction (radians, y down: 0 east, tau/4 south), as facing.py picks it.
+// The heading row for a direction (radians, y down: 0 east, tau/4 south), as fc.rs picks it.
 export function rowOf(angle, rows) {
   return ((Math.round((angle / TAU) * rows) % rows) + rows) % rows;
 }

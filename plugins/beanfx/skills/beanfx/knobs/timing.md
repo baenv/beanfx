@@ -30,7 +30,7 @@ sees where the time goes (`.` build-up, `#` peak, `-` fade):
 - How time splits in a one-shot: build-up about 15 to 25 percent, the peak 1 to 2 frames, the fade 50 to 65
   percent. The peak frame holds 1.5 to 2.5 times longer than the build-up frames.
 - **Impact freeze** (for an effect that hits something; it goes into `act.hits`): the game stops everyone for a
-  moment on contact, and a stronger hit stops longer (Sakurai, Smash Bros.). Offer the weights of `ex.WEIGHTS`: "Light: a quick
+  moment on contact, and a stronger hit stops longer (Sakurai, Smash Bros.). Offer the weights of `ex::WEIGHTS`: "Light: a quick
   tap, the screen barely stops", "Heavy (Recommended for a strike): a clear stop, a short shake, the target slides
   back", "Finisher: a long stop and a hard shake, the target is thrown up", "Blast: a short stop, a long rumble" (for
   an explosion). A combo asks once and escalates light, light, heavy, finisher.

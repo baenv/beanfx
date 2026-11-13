@@ -7,18 +7,16 @@ Issues and pull requests are welcome. All text in the repo is English; effect id
 
 ```
 git config core.hooksPath .githooks                  # gitleaks on every commit (the repo is public)
-bash plugins/beanfx/skills/beanfx/setup.sh           # .venv with numpy, pillow and the beanfx binary (needs cargo)
-pip install pytest pytest-cov                        # for the tests
+bash plugins/beanfx/skills/beanfx/setup.sh           # builds the beanfx binary into .beanfx/bin (needs cargo)
 ```
 
 ## Where to edit
 
 | change | place |
 |---|---|
-| the drawing kit | `plugins/beanfx/skills/beanfx/kit/` |
-| sheet export and checks, sound, preview writers | `plugins/beanfx/skills/beanfx/rust/` (the `beanfx` binary; `kit/export.py`, `kit/sfx.py` and the `pfx` writers call it through `kit/bridge.py`) |
-| the skill, its knobs, the gate | `plugins/beanfx/skills/beanfx/` (`SKILL.md`, `knobs/`, `gate.py`) |
-| the browser runtime | `plugins/beanfx/skills/beanfx/runtime/beanfx.js`, then copy it to `docs/beanfx.js` and run `python3 plugins/beanfx/skills/beanfx/tests/test_preview.py --write` |
+| the drawing kit, export and checks, sound, preview page, gate | `plugins/beanfx/skills/beanfx/kit/src/` (one Rust crate; `kit/API.md` lists the modules) |
+| the skill and its knobs | `plugins/beanfx/skills/beanfx/` (`SKILL.md`, `knobs/`) |
+| the browser runtime | `plugins/beanfx/skills/beanfx/runtime/beanfx.js`, then copy it to `docs/beanfx.js` and paste it into `tools/preview.html` between the RUNTIME START and RUNTIME END markers (`export ` removed); `cargo test` in `kit/` checks the copy |
 
 Each draft keeps its own copy of the kit, so a kit fix does not change a
 finished effect. To see which drafts are behind, and to move one to the current kit:
@@ -31,20 +29,14 @@ bash plugins/beanfx/skills/beanfx/setup.sh --draft <name> --refresh-kit   # then
 ## Tests
 
 ```
-(cd plugins/beanfx/skills/beanfx/rust && cargo test)   # the binary's unit tests
-pytest                                    # every test script, python and node (finds .venv/bin/beanfx; BEANFX_BIN overrides)
-pytest --cov --cov-report=term-missing    # with coverage of kit/ and gate.py
+(cd plugins/beanfx/skills/beanfx/kit && cargo test --locked)   # the crate's unit and integration tests
+node plugins/beanfx/skills/beanfx/tests/test_runtime.mjs       # the browser runtime
 claude plugin validate plugins/beanfx && claude plugin validate .
 ```
 
-A test is a script in `plugins/beanfx/skills/beanfx/tests/` named `test_<part>.py` (or `.mjs`) that exits 0 when
-clean and prints one `FAIL` line per problem; it also runs alone with python. Its `ok(cond, name)` helper passes
-each check to `checklog.record` (the `.mjs` prints `CHECK ok|fail <name>` when `BEANFX_CHECKS` is set), and
-`tests/conftest.py` turns every record into its own pytest test, so a failure names the check. Give each check a
-short name that says what should hold; values go in the failure detail. A kit change comes with a check in the
-matching script.
-
-CI fails when coverage drops under `fail_under` in `pyproject.toml`. Raise it when you add tests.
+A kit change comes with a test in the matching module or in `kit/tests/`. Give each test a name that says what
+should hold, and put values in the failure message. CI runs the same tests under `cargo llvm-cov` and fails below
+85 percent line coverage (`.github/workflows/tests.yml`).
 
 ## Media
 

@@ -153,17 +153,17 @@ the shape that ports: each frame is a pure function of the frame index and the s
 1. **Two buffers.** Colour is a shade map of palette indices (-1 empty) painted to RGBA; light is a float map summed
    from glows. Recolour at runtime by swapping the palette array. Keep both buffers separate in the port.
 2. **Shapes are distance tests per pixel.** Each helper evaluates pixel centres (`x + 0.5 - pivot`): a disc is
-   `hypot(dx, dy) < r`, `fxlib.stroke` is the distance to a polyline minus a half width that tapers along it,
-   `fxkit.rot` turns the grid into the travel frame. Port them as functions over one pixel; run them over the cell
+   `hypot(dx, dy) < r`, `fl::stroke` is the distance to a polyline minus a half width that tapers along it,
+   `fk::rot` turns the grid into the travel frame. Port them as functions over one pixel; run them over the cell
    on the CPU, or as a fragment shader where each pixel calls them.
 3. **Light.** `L += k * (1 - d)^2` where `d = distance / r < 1`, summed over every glow; tint with the light ramp.
    On screen add it (`dst + light`). Over transparency: `alpha = max(a, max(light))`, `rgb = (rgb * a + light) /
-   alpha`, as `pfx.composite` does.
+   alpha`, as `pfx::composite` does.
 4. **Dither.** The 4x4 Bayer matrix `[[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]] / 16`; a pixel
    shows where its threshold is below the fade.
-5. **Randomness.** numpy's generator does not exist in the engine. Either bake what it gave (the noise lattice from
-   `fxlib.lattice(nx, ny, seed)`, each particle's size, speed and delay) into a small table the port reads, or
-   switch the draft to a hash (`fxkit.hsh(i, salt)`) that ports in a few lines, render the sheet again, and port
+5. **Randomness.** The kit's seeded generator (`rng::default_rng`) does not exist in the engine. Either bake what it gave
+   (the noise lattice from `fl::lattice(nx, ny, seed)`, each particle's size, speed and delay) into a small table the port reads, or
+   switch the draft to a hash (`fk::hsh(i, salt)`) that ports in a few lines, render the sheet again, and port
    that.
 6. **Timing.** `f = floor(t * fps)`; a loop takes `f mod frames`. Keep the state starts as named constants.
 7. **Budget.** A sheet costs nothing per frame to draw; a port does. Time the port's frame at the peak (the most
@@ -175,6 +175,4 @@ Check the port against the sheet: render frames 0, the peak and the last from th
 same cell of `<name>_color.png` and `<name>_light.png`. The colour should match pixel for pixel; the light within
 1 / 255 of rounding. A difference is a bug in the port, not a new take.
 
-```
-python3 -c "import numpy as np, sys; from PIL import Image; a, b = (np.asarray(Image.open(p), int) for p in sys.argv[1:3]); print(np.abs(a - b).max(), (a != b).any(-1).sum(), 'px differ')" sheet_cell.png port_cell.png
-```
+Count the differing pixels with any image diff tool, for example ImageMagick: `compare -metric AE sheet_cell.png port_cell.png null:`.

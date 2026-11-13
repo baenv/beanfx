@@ -29,8 +29,8 @@ it) skips it.
   blast in front.
 - Game target: a lock-on or cursor spell, such as a meteor dropped on the clicked spot.
 
-**How it ships:** the sheet's pivot stays the struck spot. `r.meta(anim, fps, start, offset=range)` (or
-`fc.offset(range, directions)` for the mockup caster) writes `meta.beanfx.caster.offset`: per direction the
+**How it ships:** the sheet's pivot stays the struck spot. `r.meta(anim, fps, rig::Meta { offset: Some(range), .. })` (or
+`fc::offset_dirs(range, directions)` for the mockup caster) writes `meta.beanfx.caster.offset`: per direction the
 `[dx, dy]` from the character's pivot to the effect's pivot (screen px, y down; a side view gives one pair that
 flips with the mirror), and `range`. The engine adds it at spawn and leaves the effect there while the caster moves.
 

@@ -104,7 +104,7 @@
 </main>
 
 <script type="module">
-// ---------- runtime/beanfx.js, inlined (pages opened from disk cannot import modules); tests/test_preview.py checks
+// ---------- runtime/beanfx.js, inlined (pages opened from disk cannot import modules); kit/tests/preview.rs checks
 // it matches the runtime ----------
 // RUNTIME START
 // beanfx.js: play an exported beanfx effect on a 2D canvas. No dependencies, one ES module.
@@ -159,7 +159,7 @@ function fromJson(json, images = {}) {
   return { meta: bfx, tags, frames, images };
 }
 
-// The heading row for a direction (radians, y down: 0 east, tau/4 south), as facing.py picks it.
+// The heading row for a direction (radians, y down: 0 east, tau/4 south), as fc.rs picks it.
 function rowOf(angle, rows) {
   return ((Math.round((angle / TAU) * rows) % rows) + rows) % rows;
 }
@@ -432,7 +432,7 @@ async function loadParts(m, base) {
   return out;
 }
 
-// the effect's sound (meta.beanfx.sound, kit/sfx.py): one blob URL per cue file, fired on the cue's frame
+// the effect's sound (meta.beanfx.sound, kit/src/sfx.rs): one blob URL per cue file, fired on the cue's frame
 function loadSound(m, base) {
   const urls = {};
   const cues = (m.sound?.cues || []).filter((c) => VFS.has(base + c.file));

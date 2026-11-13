@@ -1,6 +1,6 @@
 <h1><img src="docs/media/logo.png" width="294" alt="beanfx"></h1>
 
-Pixel-art effects drawn as code. Describe an effect, and the `/beanfx` skill for Claude Code draws it in Python
+Pixel-art effects drawn as code. Describe an effect, and the `/beanfx` skill for Claude Code draws it in Rust
 and exports a sprite sheet with JSON that any engine plays.
 
 <p>
@@ -18,8 +18,9 @@ and exports a sprite sheet with JSON that any engine plays.
 /plugin install beanfx@beanfx
 ```
 
-Needs Python 3.10+ and Rust (cargo, from https://rustup.rs). The first run sets up `.venv/` in your project: numpy,
-pillow and the `beanfx` binary, built from the skill's `rust/` (sheet export and checks, sound, preview writers).
+Needs Rust (cargo, from https://rustup.rs). The first run builds the `beanfx` binary into `.beanfx/bin/` in your
+project. Each draft is a small Rust crate that links the skill's kit (drawing, sheet export and checks, sound,
+preview page).
 
 ## Use
 
@@ -30,7 +31,7 @@ pillow and the `beanfx` binary, built from the skill's `rust/` (sheet export and
 
 The skill asks about anything the prompt leaves open, then writes the effect to `drafts/<name>/`:
 
-- `<name>.py`: the effect as code; edit it and run it again
+- `src/main.rs`: the effect as code; edit it and run `cargo run --release` again
 - `out/sheets/<name>.png` and `.json`: the sprite sheet and its JSON, the files a game loads
 - `out/<name>.html`: a preview page that opens with a double click
 
@@ -53,4 +54,4 @@ Phaser reads the JSON with `load.aseprite`. More:
 [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md) · MIT, see `LICENSE`
 
 The light layer learns from [pixelfx](https://github.com/patch-gg/pixelfx) (MIT, Patch); beanfx reimplements it in
-Python and ships no pixelfx code.
+Rust and ships no pixelfx code.

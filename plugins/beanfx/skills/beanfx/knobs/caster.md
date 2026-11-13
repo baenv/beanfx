@@ -7,7 +7,7 @@ applies: Is the effect a skill cast by someone (a sword art, a palm strike, a su
 ---
 # Mockup caster
 
-Some effects read better with someone casting them. Draw one only when the owner wants it; `kit/caster.py` and
+Some effects read better with someone casting them. Draw one only when the owner wants it; `kit/src/cs.rs` and
 its use are in SKILL.md section 2.
 
 **Fixed when** the prompt says to draw a caster, a silhouette or an avatar, or says effect only.
