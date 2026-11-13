@@ -16,6 +16,13 @@ jobs:
         with:
           node-version: "20"
       - run: pip install numpy pillow pytest pytest-cov
+      - uses: dtolnay/rust-toolchain@stable
+      - name: the beanfx binary (the skill's rust/) and its unit tests
+        working-directory: plugins/beanfx/skills/beanfx/rust
+        run: |
+          cargo test --locked
+          cargo build --release --locked
+          echo "BEANFX_BIN=$PWD/target/release/beanfx" >> "$GITHUB_ENV"
       - name: skill tests (one test per check in every tests/test_*.py and test_*.mjs; coverage floor)
         run: pytest --cov --cov-report=term-missing   # fails under fail_under in pyproject.toml
       - name: the demo page's runtime is the skill's runtime

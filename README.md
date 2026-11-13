@@ -18,7 +18,8 @@ and exports a sprite sheet with JSON that any engine plays.
 /plugin install beanfx@beanfx
 ```
 
-Needs Python 3.10+. The first run sets up `.venv/` (numpy, pillow) in your project.
+Needs Python 3.10+ and Rust (cargo, from https://rustup.rs). The first run sets up `.venv/` in your project: numpy,
+pillow and the `beanfx` binary, built from the skill's `rust/` (sheet export and checks, sound, preview writers).
 
 ## Use
 

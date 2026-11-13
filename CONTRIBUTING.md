@@ -7,7 +7,7 @@ Issues and pull requests are welcome. All text in the repo is English; effect id
 
 ```
 git config core.hooksPath .githooks                  # gitleaks on every commit (the repo is public)
-bash plugins/beanfx/skills/beanfx/setup.sh           # .venv with numpy and pillow
+bash plugins/beanfx/skills/beanfx/setup.sh           # .venv with numpy, pillow and the beanfx binary (needs cargo)
 pip install pytest pytest-cov                        # for the tests
 ```
 
@@ -16,6 +16,7 @@ pip install pytest pytest-cov                        # for the tests
 | change | place |
 |---|---|
 | the drawing kit | `plugins/beanfx/skills/beanfx/kit/` |
+| sheet export and checks, sound, preview writers | `plugins/beanfx/skills/beanfx/rust/` (the `beanfx` binary; `kit/export.py`, `kit/sfx.py` and the `pfx` writers call it through `kit/bridge.py`) |
 | the skill, its knobs, the gate | `plugins/beanfx/skills/beanfx/` (`SKILL.md`, `knobs/`, `gate.py`) |
 | the browser runtime | `plugins/beanfx/skills/beanfx/runtime/beanfx.js`, then copy it to `docs/beanfx.js` and run `python3 plugins/beanfx/skills/beanfx/tests/test_preview.py --write` |
 
@@ -30,7 +31,8 @@ bash plugins/beanfx/skills/beanfx/setup.sh --draft <name> --refresh-kit   # then
 ## Tests
 
 ```
-pytest                                    # every test script, python and node
+(cd plugins/beanfx/skills/beanfx/rust && cargo test)   # the binary's unit tests
+pytest                                    # every test script, python and node (finds .venv/bin/beanfx; BEANFX_BIN overrides)
 pytest --cov --cov-report=term-missing    # with coverage of kit/ and gate.py
 claude plugin validate plugins/beanfx && claude plugin validate .
 ```

@@ -7,8 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 A sandbox for pixel-art project skills (any style, size and palette, no house rules). The
 shipped skill is `/beanfx` effects, packaged as a Claude Code plugin (`plugins/beanfx/skills/beanfx/SKILL.md`;
 this repo is its marketplace, `.claude-plugin/marketplace.json`). Work here means running the skill and
-judging what it makes, or editing its `SKILL.md` or its kit. The plugin is standalone: it needs only Python
-(numpy, pillow), and node with a pixelfx clone for reuse and the benchmark.
+judging what it makes, or editing its `SKILL.md` or its kit. The plugin is standalone: it needs Python
+(numpy, pillow), Rust (cargo builds the `beanfx` binary), and node with a pixelfx clone for reuse and the benchmark.
 
 Work in progress: `/char` (characters with held weapons and objects) and `/scene` (scenes and backdrops). Their
 skills, kits and drafts stay local and are gitignored until they are ready.
@@ -37,7 +37,12 @@ skills, kits and drafts stay local and are gitignored until they are ready.
 - `docs/media/`: the README preview gifs (CI budget: `docs/` at most 8 MB, one file at most 5 MB).
 - `CONTRIBUTING.md` (where to edit, tests, media, release steps), `CHANGELOG.md`, `pyproject.toml` (pytest and
   coverage settings only).
-- `.venv/`: Python with numpy and pillow. `setup.sh` creates it when missing; `--pixelfx` also checks node.
+- `.venv/`: Python with numpy and pillow, and `bin/beanfx`. `setup.sh` creates it when missing and rebuilds the binary when
+  `rust/` changes; `--pixelfx` also checks node.
+- `plugins/beanfx/skills/beanfx/rust/`: the `beanfx` binary (Rust, crate features export, sfx, preview): sheet writing,
+  pages and Aseprite JSON, every `ex.check`, the preview page, sound synthesis and the strip, gif, contact and takes
+  writers. `kit/export.py`, `kit/sfx.py` and the `pfx` writers keep their Python API and call it through `kit/bridge.py`
+  (arrays as .npy, JSON in and out). Drafts and the drawing kit stay Python. `cargo test` in that folder.
 - Bundled casters: the skill's `casters/` ships `nghich_tien_kiem`, `_kiem_topdown`, `_truong` and `_truong_topdown`
   (a sword and a staff caster; side 2 rows, top-down 8), sheets and `rig.json` only. `rig.load(name)` and `ex.page`
   look in the project's `casters/` first, then there, so any project can use them with no setup. Their build script

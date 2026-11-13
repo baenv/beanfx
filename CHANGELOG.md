@@ -3,7 +3,14 @@
 Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag `v<version>` on `main`; see
 `CONTRIBUTING.md`.
 
-## Unreleased
+## 1.0.0
+
+- The fixed tooling moves to Rust: the `beanfx` binary (the skill's `rust/`) writes the sheets, pages, Aseprite JSON
+  and preview page, runs every `ex.check`, synthesises the sound and writes the strip, gif, contact and takes
+  previews. `export.py`, `sfx.py` and the `pfx` writers keep their Python API and call it through `kit/bridge.py`,
+  so drafts do not change. `setup.sh` builds the binary into `.venv/bin/beanfx` with cargo, so Rust is now a
+  requirement. Drafts pinned to an older kit keep running their Python copy. `gate.py` stays Python: it calls the
+  Python Jev client and shares its breaker file.
 
 ## 0.4.0
 

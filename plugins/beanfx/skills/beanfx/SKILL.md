@@ -23,7 +23,7 @@ drafts get it only when the owner names them (`setup.sh --kit-status` lists the 
 ## Setup (first, every run)
 
 ```
-bash ${CLAUDE_SKILL_DIR}/setup.sh             # .venv with numpy and pillow, checks the kit imports
+bash ${CLAUDE_SKILL_DIR}/setup.sh             # .venv with numpy, pillow and the beanfx binary (cargo), checks the kit imports
 bash ${CLAUDE_SKILL_DIR}/setup.sh --draft <name>   # once the draft is named, before its first file: drafts/<name>/kit/
 bash ${CLAUDE_SKILL_DIR}/setup.sh --pixelfx   # reuse (2b) and the benchmark: also node 18+ and pixelfx
 ```

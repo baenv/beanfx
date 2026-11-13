@@ -20,7 +20,9 @@ import json
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image
+
+import bridge
 
 
 class Layers:
@@ -116,24 +118,17 @@ def composite(color, light, bg=None):
     return (np.concatenate([rgb, alpha], axis=-1) * 255).round().astype(np.uint8)
 
 
+def _stack(frames):
+    return bridge.stack(list(frames))
+
+
 def strip(frames, path):
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    Image.fromarray(np.concatenate(list(frames), axis=1), "RGBA").save(path)
+    bridge.run("preview", "strip", {"path": path}, arrays={"frames": _stack(frames)})
 
 
 def gif(frames, path, fps, scale=4, bg="#101018"):
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    ims = []
-    for f in frames:
-        if f[..., 3].min() < 255:
-            f = composite(f, np.zeros((*f.shape[:2], 3)), bg)
-        im = Image.fromarray(f[..., :3]).resize((f.shape[1] * scale, f.shape[0] * scale), Image.NEAREST)
-        ims.append(im)
-    ims[0].save(path, save_all=True, append_images=ims[1:], duration=round(1000 / fps), loop=0, disposal=2)
-
-
-def _flat(f, bg):
-    return composite(f, np.zeros((*f.shape[:2], 3)), bg)[..., :3] if f[..., 3].min() < 255 else f[..., :3]
+    bridge.run("preview", "gif", {"path": path, "fps": fps, "scale": scale, "bg": bg},
+               arrays={"frames": _stack(frames)})
 
 
 def contact(path, frames, fps, n=12, scale=3, bg="#101018", ref=None, by="phase", names=("draft", "ref")):
@@ -141,35 +136,12 @@ def contact(path, frames, fps, n=12, scale=3, bg="#101018", ref=None, by="phase"
     without the gif. ref (frames, fps) adds a second row at the same moments for the benchmark: by "phase" the same
     share of each one's length (0, 1/(n-1), .. 1), by "time" the same seconds (a cell past the end stays empty).
     Frames are RGBA uint8 (h, w, 4) as composite gives; transparency goes over bg. Returns the frame indices used."""
-    runs = [(names[0], list(frames), fps)] + ([(names[1], list(ref[0]), ref[1])] if ref is not None else [])
-    span = max((len(fr) - 1) / f for _, fr, f in runs)
-    picks = []
-    for _, fr, f in runs:
-        N = len(fr)
-        if by == "time":
-            idx = [round(k / max(1, n - 1) * span * f) for k in range(n)]
-            picks.append([i if i < N else None for i in idx])
-        else:
-            picks.append([round(k / max(1, n - 1) * (N - 1)) for k in range(n)])
-    ch = max(fr[0].shape[0] for _, fr, _ in runs) * scale
-    cw = max(fr[0].shape[1] for _, fr, _ in runs) * scale
-    lab, gap, head = 12, 4, 14
-    im = Image.new("RGB", (n * (cw + gap) + gap, len(runs) * (ch + lab + head + gap) + gap), tuple(_hex(bg).astype(int)))
-    dr = ImageDraw.Draw(im)
-    for r, ((name, fr, f), idx) in enumerate(zip(runs, picks)):
-        y0 = gap + r * (ch + lab + head + gap)
-        dr.text((gap, y0), f"{name}: {len(fr)} frames, {f} fps, {len(fr) / f:.2f} s", fill=(220, 220, 230))
-        for k, i in enumerate(idx):
-            if i is None:
-                continue
-            a = _flat(fr[i], bg)
-            cell = Image.fromarray(a).resize((a.shape[1] * scale, a.shape[0] * scale), Image.NEAREST)
-            x = gap + k * (cw + gap)
-            im.paste(cell, (x + (cw - cell.width) // 2, y0 + head + (ch - cell.height) // 2))
-            dr.text((x, y0 + head + ch + 1), f"f{i} {i / f:.2f}s", fill=(170, 170, 185))
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    im.save(path)
-    return picks
+    args = {"path": path, "fps": fps, "n": n, "scale": scale, "bg": bg, "by": by, "names": list(names)}
+    arrays = {"frames": _stack(frames)}
+    if ref is not None:
+        args["ref_fps"] = ref[1]
+        arrays["ref"] = _stack(ref[0])
+    return bridge.run("preview", "contact", args, arrays=arrays)
 
 
 def takes(path, options, fps=None, scale=4, bg="#101018"):
@@ -177,31 +149,7 @@ def takes(path, options, fps=None, scale=4, bg="#101018"):
     uint8 (h, w, 4) as composite gives (a peak frame alone, or the frames round it). Writes path (png, the first frame
     of each take) and, when fps is given and a take has more than one frame, the same name as a gif that plays them
     in step, the shortest take holding its last frame. Returns the paths written."""
-    path = Path(path)
-    runs = [(str(lab), list(fr)) for lab, fr in options]
-    ch = max(fr[0].shape[0] for _, fr in runs) * scale
-    cw = max(fr[0].shape[1] for _, fr in runs) * scale
-    gap, head = 8, 16
-    size = (len(runs) * (cw + gap) + gap, ch + head + 2 * gap)
-
-    def board(k):
-        im = Image.new("RGB", size, tuple(_hex(bg).astype(int)))
-        dr = ImageDraw.Draw(im)
-        for n, (lab, fr) in enumerate(runs):
-            a = _flat(fr[min(k, len(fr) - 1)], bg)
-            cell = Image.fromarray(a).resize((a.shape[1] * scale, a.shape[0] * scale), Image.NEAREST)
-            x = gap + n * (cw + gap)
-            dr.text((x, gap), "%d. %s" % (n + 1, lab), fill=(220, 220, 230))
-            im.paste(cell, (x + (cw - cell.width) // 2, gap + head + (ch - cell.height) // 2))
-        return im
-
-    path.parent.mkdir(parents=True, exist_ok=True)
-    board(0).save(path)
-    written = [path]
-    n = max(len(fr) for _, fr in runs)
-    if fps and n > 1:
-        g = path.with_suffix(".gif")
-        ims = [board(k) for k in range(n)]
-        ims[0].save(g, save_all=True, append_images=ims[1:], duration=round(1000 / fps), loop=0)
-        written.append(g)
-    return written
+    options = [(lab, list(fr)) for lab, fr in options]   # an iterator is read once
+    arrays = {f"take{i}": _stack(fr) for i, (_, fr) in enumerate(options)}
+    args = {"path": path, "labels": [str(lab) for lab, _ in options], "fps": fps, "scale": scale, "bg": bg}
+    return [Path(p) for p in bridge.run("preview", "takes", args, arrays=arrays)]

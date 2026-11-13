@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Checks the tools /beanfx needs and installs the missing ones into the project (.venv/); --draft <name> gives drafts/<name>/ its own copy of the kit; --pixelfx adds node and pixelfx for the benchmark and reuse.
+# Checks the tools /beanfx needs and installs the missing ones into the project (.venv/ with numpy, pillow and the beanfx binary built by cargo); --draft <name> gives drafts/<name>/ its own copy of the kit; --pixelfx adds node and pixelfx for the benchmark and reuse.
 # --kit-status lists the drafts whose pinned kit differs from this skill's kit; --draft <name> --refresh-kit copies the current kit over that draft's (asked for by name only, never by itself).
 # Prints PIXELFX=<dir> when the benchmark tools are there and LAYERS=<script> when reuse works; exits 1 when something cannot be installed here.
 set -u
@@ -51,9 +51,29 @@ else
   "$PY" -c "import numpy, PIL" 2>/dev/null && say "venv: ok" || { say "venv: install failed"; fail=1; }
 fi
 
+# 1b. The beanfx binary, the Rust half of the kit (this skill's rust/): sheet export and checks, sound, preview
+# writers. Built with cargo into the project's .venv/bin/beanfx, rebuilt when the skill's source changes
+BIN="$ROOT/.venv/bin/beanfx"
+SUM="$(find "$SKILL/rust/src" "$SKILL/rust/Cargo.toml" "$SKILL/rust/Cargo.lock" -type f -print0 | sort -z | xargs -0 cat | shasum | cut -c1-40)"
+if [ -x "$BIN" ] && [ "$(cat "$ROOT/.venv/beanfx.src" 2>/dev/null)" = "$SUM" ]; then
+  say "beanfx: ok ($("$BIN" version))"
+elif ! command -v cargo >/dev/null; then
+  say "beanfx: needs cargo to build; install Rust from https://rustup.rs (curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh), then rerun"
+  fail=1
+else
+  say "beanfx: building the binary (first build takes about a minute)"
+  if cargo build --release --locked --quiet --manifest-path "$SKILL/rust/Cargo.toml" --target-dir "$ROOT/.venv/beanfx-target" \
+      && mkdir -p "$ROOT/.venv/bin" && cp "$ROOT/.venv/beanfx-target/release/beanfx" "$BIN"; then
+    printf '%s\n' "$SUM" > "$ROOT/.venv/beanfx.src"
+    say "beanfx: ok ($("$BIN" version))"
+  else
+    say "beanfx: build failed"; fail=1
+  fi
+fi
+
 # 2. The drawing kit: source of truth is this skill's kit/. Each draft gets its own copy in drafts/<name>/kit/,
 # made once and never overwritten, so a plugin update leaves the kit of an existing draft as it was drawn with
-if [ $fail -eq 0 ] && (cd "$SKILL/kit" && "$PY" -B -c "import fxkit, fxlib, light, pfx, caster, facing, derive, export, target, ref, rig" 2>/dev/null); then
+if [ $fail -eq 0 ] && (cd "$SKILL/kit" && BEANFX_BIN="$BIN" "$PY" -B -c "import fxkit, fxlib, light, pfx, caster, facing, derive, export, target, ref, rig, sfx, bridge; bridge.binary()" 2>/dev/null); then
   say "kit: ok"
 else
   say "kit: does not import"; fail=1

@@ -23,7 +23,8 @@ import math
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
+
+import bridge
 
 TAU = math.tau
 VIEWS = ("side", "top-down", "3/4")
@@ -47,9 +48,7 @@ def rows(draw, n, frames):
 
 def sheet(rows, path):
     """One row per heading, frames left to right."""
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    img = np.concatenate([np.concatenate(list(r), axis=1) for r in rows], axis=0)
-    Image.fromarray(img, "RGBA").save(path)
+    bridge.run("preview", "sheet", {"path": path}, arrays={"rows": bridge.stack([list(r) for r in rows])})
 
 
 def mirror(frames):

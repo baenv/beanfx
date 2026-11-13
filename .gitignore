@@ -74,3 +74,6 @@ drafts/*
 !drafts/van_kiem_quy_tong_v5/
 !drafts/van_tien/
 !drafts/wind_burst/
+
+# the Rust tooling build (plugins/beanfx/skills/beanfx/rust)
+target/
