@@ -1,3 +1,0 @@
-# every draft builds into the project's one target folder, so the kit and its crates build once
-[build]
-target-dir = "../../.beanfx/target"
