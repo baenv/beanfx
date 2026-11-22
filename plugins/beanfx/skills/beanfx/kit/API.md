@@ -165,4 +165,6 @@ may differ in the last bit there; use the helper wherever one exists.
 
 - `beanfx version` prints `{"version": "<crate version>", "protocol": 2}`. Protocol 2 means drafts link the library.
 - `beanfx gate "<prompt>" [--context "<what the image shows>"]` (`-` as the prompt reads it from stdin) prints the gate JSON (`ask`, `skip`, `source`).
+- `beanfx check <sheet.json> [--max-colours N] [--max-mb M] [--no-trim] [--json]` runs the kit's craft, framing, budget, act and sound checks on an exported sheet (single or paged) and exits 0 when clean, 1 when a check fails, 2 on error.
+- `beanfx sfx <sheet.json> [--out <dir>] [--voice retro|soft|real] [--element <el>] [--seed N] [--sounds <dir|auto|none>] [--json]` synthesises the WAV track and cue files for an exported sheet JSON, updates `meta.beanfx.sound`, and runs `sfx::check`.
   setup.sh builds it into `<project>/.beanfx/bin/beanfx`.
