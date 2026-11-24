@@ -3,6 +3,13 @@
 Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag `v<version>` on `main`; see
 `CONTRIBUTING.md`.
 
+## Unreleased
+
+- `beanfx check <sheet.json>` and `beanfx sfx <sheet.json>`: the kit's checks and sound synthesis on an exported
+  sheet, without a draft (exit 0 clean, 1 a check failed, 2 an error). Contributed by @newjordan in #7.
+- `beanfx sfx --out <dir>` with another folder now saves the sound block into the sheet's own JSON, with the track
+  and cue paths pointing into that folder.
+
 ## 2.2.1
 
 Drawing rules learnt on solid bodies and hazy light (2026-11-14).
