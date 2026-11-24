@@ -3,9 +3,9 @@
 Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag `v<version>` on `main`; see
 `CONTRIBUTING.md`.
 
-## Unreleased
+## 2.5.0
 
-Shorter runs for long, caster to target effects (learnt on a 540-frame nine-sun cast that took about 15 minutes).
+Shorter runs for long, caster to target effects (2026-11-24).
 
 - `Layer::Behind`: the part of the effect behind the character (a ring at the back, a halo). The sheet is `Behind`
   then `Effect` on one canvas, the same bytes as drawing both in `Effect`; the previews draw it under the caster.
