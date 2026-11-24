@@ -1,0 +1,41 @@
+{
+  "source": "sprites",
+  "locked": false,
+  "files": [
+    "assets/sprites/coin.png",
+    "assets/sprites/torch.png"
+  ],
+  "colours": 7,
+  "top": [
+    "#805010",
+    "#c09020",
+    "#ffd840",
+    "#3a1020",
+    "#8a2a18",
+    "#e0601c",
+    "#ffc040"
+  ],
+  "ramps": [
+    {
+      "family": "warm",
+      "share": 1.0,
+      "tones": [
+        "#3a1020",
+        "#805010",
+        "#e0601c",
+        "#c09020",
+        "#ffd840"
+      ],
+      "colours": [
+        "#3a1020",
+        "#8a2a18",
+        "#805010",
+        "#e0601c",
+        "#c09020",
+        "#ffc040",
+        "#ffd840"
+      ]
+    }
+  ],
+  "skipped": 1
+}

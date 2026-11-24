@@ -361,6 +361,23 @@ pub struct Aura {
     pub pivot: P,
 }
 
+/// A recoloured copy of the sheet (`knobs/palette.md`): `Spec.ramp` mapped onto `ramp` with `pfx::recolour`, the
+/// light tinted with `light_ramp`; written as `<name>_<variant>` beside the sheet.
+#[derive(Clone, Debug)]
+pub struct Variant {
+    pub name: String,
+    /// As many tones as `Spec.ramp`, dark to bright.
+    pub ramp: Vec<String>,
+    pub light_ramp: Vec<String>,
+}
+
+impl Variant {
+    pub fn new(name: &str, ramp: &[&str], light_ramp: &[&str]) -> Variant {
+        let v = |r: &[&str]| r.iter().map(|c| c.to_string()).collect();
+        Variant { name: name.into(), ramp: v(ramp), light_ramp: v(light_ramp) }
+    }
+}
+
 /// The brief. `Spec::new` fills the defaults; set the rest by field.
 #[derive(Clone, Debug)]
 pub struct Spec {
@@ -403,6 +420,10 @@ pub struct Spec {
     pub pick: Vec<usize>,
     /// Frames of the glow takes; empty takes every second frame for 12 each side of the first hit.
     pub takes: Vec<usize>,
+    /// The effect's own colour ramp, dark to bright (the tones `draw` paints with); `variants` map it.
+    pub ramp: Vec<String>,
+    /// Recoloured copies of the sheet; empty writes none.
+    pub variants: Vec<Variant>,
 }
 
 impl Spec {
@@ -413,6 +434,7 @@ impl Spec {
             light_ramp: vec!["#40306a".into(), "#c0a0ff".into(), "#f0e8ff".into(), "#ffffff".into()],
             steps: None, edge_fade: 0.0, hits: vec![], states: vec![], poses: vec![], windup: 0.0, target: None,
             dummy: None, caster_foot: None, aura: None, extra: Map::new(), trim: Some(ex::TRIM), pick: vec![], takes: vec![],
+            ramp: vec![], variants: vec![],
         }
     }
 }
@@ -426,7 +448,7 @@ pub trait Effect {
 
 /// `fn main() -> ExitCode { dr::main(&Fx, env!("CARGO_MANIFEST_DIR")) }`: exit 0 clean, 1 on a failed check, 2 on
 /// an error.
-pub fn main(fx: &dyn Effect, draft_dir: &str) -> ExitCode {
+pub fn main(fx: &(dyn Effect + Sync), draft_dir: &str) -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();
     match run(fx, Path::new(draft_dir), &args) {
         Ok(code) => ExitCode::from(code),
@@ -438,7 +460,7 @@ pub fn main(fx: &dyn Effect, draft_dir: &str) -> ExitCode {
 }
 
 struct Ctx<'a> {
-    fx: &'a dyn Effect,
+    fx: &'a (dyn Effect + Sync),
     sp: Spec,
 }
 
@@ -461,9 +483,16 @@ impl Ctx<'_> {
 
     /// Light after gain and edge fade (the measured light), then stepped and tinted.
     fn finish_light(&self, l: &Array2<f64>, gain: f64) -> Result<(Array2<f64>, Array3<f64>), String> {
+        let measured = self.measure_light(l, gain);
+        let tinted = self.tint_light(&measured, &self.sp.light_ramp)?;
+        Ok((measured, tinted))
+    }
+
+    /// The measured light: after gain and edge fade, clipped to 0..1.
+    fn measure_light(&self, l: &Array2<f64>, gain: f64) -> Array2<f64> {
         let (h, w) = l.dim();
         let ef = self.sp.edge_fade;
-        let measured = Array2::from_shape_fn((h, w), |(y, x)| {
+        Array2::from_shape_fn((h, w), |(y, x)| {
             let mut v = l[[y, x]] * gain;
             if ef > 0.0 {
                 let e = (x as f64).min((w - 1 - x) as f64).min(y as f64).min((h - 1 - y) as f64);
@@ -471,13 +500,18 @@ impl Ctx<'_> {
                 v *= k * k;
             }
             np::clip(v, 0.0, 1.0)
-        });
+        })
+    }
+
+    /// The measured light stepped (hard retro) and tinted with a ramp.
+    fn tint_light(&self, measured: &Array2<f64>, ramp: &[String]) -> Result<Array3<f64>, String> {
+        let (h, w) = measured.dim();
         let lc = match self.sp.steps {
             Some(st) => lt::steps(&measured, st),
             None => measured.clone(),
         };
         let l3 = Array3::from_shape_fn((h, w, 3), |(y, x, _)| lc[[y, x]]);
-        Ok((measured, pfx::tint(&l3, &self.sp.light_ramp)?))
+        pfx::tint(&l3, ramp)
     }
 
     fn frame(&self, f: usize, seed: u64, gain: f64) -> Result<Frame, String> {
@@ -504,6 +538,78 @@ impl Ctx<'_> {
             Some(b) => pfx::composite(&out, &Array3::zeros((sp.h, sp.w, 3)), Some(b)),
         }
     }
+}
+
+/// The recoloured sheets of `Spec.variants` (same cells, act and fields as the sheet), a 1x strip each; prints a
+/// note for a variant whose ramp misses most of the colour.
+fn write_variants(ctx: &Ctx, out: &Path, cols: &[Array3<u8>], measured: &[Array2<f64>], extra: &Value) -> Result<(), String> {
+    let sp = &ctx.sp;
+    if sp.variants.is_empty() {
+        return Ok(());
+    }
+    if sp.ramp.len() < 2 {
+        return Err("variants: set Spec.ramp to the effect's own colour ramp (dark to bright) first".into());
+    }
+    let opaque: usize = cols.iter().map(|c| c.slice(s![.., .., 3]).iter().filter(|&&a| a > 0).count()).sum();
+    for v in &sp.variants {
+        let vname = format!("{}_{}", sp.name, v.name);
+        let done = par(cols.len(), |i| {
+            let (c, kept) = pfx::recolour(&cols[i], &sp.ramp, &v.ramp)?;
+            let l = ctx.tint_light(&measured[i], &v.light_ramp)?;
+            Ok((pfx::composite(&c, &l, None)?, c, l, kept))
+        })?;
+        let kept: usize = done.iter().map(|d| d.3).sum();
+        let (mut fins, mut vc, mut vl) = (vec![], vec![], vec![]);
+        for (f, c, l, _) in done {
+            fins.push(f);
+            vc.push(c);
+            vl.push(l);
+        }
+        if opaque > 0 && kept * 2 > opaque {
+            // a note, not a failure: smoke, rock and other colours off the ramp keep their colour on purpose
+            println!("note: variant {}: {:.0} % of the colour is off Spec.ramp and kept its colour (smoke, rock); if the \
+                      effect's own tones are among it, list them in Spec.ramp", v.name, 100.0 * kept as f64 / opaque as f64);
+        }
+        pfx::strip(&fins, out.join(format!("{vname}_1x.png")))?;
+        ex::write(out.join("sheets"), &vname, &fins, sp.fps, sp.pivot, sp.looped, ex::Write {
+            light: Some((&vl).into()), color: Some((&vc).into()), states: sp.states.clone(), hits: sp.hits.clone(),
+            windup: sp.windup, poses: sp.poses.clone(), target: sp.target.clone(), extra: Some(extra.clone()), hold: sp.hold,
+            ..Default::default()
+        })?;
+        println!("variant: {vname}");
+    }
+    Ok(())
+}
+
+/// `f(0)..f(n - 1)` on all cores (`BEANFX_THREADS` caps the count; 1 runs in order on this thread), results in
+/// index order, the first error by index returned. A draw is a pure function of (frame, seed), so the output is the
+/// same whatever the thread count.
+pub fn par<T: Send>(n: usize, f: impl Fn(usize) -> Result<T, String> + Sync) -> Result<Vec<T>, String> {
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    let cores = std::thread::available_parallelism().map_or(1, |c| c.get());
+    let k = std::env::var("BEANFX_THREADS").ok().and_then(|v| v.parse().ok()).unwrap_or(cores).clamp(1, n.max(1));
+    if k == 1 {
+        return (0..n).map(f).collect();
+    }
+    let next = AtomicUsize::new(0);
+    let mut slots: Vec<Option<Result<T, String>>> = (0..n).map(|_| None).collect();
+    let parts: Vec<Vec<(usize, Result<T, String>)>> = std::thread::scope(|sc| {
+        let workers: Vec<_> = (0..k).map(|_| sc.spawn(|| {
+            let mut got = vec![];
+            loop {
+                let i = next.fetch_add(1, Ordering::Relaxed);
+                if i >= n {
+                    break got;
+                }
+                got.push((i, f(i)));
+            }
+        })).collect();
+        workers.into_iter().map(|w| w.join().unwrap_or_else(|e| std::panic::resume_unwind(e))).collect()
+    });
+    for (i, r) in parts.into_iter().flatten() {
+        slots[i] = Some(r);
+    }
+    slots.into_iter().map(|r| r.expect("every index drawn")).collect()
 }
 
 /// Cover and mean of the light inside the colour's box (None for an empty frame); `light.md`, the light measure.
@@ -593,7 +699,7 @@ fn command(ctx: &Ctx, out: &Path, args: &[String]) -> Result<u8, String> {
             let r = pfx::load(out.join("ref"), id)?;
             let refs = r.color.iter().zip(&r.light).map(|(c, l)| pfx::composite(c, l, None)).collect::<Result<Vec<_>, String>>()?;
             let ref_fps = r.meta["fps"].as_f64().unwrap_or(24.0);
-            let mine = (0..sp.n).map(|f| ctx.frame(f, sp.seed, 1.0).map(|x| x.fin)).collect::<Result<Vec<_>, String>>()?;
+            let mine = par(sp.n, |f| ctx.frame(f, sp.seed, 1.0).map(|x| x.fin))?;
             pfx::contact(out.join("bench.png"), &mine, sp.fps, pfx::Contact { r#ref: Some((&refs, ref_fps)),
                          names: [sp.name.clone(), id.clone()], ..Default::default() })?;
             println!("bench.png");
@@ -604,7 +710,7 @@ fn command(ctx: &Ctx, out: &Path, args: &[String]) -> Result<u8, String> {
 }
 
 /// The runner behind `main`, given the draft folder and the command-line arguments.
-pub fn run(fx: &dyn Effect, dir: &Path, args: &[String]) -> Result<u8, String> {
+pub fn run(fx: &(dyn Effect + Sync), dir: &Path, args: &[String]) -> Result<u8, String> {
     let ctx = Ctx { fx, sp: fx.spec() };
     let sp = &ctx.sp;
     let name = sp.name.as_str();
@@ -614,9 +720,8 @@ pub fn run(fx: &dyn Effect, dir: &Path, args: &[String]) -> Result<u8, String> {
         return command(&ctx, &out, args);
     }
 
-    let (mut fins, mut cols, mut lights, mut covers, mut means) = (vec![], vec![], vec![], vec![], vec![]);
-    for f in 0..sp.n {
-        let fr = ctx.frame(f, sp.seed, 1.0)?;
+    let (mut fins, mut cols, mut lights, mut covers, mut means, mut measured) = (vec![], vec![], vec![], vec![], vec![], vec![]);
+    for fr in par(sp.n, |f| ctx.frame(f, sp.seed, 1.0))? {
         if let Some((cv, mn)) = measure(&fr.col, &fr.measured) {
             covers.push(cv);
             means.push(mn);
@@ -624,6 +729,7 @@ pub fn run(fx: &dyn Effect, dir: &Path, args: &[String]) -> Result<u8, String> {
         fins.push(fr.fin);
         cols.push(fr.col);
         lights.push(fr.light);
+        measured.push(fr.measured);
     }
     let g = lt::glow_level(&sp.glow).ok_or(format!("glow {} is not subtle, medium or strong", sp.glow))?;
     let (cover, mean) = if covers.is_empty() { (0.0, 0.0) } else { (np::median(&covers), np::median(&means)) };
@@ -631,7 +737,7 @@ pub fn run(fx: &dyn Effect, dir: &Path, args: &[String]) -> Result<u8, String> {
     let ncol: Vec<f64> = fins.iter().map(|x| ex::colours(x) as f64).collect();
     println!("colours: median {} a frame", np::median(&ncol) as i64);
 
-    let previews = (0..sp.n).map(|f| ctx.preview(f, 1.0, None)).collect::<Result<Vec<_>, String>>()?;
+    let previews = par(sp.n, |f| ctx.preview(f, 1.0, None))?;
     let pick = if sp.pick.is_empty() { evenly(sp.n, 12) } else { sp.pick.clone() };
     for (bg, tag) in [("#101018", "dark"), ("#5a6070", "mid")] {
         let cells = pick.iter().filter(|&&i| i < sp.n)
@@ -661,6 +767,12 @@ pub fn run(fx: &dyn Effect, dir: &Path, args: &[String]) -> Result<u8, String> {
         }
         extra.insert("parts".into(), Value::Object(parts));
     }
+    if !sp.variants.is_empty() {
+        let vs: Vec<Value> = sp.variants.iter()
+            .map(|v| json!({"name": v.name, "sheet": format!("{name}_{}.png", v.name), "ramp": v.ramp, "light_ramp": v.light_ramp}))
+            .collect();
+        extra.insert("variants".into(), json!({"from": sp.ramp, "light_ramp": sp.light_ramp, "list": vs}));
+    }
     for (k, v) in &sp.extra {
         extra.insert(k.clone(), v.clone());
     }
@@ -668,9 +780,10 @@ pub fn run(fx: &dyn Effect, dir: &Path, args: &[String]) -> Result<u8, String> {
     fc::check(&extra)?;
     let meta = ex::write(out.join("sheets"), name, &fins, sp.fps, sp.pivot, sp.looped, ex::Write {
         light: Some((&lights).into()), color: Some((&cols).into()), states: sp.states.clone(), hits: sp.hits.clone(),
-        windup: sp.windup, poses: sp.poses.clone(), target: sp.target.clone(), extra: Some(extra), hold: sp.hold,
+        windup: sp.windup, poses: sp.poses.clone(), target: sp.target.clone(), extra: Some(extra.clone()), hold: sp.hold,
         ..Default::default()
     })?;
+    write_variants(&ctx, &out, &cols, &measured, &extra)?;
     if let Some(p) = ex::page(out.join("sheets").join(format!("{name}.json")), Default::default())? {
         println!("page: {}", p.display());
     }
@@ -680,17 +793,11 @@ pub fn run(fx: &dyn Effect, dir: &Path, args: &[String]) -> Result<u8, String> {
         light: Some((&lights).into()), looped: sp.looped, hold: sp.hold, src: Some(src),
         max_colours: sp.steps.map(|_| 48.0), trim: sp.trim, ..Default::default()
     })?);
-    let failed = std::cell::RefCell::new(None);
-    bad.extend(ex::check_seeds(|f, sd| match ctx.full(f, sd, Layer::Effect) {
-        Ok(c) => c.col,
-        Err(e) => {
-            failed.borrow_mut().get_or_insert(e);
-            Array3::zeros((sp.h, sp.w, 4))
-        }
-    }, sp.n, &[2, 3, 7], 2)?);
-    if let Some(e) = failed.into_inner() {
-        return Err(e);
-    }
+    // every seed's frames drawn in parallel first, then handed to check_seeds in its own order
+    let (seeds, step) = ([2u64, 3, 7], 2);
+    let order: Vec<(u64, usize)> = seeds.iter().flat_map(|&sd| (0..sp.n).step_by(step).map(move |f| (sd, f))).collect();
+    let mut drawn = par(order.len(), |i| ctx.full(order[i].1, order[i].0, Layer::Effect).map(|c| c.col))?.into_iter();
+    bad.extend(ex::check_seeds(|_, _| drawn.next().unwrap_or_else(|| Array3::zeros((sp.h, sp.w, 4))), sp.n, &seeds, step)?);
     if let Some(act) = meta.pointer("/meta/beanfx/act") {
         bad.extend(ex::check_act(act, sp.n as i64, sp.fps, sp.looped)?);
     }

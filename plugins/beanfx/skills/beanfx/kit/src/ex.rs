@@ -301,6 +301,29 @@ fn on_edge(y: usize, x: usize, h: usize, w: usize) -> bool {
     y == 0 || x == 0 || y + 1 == h || x + 1 == w
 }
 
+/// What an edge failure says beyond "touches the edge": how many px sit on the border, on which sides, and the box
+/// the drawing fills, so the fix (a bigger cell, the pivot moved, the parts pulled in) is plain from the message.
+pub fn spill(on: &[bool], h: usize, w: usize) -> String {
+    let (mut n, mut sides) = (0usize, [false; 4]);
+    let (mut x0, mut y0, mut x1, mut y1) = (usize::MAX, usize::MAX, 0usize, 0usize);
+    for (p, &b) in on.iter().enumerate() {
+        if !b {
+            continue;
+        }
+        let (y, x) = (p / w, p % w);
+        (x0, y0, x1, y1) = (x0.min(x), y0.min(y), x1.max(x), y1.max(y));
+        if on_edge(y, x, h, w) {
+            n += 1;
+            sides[0] |= x == 0;
+            sides[1] |= y == 0;
+            sides[2] |= x + 1 == w;
+            sides[3] |= y + 1 == h;
+        }
+    }
+    let names: Vec<&str> = ["left", "top", "right", "bottom"].iter().zip(sides).filter(|(_, s)| *s).map(|(n, _)| *n).collect();
+    format!("{n} px on the {} border; the drawing fills x {x0}..{x1}, y {y0}..{y1} of {w}x{h}", names.join(" and "))
+}
+
 /// framing(): box (x0, y0, x1, y1 inclusive), cell (w, h), cut (left, top, right, bottom) px and trim share.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Framing {
@@ -878,7 +901,7 @@ fn check_inner(fa: &Array, o: Check) -> Result<Vec<String>, String> {
             if !any {
                 bad.push(format!("{tag}frame {i}: empty colour"));
             } else if on.iter().enumerate().any(|(p, &b)| b && on_edge(p / w, p % w, h, w)) {
-                bad.push(format!("{tag}frame {i}: colour touches the edge"));
+                bad.push(format!("{tag}frame {i}: colour touches the edge ({})", spill(&on, h, w)));
             }
             if let Some(mc) = &max_colours {
                 if any {
@@ -934,7 +957,8 @@ fn edges(labels: &[(u64, usize)], h: usize, w: usize, alpha: &[u8]) -> Vec<Strin
         if !on.iter().any(|&b| b > 0) {
             bad.push(format!("seed {sd} frame {f}: empty colour"));
         } else if on.iter().enumerate().any(|(p, &b)| b > 0 && on_edge(p / w, p % w, h, w)) {
-            bad.push(format!("seed {sd} frame {f}: colour touches the edge"));
+            let on: Vec<bool> = on.iter().map(|&b| b > 0).collect();
+            bad.push(format!("seed {sd} frame {f}: colour touches the edge ({})", spill(&on, h, w)));
         }
     }
     bad

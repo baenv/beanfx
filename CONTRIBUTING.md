@@ -42,7 +42,20 @@ rsync -a --exclude target --exclude results plugins/beanfx /tmp/beanfx-eval/ && 
 ```
 
 A kit change comes with a test in the matching module or in `kit/tests/`. Give each test a name that says what
-should hold, and put values in the failure message. CI runs the same tests under `cargo llvm-cov` and fails below
+should hold, and put values in the failure message.
+
+Every change also shows before and after. `kit/tests/snapshot.rs` runs fixed effects through the runner and
+compares a hash of every file it writes with `kit/tests/fixtures/snapshots/<case>.txt`, written by the kit before
+the change:
+
+- A change that should not alter output (speed, a refactor) passes the snapshots unchanged. For a new fast path,
+  also test it against the slow path it replaces (the snapshots run every case at 1 and at 4 threads).
+- A change that alters output on purpose re-blesses (`BEANFX_BLESS=1 cargo test --locked --test snapshot`), and
+  the commit names the files that changed and why.
+- A new feature adds a case, blessed on the commit that brings it, plus a test against what it should equal
+  before the feature (the `variants` case: no variants and an identity variant both give the plain sheet).
+- To bless a case on the old kit, run the test file in a `git worktree` of the commit before the change and copy
+  the `.txt` over. CI runs the same tests under `cargo llvm-cov` and fails below
 85 percent line coverage (`.github/workflows/tests.yml`).
 
 ## Media

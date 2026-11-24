@@ -82,7 +82,10 @@ head lands on it exactly.
 Fire and comets are a lumpy head banded white, yellow, orange, red and a dark
 edge with broken trailing puffs that shrink and cool; a blow is a flash disc, tapered streaks of mixed length and a
 brief ring; an explosion contracts, flashes a core, throws shards or embers, then leaves 3-tone smoke that breaks
-up; a cloud deck or smoke mass is one continuous field: noise along its flow (a vortex winds tighter
+up (`mo::burst` is that hand-off from flame puffs to smoke puffs; sparks and embers slow with drag, fall, bounce
+and stop with `mo::fly_ground` and `mo::spark`, never fly on at launch speed; rocks tumble and kick dust where they
+land, `mo::chunks`; a blast that leaves a mark scorches the floor, `mo::scorch`, and throws burning brands whose
+small fires die to embers, `mo::brands`); a cloud deck or smoke mass is one continuous field: noise along its flow (a vortex winds tighter
 near the eye), lit from the source inside or behind it (brightest at the inner rim, darker outward, the belly darker
 than the top), 5 to 7 hard tone steps, solid pixels, a 1 px pale rim where it meets the light;
 a bolt has a bright tip and a ribbon trail with sparkles; rock and ice are faceted with a hard highlight;

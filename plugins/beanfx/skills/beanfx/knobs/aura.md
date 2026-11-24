@@ -18,7 +18,9 @@ effect's sheet (the distance between them changes per direction and per target).
 **Ask:** "What shows round the caster while casting?" Options, in the effect's palette and light hue:
 - "Body aura (Recommended)": a glyph ring under the feet, small arcs or flames of the element round the body, motes
   rising, a flash at the weapon or hand on the release; grows with the effect, flares on its peak, then dies.
-- "Ground ring only": a lit ring or sigil under the feet; nothing on the body, so the sprite stays clear.
+- "Ground ring only": a lit ring or sigil under the feet; nothing on the body, so the sprite stays clear. A tilted
+  ring is cut in two (`pt::ring` with `Half::Far` behind the body, `Half::Near` in front), so the caster stands
+  inside it.
 - "Body outline only": light hugging the silhouette; needs the character's own frames, so it fits a game character.
 - "None".
 Follow-ups when open: when it starts (the release frame by default) and how long it lasts after the peak.

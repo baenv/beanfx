@@ -203,6 +203,36 @@ fn indexed(rgb: &[u8]) -> (Vec<u8>, Vec<u8>) {
         *e += 1;
     }
     let pal: Vec<[u8; 3]> = if order.len() <= 256 { order } else { median_cut(&counts) };
+    index_with(rgb, pal)
+}
+
+/// `indexed` of a frame scaled k times, worked out at 1x: the same palette (first-seen order) and the indices
+/// scaled up, when the frame has at most 256 colours; None otherwise (the median cut weighs scaled counts).
+fn indexed_scaled(rgb: &[u8], w: usize, h: usize, k: usize) -> Option<(Vec<u8>, Vec<u8>)> {
+    let mut seen: HashMap<[u8; 3], ()> = HashMap::new();
+    let mut order: Vec<[u8; 3]> = Vec::new();
+    for p in rgb.chunks(3) {
+        let c = [p[0], p[1], p[2]];
+        if seen.insert(c, ()).is_none() {
+            order.push(c);
+            if order.len() > 256 {
+                return None;
+            }
+        }
+    }
+    let (pal, idx) = index_with(rgb, order);
+    let mut out = Vec::with_capacity(w * h * k * k);
+    for y in 0..h {
+        let row: Vec<u8> = idx[y * w..(y + 1) * w].iter().flat_map(|&i| std::iter::repeat(i).take(k)).collect();
+        for _ in 0..k {
+            out.extend_from_slice(&row);
+        }
+    }
+    Some((pal, out))
+}
+
+/// Each pixel as the index of its nearest palette colour (the first on a tie).
+fn index_with(rgb: &[u8], pal: Vec<[u8; 3]>) -> (Vec<u8>, Vec<u8>) {
     let mut at: HashMap<[u8; 3], u8> = HashMap::new();
     let mut idx = Vec::with_capacity(rgb.len() / 3);
     for p in rgb.chunks(3) {
@@ -224,6 +254,13 @@ fn indexed(rgb: &[u8]) -> (Vec<u8>, Vec<u8>) {
 
 /// Writes RGB frames (all w x h) as a looping gif; each frame carries its own palette.
 fn write_gif(path: &str, frames: &[Vec<u8>], w: usize, h: usize, fps: f64, disposal: bool) -> Result<(), String> {
+    write_gif_by(path, frames, w, h, fps, disposal, |f| indexed(f))
+}
+
+/// `write_gif` with the palette and indices of a frame from `index` (frames are compared as given, so equal
+/// neighbours merge); the frames are indexed and compressed on all cores, then written in order.
+fn write_gif_by(path: &str, frames: &[Vec<u8>], w: usize, h: usize, fps: f64, disposal: bool,
+                index: impl Fn(&Vec<u8>) -> (Vec<u8>, Vec<u8>) + Sync) -> Result<(), String> {
     mkdirs(path)?;
     let file = File::create(path).map_err(|e| format!("{path}: {e}"))?;
     let mut enc = gif::Encoder::new(BufWriter::new(file), w as u16, h as u16, &[]).map_err(|e| e.to_string())?;
@@ -237,8 +274,9 @@ fn write_gif(path: &str, frames: &[Vec<u8>], w: usize, h: usize, fps: f64, dispo
             _ => runs.push((f, ms)),
         }
     }
-    for (f, total) in runs {
-        let (pal, idx) = indexed(f);
+    let done = crate::dr::par(runs.len(), |i| {
+        let (f, total) = runs[i];
+        let (pal, idx) = index(f);
         let mut fr = gif::Frame::default();
         fr.width = w as u16;
         fr.height = h as u16;
@@ -248,7 +286,11 @@ fn write_gif(path: &str, frames: &[Vec<u8>], w: usize, h: usize, fps: f64, dispo
         }
         fr.palette = Some(pal);
         fr.buffer = std::borrow::Cow::Owned(idx);
-        enc.write_frame(&fr).map_err(|e| e.to_string())?;
+        fr.make_lzw_pre_encoded();
+        Ok(fr)
+    })?;
+    for fr in done {
+        enc.write_lzw_pre_encoded_frame(&fr).map_err(|e| e.to_string())?;
     }
     Ok(())
 }
@@ -271,9 +313,13 @@ pub fn gif(frames: &[Array3<u8>], path: impl AsRef<Path>, fps: f64, o: Gif) -> R
     let f = Frames::of(frames, "gif")?;
     let scale = o.scale;
     let bg = hexa(&o.bg)?;
-    let frames: Vec<Vec<u8>> =
-        (0..f.n).map(|i| scaled(&flat(f.frame(i), f.translucent(i), bg), f.w, f.h, scale)).collect();
-    write_gif(path_str(path.as_ref())?, &frames, f.w * scale, f.h * scale, fps, true)
+    // indexed at 1x and scaled after (the same bytes, a scale-squared less work); a frame of more than 256
+    // colours falls back to the median cut of the scaled frame
+    let frames: Vec<Vec<u8>> = (0..f.n).map(|i| flat(f.frame(i), f.translucent(i), bg)).collect();
+    let (w, h) = (f.w, f.h);
+    write_gif_by(path_str(path.as_ref())?, &frames, w * scale, h * scale, fps, true, |rgb| {
+        indexed_scaled(rgb, w, h, scale).unwrap_or_else(|| indexed(&scaled(rgb, w, h, scale)))
+    })
 }
 
 // ---- labels ----
@@ -544,6 +590,62 @@ pub fn luma(light: &Array3<f64>) -> Array2<f64> {
 }
 
 /// Recolour light by its strength along a hex ramp, weak to strong; the brightness stays the source light's.
+/// Colour pixels farther than this (RGB, 0..255) from every step of the `from` ramp keep their colour in `recolour`.
+pub const RECOLOUR_REACH: f64 = 40.0;
+
+/// A palette swap of RGBA colour frames, the gradient-map way: each opaque pixel goes to its nearest point on the
+/// `from` ramp (the line through its tones, dark to bright) and takes the colour at the same point of `to` (as
+/// many tones), plus its own offset from the ramp. A tone of `from` becomes exactly the tone of `to`; a blend
+/// between two tones becomes the same blend of theirs; `from` mapped onto itself changes nothing; a colour farther than `RECOLOUR_REACH` from the ramp (a caster, a grey rock) stays. Alpha stays.
+/// Returns the frame and the count of opaque pixels left as they were.
+pub fn recolour<S: AsRef<str>>(col: &Array3<u8>, from: &[S], to: &[S]) -> Result<(Array3<u8>, usize), String> {
+    if from.len() < 2 || from.len() != to.len() {
+        return Err(format!("recolour: the ramps need the same number of tones, at least 2 (from {}, to {})", from.len(), to.len()));
+    }
+    let tones = |r: &[S]| r.iter().map(|c| hexa(c.as_ref()).map(|v| [v[0], v[1], v[2]])).collect::<Result<Vec<_>, _>>();
+    let (a, b) = (tones(from)?, tones(to)?);
+    let (h, w, c) = col.dim();
+    if c != 4 {
+        return Err("recolour: needs RGBA frames".into());
+    }
+    let mut memo: HashMap<[u8; 3], Option<[u8; 3]>> = HashMap::new();
+    let mut out = col.clone();
+    let mut kept = 0;
+    for y in 0..h {
+        for x in 0..w {
+            if col[[y, x, 3]] == 0 {
+                continue;
+            }
+            let px = [col[[y, x, 0]], col[[y, x, 1]], col[[y, x, 2]]];
+            let got = *memo.entry(px).or_insert_with(|| {
+                let p = px.map(|v| v as f64);
+                let mut best = (f64::MAX, 0usize, 0.0);
+                for i in 0..a.len() - 1 {
+                    let d = [0, 1, 2].map(|k| a[i + 1][k] - a[i][k]);
+                    let dd = d[0] * d[0] + d[1] * d[1] + d[2] * d[2];
+                    let t = if dd == 0.0 { 0.0 } else { ([0, 1, 2].map(|k| (p[k] - a[i][k]) * d[k]).iter().sum::<f64>() / dd).clamp(0.0, 1.0) };
+                    let e: f64 = [0, 1, 2].map(|k| { let q = a[i][k] + d[k] * t - p[k]; q * q }).iter().sum();
+                    if e < best.0 {
+                        best = (e, i, t);
+                    }
+                }
+                let (e, i, t) = best;
+                // the point on `to`, plus the pixel's own offset from the `from` ramp (so a ramp mapped onto itself
+                // gives every pixel back, and the shading between tones survives the swap)
+                (e.sqrt() <= RECOLOUR_REACH).then(|| [0, 1, 2].map(|k| {
+                    let on = a[i][k] + (a[i + 1][k] - a[i][k]) * t;
+                    round_py(b[i][k] + (b[i + 1][k] - b[i][k]) * t + (p[k] - on)).clamp(0, 255) as u8
+                }))
+            });
+            match got {
+                Some(v) => (0..3).for_each(|k| out[[y, x, k]] = v[k]),
+                None => kept += 1,
+            }
+        }
+    }
+    Ok((out, kept))
+}
+
 pub fn tint<S: AsRef<str>>(light: &Array3<f64>, ramp: &[S]) -> Result<Array3<f64>, String> {
     if ramp.is_empty() {
         return Err("need at least one array to stack".into());

@@ -47,6 +47,7 @@ Present when the effect uses them:
 | `sound` | optional, when the brief asked for sound: `track` (the whole effect as WAV from frame 0), `loop`, `length`, `rate`, `seed`, `voice`, `element` and `cues` (`name`, `kind`, `t`, `frame`, `file`, `length`, `gain`, `source` (`synth` or `sample:<file>`), `weight` for hits), and `samples` (recordings used, to credit); each act hit names its cue in `sound` |
 | `parts` | `cast`, `travel` and `impact` sheets of a caster to target effect, each with its own size, pivot and anchor |
 | `caster` | the game character the effect rides on: animation, layer, offset per direction, aura parts |
+| `variants` | recoloured copies of the sheet (`knobs/palette.md`): `from` (the effect's own ramp), `light_ramp`, and `list` (`name`, `sheet`, `ramp`, `light_ramp`); each copy has its own `<name>_<variant>.json` with the same cells and act |
 | `move` | optional, an effect that moves the caster: `kind` (`teleport`), `range` px, `stand`, `walk_px`, `walk` (frames) and `portal` (`in`, `out` px); the matching `caster.chain` segment carries `walk` and `portal` |
 
 [`porting.md`](../plugins/beanfx/skills/beanfx/porting.md) gives the rules an engine follows for each field.

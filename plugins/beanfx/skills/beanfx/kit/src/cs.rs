@@ -287,6 +287,18 @@ pub fn pose_at(f: f64, front_keys: &[(f64, &str)], back_keys: &[(f64, &str)], ai
     Ok((at(front_keys, &front)?, at(back_keys, &BACK)?))
 }
 
+/// The frame to pose the limbs on when they move in whole steps of a slower beat (`step_fps`, such as 12 on a
+/// 24 fps sheet): the frame floored to that beat, so arms snap from key to key like hand-drawn animation while the
+/// feet, the body's travel and the effect stay smooth on `f`. `step_fps` at or above `fps` (or 0) returns `f`.
+/// `cs::pose_at(cs::stepped(f, 24.0, 12.0), ..)`.
+pub fn stepped(f: f64, fps: f64, step_fps: f64) -> f64 {
+    if step_fps <= 0.0 || step_fps >= fps || fps <= 0.0 {
+        return f;
+    }
+    let k = fps / step_fps;
+    (f / k).floor() * k
+}
+
 /// Unit vector from the caster's front shoulder to a world point, for pose_at(aim).
 pub fn aim_from(foot: P, sc: f64, target: P) -> P {
     let d = [target[0] - (foot[0] + SHOULDER[0] * sc), target[1] - (foot[1] + SHOULDER[1] * sc)];

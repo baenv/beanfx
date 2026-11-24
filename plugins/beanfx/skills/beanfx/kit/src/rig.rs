@@ -30,10 +30,9 @@
 use crate::{ex, fc, img, np};
 use ndarray::{s, Array3};
 use serde_json::{json, Map, Value};
-use std::cell::RefCell;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use std::rc::Rc;
+use std::sync::{Arc, Mutex};
 
 pub const VIEWS: [&str; 2] = ["side", "top-down"];
 /// export.row_names(4) and facing rows, in order.
@@ -122,7 +121,7 @@ pub struct Rig {
     pub view: String,
     pub fps: f64,
     pub directions: Vec<String>,
-    cache: RefCell<HashMap<(String, String), Rc<Vec<Array3<u8>>>>>,
+    cache: Mutex<HashMap<(String, String), Arc<Vec<Array3<u8>>>>>,
 }
 
 /// Options of `frame_at`.
@@ -213,7 +212,7 @@ impl Rig {
         if !spec.get("anims").map(|a| a.is_object()).unwrap_or(false) {
             return Err("rig.json: no anims".into());
         }
-        Ok(Rig { dir, spec, name, view, fps, directions, cache: RefCell::new(HashMap::new()) })
+        Ok(Rig { dir, spec, name, view, fps, directions, cache: Mutex::new(HashMap::new()) })
     }
 
     /// The animation names, in rig.json order.
@@ -227,11 +226,11 @@ impl Rig {
     }
 
     /// The character's frames (h, w, 4) uint8 for one animation and direction (top-down).
-    pub fn frames(&self, anim: &str, direction: Option<&str>) -> Result<Rc<Vec<Array3<u8>>>, String> {
+    pub fn frames(&self, anim: &str, direction: Option<&str>) -> Result<Arc<Vec<Array3<u8>>>, String> {
         let a = self.anim(anim)?;
         let d = dir_or(self, direction).to_string();
         let key = (anim.to_string(), d.clone());
-        if let Some(f) = self.cache.borrow().get(&key) {
+        if let Some(f) = self.cache.lock().unwrap().get(&key) {
             return Ok(f.clone());
         }
         let sheet = if a.get("sheets").is_some() {
@@ -242,8 +241,8 @@ impl Rig {
         let w = a["frame"][0].as_u64().ok_or("'frame'")? as usize;
         let h = a["frame"][1].as_u64().ok_or("'frame'")? as usize;
         let n = a["frames"].as_u64().ok_or("'frames'")? as usize;
-        let f = Rc::new(cells(&self.dir.join(sheet), w, h, n)?);
-        self.cache.borrow_mut().insert(key, f.clone());
+        let f = Arc::new(cells(&self.dir.join(sheet), w, h, n)?);
+        self.cache.lock().unwrap().insert(key, f.clone());
         Ok(f)
     }
 

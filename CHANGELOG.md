@@ -3,8 +3,42 @@
 Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag `v<version>` on `main`; see
 `CONTRIBUTING.md`.
 
-## Unreleased
+## 2.3.0
 
+Faster draft runs, palette variants, particles, marks and parts (2026-11-24).
+
+- The runner draws frames on every core (`dr::par`): the main frames, the previews and the three `check_seeds`
+  seeds. A 108-frame draft ran in 8 s instead of 19 s on 4 cores; the output is byte-identical at any thread count
+  (`BEANFX_THREADS=1` runs on one thread). `dr::main` now takes `&(dyn Effect + Sync)`; `Rig` caches its frames
+  behind a `Mutex` (`frames` returns `Arc`).
+- `pfx::gif` indexes each frame at 1x and scales the indices (the same bytes, scale squared less work; a frame of
+  more than 256 colours keeps the scaled median cut), and compresses the frames on every core.
+- Palette variants: `Spec.ramp` and `Spec.variants` (`dr::Variant`) write a recoloured sheet per variant with
+  `pfx::recolour`, a gradient map from the effect's ramp; the JSON lists them under `variants`. Colours off the
+  ramp (smoke, rock) keep theirs, and a variant that leaves most of the colour unchanged prints a note, not a failure. `knobs/palette.md`
+  offers "one ramp plus colour variants".
+- `knobs/loop.md`: a fourth option, "one-shot that leaves a mark", for a blast that settles on a held residue.
+- Before/after tests: `kit/tests/snapshot.rs` hashes every file the runner writes for four fixed effects. `calm`
+  and `busy` were blessed on kit 2.2.0, so they prove the parallel runner and the 1x gif indexing left every byte
+  as it was (both cases also run at 1 and 4 threads); `variants` checks that a sheet with variants and an identity
+  variant both equal the plain sheet. `CONTRIBUTING.md` makes a before/after test part of every change.
+- `pfx::recolour` keeps each pixel's offset from the ramp, so a ramp mapped onto itself changes nothing (the
+  identity test found blends snapped onto the ramp line).
+- `beanfx palette [dir]` (module `hp`) reads the project the skill runs in: a palette file (GIMP .gpl, JASC .pal,
+  .hex) means a locked palette; otherwise the palettes of its Aseprite files and the colours of its pixel-art PNGs
+  (each file weighs the same, a background fill and photos left out, drafts and beanfx outputs never read). It
+  prints ramps in the game's own colours by family (warm, green, cool, purple, neutral). `knobs/palette.md` and
+  `SKILL.md`: the recommended palette option comes from it, so an effect matches the game it goes into; a locked
+  palette also recommends stepped light. Tests in `kit/tests/palette.rs`, with a JSON snapshot.
+- New module `mo`, pure in time: `fly` (exponential drag), `fly_ground`
+  (bounce and rest), `cycle`, `spark` (a streak as long as its speed), `flame` (cools down its ramp), `smoke`
+  (three discs that swell and thin) and `burst` (fire that cools into smoke); then `chunks` (debris that tumbles,
+  rests and kicks up `dust`), `brands` (burning chunks whose small fires die to embers), `scorch` (a floor mark that
+  cools from white-hot to soot and holds) and `landed_at`.
+- New module `pt`: `ring` and `ring_glow` cut into far and near halves for a ring round a body, `crystal` with a
+  sweeping glint, `edge_depth` and `frost` (frost from a body's edge inward, icicles under it). `cs::stepped` poses
+  limbs on a slower beat. An edge failure now says how many px, on which sides, and the box the drawing fills.
+  Tests in `kit/tests/parts.rs` and the `marks` snapshot case; the earlier snapshots are unchanged.
 - `beanfx check <sheet.json>` and `beanfx sfx <sheet.json>`: the kit's checks and sound synthesis on an exported
   sheet, without a draft (exit 0 clean, 1 a check failed, 2 an error). Contributed by @newjordan in #7.
 - `beanfx sfx --out <dir>` with another folder now saves the sound block into the sheet's own JSON, with the track
