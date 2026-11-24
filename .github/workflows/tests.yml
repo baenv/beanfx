@@ -19,9 +19,13 @@ jobs:
       - name: the kit crate (the skill's kit/) and the beanfx binary, with a line coverage floor
         working-directory: plugins/beanfx/skills/beanfx/kit
         run: cargo llvm-cov --locked --fail-under-lines 85   # 89 percent when set; the parity tests skip here (their cases are not committed)
-      - name: the example draft builds on its pinned kit
-        working-directory: drafts/hoa_cong_v2
-        run: cargo check --locked
+      - name: a starter draft from setup.sh builds, runs and passes its checks
+        env:
+          BEANFX_PROJECT: ${{ runner.temp }}/beanfx_project
+        run: |
+          mkdir -p "$BEANFX_PROJECT"
+          bash plugins/beanfx/skills/beanfx/setup.sh --draft ci_starter
+          cd "$BEANFX_PROJECT/drafts/ci_starter" && cargo run --release -q   # not --locked: setup.sh renames the kit package, so the copied lock gets that one entry rewritten
       - name: the browser runtime
         run: node plugins/beanfx/skills/beanfx/tests/test_runtime.mjs
       - name: the demo page's runtime is the skill's runtime
