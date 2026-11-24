@@ -63,7 +63,8 @@ draft's `kit/` by hand. Leave other drafts in `drafts/` unread unless the owner 
 ## 1. Brief (write it in the reply, 6 lines)
 
 Each knob is a file in `knobs/`: what it is, when the prompt fixes it, the question with its options, and the
-default. In order: `role`, `view` (and directions), `size`, `timing`, `loop`, `shape`, `style`, `palette`, `glow`,
+default. In order: `role`, `view` (and directions), `size`, `timing`, `phases` (how a cast's time splits into
+wind-up, release, travel, impact and recovery), `loop`, `shape`, `style`, `palette`, `glow`,
 `clarity`, `density`, `states` (multi-state effects), `caster`, `combo` (how a combo's hits are triggered),
 `placement` (where a cast lands against the caster), `aura` (what shows round the caster while it casts) and
 `sound` (asked only when the request asks for sound).
@@ -104,7 +105,7 @@ the rest and go.
 
 **The brief**, after the answers or when nothing is asked, is 6 lines in the reply: role and where it plays; view
 and directions (and the cast, travel and impact split when it goes from a caster to a target); size, frame count,
-fps, loop; palette and light hue; style, glow and clarity; shape and beats. Under it, a short "Chosen for you"
+fps, loop, and for a cast the phase split (wind-up, release, travel, impact, recovery in s); palette and light hue; style, glow and clarity; shape and beats. Under it, a short "Chosen for you"
 list: each knob you set without asking, its value, and one alternative with its effect ("16 fps, 1.4 s; 12 fps
 for a heavier, slower feel"). A multi-state effect also gets its state table (`knobs/states.md`).
 

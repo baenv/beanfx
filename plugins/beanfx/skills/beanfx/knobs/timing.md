@@ -27,6 +27,8 @@ sees where the time goes (`.` build-up, `#` peak, `-` fade):
 - 24 fps: smooth, the usual choice for hits and explosions.
 - 30 fps and up: very smooth for long loops and fast streaks, a big sheet. Celeste's dash lasts 15 game frames, 3 of
   them frozen.
+- How the time splits across a cast's wind-up, release, travel, impact and recovery is the `phases` knob; ask it
+  with this one when the effect is cast or swung.
 - How time splits in a one-shot: build-up about 15 to 25 percent, the peak 1 to 2 frames, the fade 50 to 65
   percent. The peak frame holds 1.5 to 2.5 times longer than the build-up frames.
 - **Impact freeze** (for an effect that hits something; it goes into `act.hits`): the game stops everyone for a

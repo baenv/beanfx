@@ -1,6 +1,6 @@
 ---
 name: density
-order: 11
+order: 12
 group: look
 stated: Does the request say how many parts, particles, copies or projectiles the effect has, or how busy it is?
 applies: Is the effect made of many parts or copies (a rain, a swarm, a volley, sparks, many swords or flames)?

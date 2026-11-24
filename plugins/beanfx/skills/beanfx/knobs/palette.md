@@ -1,6 +1,6 @@
 ---
 name: palette
-order: 8
+order: 9
 group: look
 stated: Does the request give a palette (hex values, a named palette, the game's palette) or the hue of the effect's light, or show them in a reference image? Colour words that describe the subject (a dark sphere, white sparks, a red dragon, an orange pumpkin) do not count.
 ---

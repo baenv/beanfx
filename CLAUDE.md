@@ -87,7 +87,7 @@ node plugins/beanfx/skills/beanfx/tools/layers.mjs <id> --out <draft>/src --pixe
   fps, pivot, loop, glow, hit timing, and the direction fields from `fc`: view, facing and mirror, or 8 or 16
   heading rows; caster to target effects add cast, travel and impact parts) and a gif. `porting.md` in the skill
   covers engine import and porting the draw code. Report in English.
-- Each brief knob is a file in the skill's `knobs/` (role, view, size, timing, loop, shape, style, palette, glow,
+- Each brief knob is a file in the skill's `knobs/` (role, view, size, timing, phases, loop, shape, style, palette, glow,
   clarity, density, states, caster, combo, placement, aura, sound). The gate, `<project>/.beanfx/bin/beanfx gate
   "<prompt>"`, says which knobs the prompt leaves open. It asks Jev (an optional prompt classifier, run through
   `python3` only when its client is installed) in one call; without it the model decides from the files. Each open

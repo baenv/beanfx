@@ -1,6 +1,6 @@
 ---
 name: style
-order: 7
+order: 8
 group: look
 stated: Does the request or a reference image say the art style (for example soft and translucent, hard retro pixels with outline and dither, painterly, a named console era)?
 ---

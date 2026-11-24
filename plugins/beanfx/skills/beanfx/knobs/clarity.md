@@ -1,6 +1,6 @@
 ---
 name: clarity
-order: 10
+order: 11
 group: look
 stated: Does the request or a reference image say how clear or hazy the effect is (crisp and see-through with a dark background kept, soft mist, thick haze or fog, atmospheric bloom)?
 ---

@@ -3,6 +3,14 @@
 Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag `v<version>` on `main`; see
 `CONTRIBUTING.md`.
 
+## Unreleased
+
+- New knob `knobs/phases.md`: how a cast's time splits into wind-up, release, travel, impact and recovery, asked
+  after `timing` for a cast, swing or caster to target effect. Four options (snappy, heavy charge, instant,
+  cinematic) with seconds and frames, an ASCII timeline, and timing recommendations (wind-up at least 3 frames and
+  a short hold, a 1 to 2 frame release, travel from distance over speed, player skills under about 1 s to the
+  impact, longer tells for enemies). The split goes into `Spec.windup` and `Spec.poses`. The gate now has 18 knobs.
+
 ## 2.3.0
 
 Faster draft runs, palette variants, particles, marks and parts (2026-11-24).

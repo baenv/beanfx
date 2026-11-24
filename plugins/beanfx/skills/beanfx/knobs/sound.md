@@ -1,6 +1,6 @@
 ---
 name: sound
-order: 17
+order: 18
 group: extra
 stated: Does the request say what the effect should sound like (retro chiptune or soft, metal, fire, lightning and so on) or say it needs no sound? "With sound" alone does not count.
 applies: Does the request ask for sound, audio, SFX or a sound effect for the effect?

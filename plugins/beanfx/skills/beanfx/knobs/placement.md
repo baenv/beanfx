@@ -1,6 +1,6 @@
 ---
 name: placement
-order: 15
+order: 16
 group: extra
 stated: Does the request say where the effect lands relative to the caster (on the caster, a fixed distance in front, or at a target the game picks), or say there is no caster?
 applies: Is the effect cast by someone onto a spot or a foe (a summon, a strike from the sky, a ground blast, a spell that lands away from the body)?

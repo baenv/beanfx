@@ -1,6 +1,6 @@
 ---
 name: loop
-order: 5
+order: 6
 group: fit
 stated: Is it settled whether the effect loops or plays once, either because the request says so or because the kind of effect has only one reading (an aura, idle or ambient effect always loops; a hit, explosion or impact always plays once)?
 ---
