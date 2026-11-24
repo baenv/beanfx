@@ -90,6 +90,8 @@ PROMPT
 result. Send them with AskUserQuestion, at most 4 per call, in the gate's order; a later call waits for the
 answers when its options depend on them (a top-down view changes which shapes read). `states` may take more than
 one question. `glow` is asked like any other knob, with its ASCII preview; medium when the owner leaves it open.
+Before the `palette` question, run `<project>/.beanfx/bin/beanfx palette`: the recommended ramp comes from the
+game's own colours when the project has art (`knobs/palette.md`).
 
 **Explain for an owner new to VFX.** A thin prompt (a subject only, no words like fps, loop, glow or palette)
 means the owner may not know the terms. Then each question gets one plain line saying why it matters, each

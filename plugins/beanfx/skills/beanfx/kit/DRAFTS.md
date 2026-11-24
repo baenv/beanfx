@@ -58,7 +58,8 @@ worked example `drafts/hoa_cong_v2` predates the runner and shows that route.
 | Need | Rust |
 |---|---|
 | shared pixel grids | `static X: LazyLock<..>` filled from `np::mgrid(H, W)` (gives ys, xs) |
-| a scene built once per seed | `thread_local!` holding a `HashMap<u64, Rc<Scene>>`, filled on first use |
+| a scene built once per seed | `thread_local!` holding a `HashMap<u64, Rc<Scene>>`, filled on first use (one per drawing thread) |
+| sparks, flames, smoke | `mo::fly` / `fly_ground` for the path, `mo::spark`, `flame`, `smoke`, `burst` to draw (API.md, mo) |
 | records | plain structs, one field per key |
 | non-zero pixels | `np::nonzero(&mask)` (row-major) |
 | stacking cells | `Array3::from_shape_fn`, `img::tile(cells, cols)` |

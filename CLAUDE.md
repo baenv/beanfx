@@ -30,10 +30,10 @@ S = `plugins/beanfx/skills/beanfx`.
   `BEANFX_PROJECT`). `--draft <name>` scaffolds `drafts/<name>/` (Cargo.toml, `.cargo/config.toml`, a starter
   `src/main.rs`) and copies the kit into `drafts/<name>/kit/` once. `--kit-status` lists drafts whose kit is behind
   the skill's; `--draft <name> --refresh-kit` recopies one. `--pixelfx` also checks node and clones pixelfx.
-- `S/kit/`: the kit, one Rust crate: library `beanfx` plus the `beanfx` binary (`version`, `gate`). `kit/API.md` lists
+- `S/kit/`: the kit, one Rust crate: library `beanfx` plus the `beanfx` binary (`version`, `gate`, `check`, `sfx`, `palette`). `kit/API.md` lists
   the modules and conventions, `kit/DRAFTS.md` is the guide to writing a draft. Modules in `kit/src/`: `fk` (shapes:
   lumpy, puff, streaks, facets, kite, leaf, claws, hits), `fl` (ramps, shade maps, strokes, noise, impact frames),
-  `lt` (additive glow), `pfx` (pixelfx layers, tint, composite, strip, gif, contact, takes), `cs` (the optional
+  `hp` (the host project's palette for the palette knob), `lt` (additive glow), `mo` (closed-form motion with drag and bounce; sparks, flames, smoke, bursts, debris, brands, scorch), `pt` (ring halves, crystal, frost on a body), `pfx` (pixelfx layers, tint, composite, strip, gif, contact, takes), `cs` (the optional
   glowing mockup caster and avatar), `tg` (a preview target dummy that reacts to hits), `rig` (a game character as
   the caster), `rf` (an object traced from a reference image), `fc` (view, facing, mirror, heading rows, the cast,
   travel and impact split in the JSON), `dv` (outline, inner lines, spine and scatter points taken from a finished

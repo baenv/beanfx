@@ -26,7 +26,8 @@ what it changes (directions, loop, size).
 - Explosion: the biggest, brightest one-shot, like the Dead Cells powerful grenade. Pick for area damage and kills;
   it hides the enemy, so not for small contacts.
 - Aura or buff: loops on a body and must leave the face and weapon readable, like Celeste's hair changing colour
-  when a dash is spent. Pick for a lasting status.
+  when a dash is spent. Pick for a lasting status. A status on the body itself (frozen, burning, poisoned) grows
+  on the character's silhouette from its edge in (`pt::frost`, `pt::edge_depth`) and needs its frames.
 - Ring that clears an area: shows its radius and keeps the middle open, like the Enter the Gungeon Blank.
 Ask one plain line when it is open: what the player does while it plays. A player who is locked in place takes 1 to
 2 s; a running player needs it under 0.5 s.

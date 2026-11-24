@@ -21,6 +21,9 @@ let gg = cs::draw(&mut over, (H, W), [foot[0] - 4.0, foot[1] - 6.0], sc * 1.27, 
 cs::ghost_light(&mut over, &mut l, &gg, k, f, point)?;
 ```
 
+For limbs that move like hand-drawn animation, pose them on a slower beat and keep the rest smooth:
+`cs::pose_at(cs::stepped(f, FPS, 12.0), ..)` while `foot`, the travel and the effect use `f`.
+
 **Game character caster** (the brief picks "Game character"): `rig` (`kit/src/rig.rs`) reads the owner's sprite sheets from
 `casters/<name>/rig.json` in the project (frame size, fps, pivot at the feet, animations with frame counts and
 contact frames, and per direction the sheet of each row). Four casters ship with the skill in its own

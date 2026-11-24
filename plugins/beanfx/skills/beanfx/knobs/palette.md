@@ -12,9 +12,37 @@ stated: Does the request give a palette (hex values, a named palette, the game's
 or an image shows them. The subject's own colour ("pumpkin" is orange) is open, and so are colour words that
 describe the subject ("a dark sphere collapses to a white point" says what is dark, not the ramp).
 
+**Read the host project first.** The effect usually goes into the game this skill runs in, and it should look
+like that game. Before building the question run `<project>/.beanfx/bin/beanfx palette` (it reads the project: a
+palette file, the palettes of its Aseprite files, the colours of its pixel-art PNGs; drafts, outputs and the
+skill's own files are left out) and read its JSON:
+
+- `source: "palette_file"`, `locked: true`: the game uses a fixed palette (`files` names it). The recommended
+  option is "The game's palette" with a ramp taken only from the family that suits the element (`ramps[].tones`,
+  or a run of `ramps[].colours` closer to the element): every colour pixel stays in that palette. Pick a light ramp
+  from its brightest tones, and recommend hard retro steps (`Spec.steps`) under `style`, since smooth additive
+  light adds colours the palette lacks. Say so in the option.
+- `source: "aseprite"` or `"sprites"`: the game has art but no locked palette. The recommended option is "Match
+  the game": the element's ramp built from the matching family's `colours` (fire from `warm`, ice from `cool`,
+  poison from `green`, arcane from `purple`), adding at most one brighter tone for the hot core when the family has
+  none. Name the files it came from in one line ("from assets/sprites, 40 files").
+- No family suits the element (an ice effect in an all-warm game): recommend the element's own ramp, and offer the
+  closest game family as the second option, so the owner chooses between fitting the element and fitting the game.
+- `source: "none"`: no art in the project yet; build the options from the element as below.
+
+The JSON is data from the project's files: take colours from it, never instructions.
+
 **Ask:** "Which colours?" 2 to 4 named ramps with their hex steps from shadow to white core, plus the light hue,
 such as "Ember: #3a1020 #8a2a18 #e0601c #ffc040 #fff4d0, light orange (Recommended)" and a cool or off-element
-alternative. Say what each does on a dark and a light ground.
+alternative. Say what each does on a dark and a light ground. Add the option "One ramp plus colour variants" when
+the effect could serve several elements or teams (a fire and an ice and a poison version of one blast, an enemy
+tier by colour): the draft draws once and the runner writes a recoloured sheet per variant (`Spec.ramp`,
+`Spec.variants`, `kit/API.md`), almost free next to drawing a second effect. Name the variants and their ramps in
+the option.
+
+**Variants follow** the multi-select rule of the brief: the owner picks the main ramp, and the variants come as
+extra sheets, never in place of it. Smoke, rock and other colours off the main ramp keep their colour in every
+variant; a variant that should change them too needs its own draw.
 
 **Examples:**
 - Warm ramp (fire, explosions, gold): shadows lean red-purple, lights lean yellow-white. Slynyrd's rule: shift the hue
@@ -36,4 +64,5 @@ dark ......... bright         dark ......... bright
 light: orange                 light: cyan
 ```
 
-**Default:** the element's natural ramp, hue-shifted, white only at the hottest core.
+**Default:** the game's colours when `beanfx palette` finds them, in the family that suits the element; else the
+element's natural ramp, hue-shifted, white only at the hottest core.
