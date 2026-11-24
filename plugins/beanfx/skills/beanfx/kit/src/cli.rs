@@ -269,15 +269,39 @@ fn sfx_inner(args: &[String]) -> Result<i32, String> {
         .and_then(|s| s.to_str())
         .ok_or("sheet.json has no stem")?
         .to_string();
-    let out = out_dir.unwrap_or_else(|| jp.parent().filter(|p| !p.as_os_str().is_empty()).unwrap_or_else(|| Path::new(".")).to_path_buf());
+    let json_dir = jp.parent().filter(|p| !p.as_os_str().is_empty()).unwrap_or_else(|| Path::new(".")).to_path_buf();
+    let out = out_dir.unwrap_or_else(|| json_dir.clone());
     std::fs::create_dir_all(&out).map_err(|e| e.to_string())?;
-    let sound_block = sfx::write(
+    let mut sound_block = sfx::write(
         &out,
         &name,
         Some(&mut js),
         sfx::Write { seed, voice, element, layers: None, sounds },
     )?;
-    let problems = sfx::check(&out, &js)?;
+    // sfx::write updates <out>/<name>.json only. When --out is another folder, point the sound paths at it from the
+    // sheet's own folder and save the sheet JSON, so `beanfx check <sheet.json>` finds the track and the cues.
+    let canon = |p: &Path| std::fs::canonicalize(p).map_err(|e| format!("{}: {e}", p.display()));
+    let (out_c, dir_c) = (canon(&out)?, canon(&json_dir)?);
+    if out_c != dir_c {
+        let prefix = match out_c.strip_prefix(&dir_c) {
+            Ok(rel) => rel.components().map(|c| c.as_os_str().to_string_lossy().into_owned()).collect::<Vec<_>>().join("/"),
+            Err(_) => out_c.to_string_lossy().replace('\\', "/"),
+        };
+        let rebase = |v: &mut Value| {
+            if let Some(f) = v.as_str() {
+                *v = json!(format!("{prefix}/{f}"));
+            }
+        };
+        rebase(&mut sound_block["track"]);
+        if let Some(cues) = sound_block.get_mut("cues").and_then(Value::as_array_mut) {
+            for c in cues {
+                rebase(&mut c["file"]);
+            }
+        }
+        js.pointer_mut("/meta/beanfx").ok_or("missing meta.beanfx in JSON")?["sound"] = sound_block.clone();
+        std::fs::write(&jp, beanfx::py::dumps(&js, Some(1))).map_err(|e| format!("{}: {e}", jp.display()))?;
+    }
+    let problems = sfx::check(&json_dir, &js)?;
     let ok = problems.is_empty();
     if as_json {
         println!(

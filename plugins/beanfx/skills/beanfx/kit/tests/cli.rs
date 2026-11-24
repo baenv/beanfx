@@ -148,6 +148,24 @@ fn sfx_synthesises_wavs_updates_json_and_passes_check() {
     assert_eq!(res.status.code(), Some(0));
     assert!(String::from_utf8_lossy(&res.stdout).contains("clean"));
     assert!(out2.join("slash_sound.wav").is_file());
+
+    // --out elsewhere still updates the sheet's own JSON, with the sound paths pointing into that folder
+    let js: Value = serde_json::from_str(&std::fs::read_to_string(&jp).unwrap()).unwrap();
+    let snd = &js["meta"]["beanfx"]["sound"];
+    assert_eq!(snd["track"], "alt_audio/slash_sound.wav", "sheet json sound: {snd}");
+    assert_eq!(snd["voice"], "soft");
+    assert!(snd["cues"].as_array().unwrap().iter().all(|c| c["file"].as_str().unwrap().starts_with("alt_audio/")));
+    let chk = run(&["check", &jp, "--json"]);
+    assert_eq!(chk.status.code(), Some(0), "check after --out failed: {}", String::from_utf8_lossy(&chk.stdout));
+
+    // A folder outside the sheet's folder gets absolute paths
+    let far = common::tmpdir("cli_sfx_far");
+    let res = run(&["sfx", &jp, "--out", far.to_str().unwrap(), "--sounds", "none"]);
+    assert_eq!(res.status.code(), Some(0), "sfx far failed: {}", String::from_utf8_lossy(&res.stdout));
+    let js: Value = serde_json::from_str(&std::fs::read_to_string(&jp).unwrap()).unwrap();
+    let track = js["meta"]["beanfx"]["sound"]["track"].as_str().unwrap().to_string();
+    assert!(Path::new(&track).is_absolute() && Path::new(&track).is_file(), "far track: {track}");
+    assert_eq!(run(&["check", &jp]).status.code(), Some(0));
 }
 
 #[test]
