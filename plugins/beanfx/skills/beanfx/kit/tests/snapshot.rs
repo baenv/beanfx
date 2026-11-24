@@ -332,3 +332,85 @@ fn a_smoky_variant_is_a_note_not_a_failure() {
     assert_eq!(code, 0, "a variant that leaves smoke grey passes");
     assert!(out.join("sheets").join("smoky_frost.png").exists(), "the variant is still written");
 }
+
+/// A halo of three dots behind a caster, a dot in front, and two parts: a crop of the sheet (the default
+/// `Effect::part`) and a travel loop with its own clock. `split` false draws the halo in `Effect` instead, as a
+/// draft did before `Layer::Behind` existed.
+struct Halo {
+    split: bool,
+}
+
+impl Halo {
+    fn halo(cv: &mut Canvas, f: usize) {
+        for i in 0..3 {
+            let a = std::f64::consts::TAU * (i as f64 / 3.0 + f as f64 / 12.0);
+            cv.ellipse(16.0 + 7.0 * a.cos(), 12.0 + 7.0 * a.sin(), 2.0, 2.0, hex("#ffc93c"), 1.0);
+            cv.glow(16.0 + 7.0 * a.cos(), 12.0 + 7.0 * a.sin(), 3.0, 0.3);
+        }
+    }
+}
+
+impl Effect for Halo {
+    fn spec(&self) -> Spec {
+        let mut sp = Spec::new("halo", 40, 32, 12, 12.0);
+        sp.pivot = [16.0, 28.0];
+        sp.caster_foot = Some([16.0, 28.0]);
+        sp.trim = None;
+        sp.light_ramp = vec!["#5a1a08".into(), "#f07a1e".into(), "#ffd070".into(), "#ffffff".into()];
+        let mut travel = dr::Part::new("travel", 4, 12, 8, [0.0, 0.0], [6.0, 4.0], "travel");
+        travel.looped = true;
+        travel.more = beanfx::serde_json::json!({"speed": 120});
+        sp.parts = vec![dr::Part::new("cast", 12, 24, 24, [4.0, 0.0], [12.0, 28.0], "caster"), travel];
+        sp
+    }
+
+    fn draw(&self, cv: &mut Canvas, f: usize, _seed: u64, layer: Layer) -> Result<(), String> {
+        let fade = 1.0 - 0.9 * dr::span(f as f64, 6.0, 11.0);
+        match layer {
+            Layer::Behind if self.split => Halo::halo(cv, f),
+            Layer::Effect => {
+                if !self.split {
+                    Halo::halo(cv, f);
+                }
+                cv.ellipse(30.0, 20.0, 2.0 * fade, 2.0 * fade, hex("#fff6d8"), 1.0);
+            }
+            Layer::Caster => cv.ellipse(16.0, 20.0, 3.0, 8.0, hex("#404050"), 1.0),
+            _ => {}
+        }
+        Ok(())
+    }
+
+    fn part(&self, cv: &mut Canvas, key: &str, f: usize, seed: u64) -> Result<(), String> {
+        if key != "travel" {
+            // the cast part: the default crop of the sheet
+            self.draw(cv, f, seed, Layer::Behind)?;
+            return self.draw(cv, f, seed, Layer::Effect);
+        }
+        let r = 2.0 + 0.5 * (std::f64::consts::TAU * f as f64 / 4.0).sin();
+        cv.ellipse(6.0, 4.0, r, r, hex("#ffc93c"), 1.0);
+        cv.line([0.0, 4.0], [4.0, 4.0], hex("#f07a1e"), 0.8);
+        Ok(())
+    }
+}
+
+#[test]
+fn behind_layer_ships_in_the_sheet_and_parts_are_written() {
+    let got = case(&Halo { split: true }, "halo");
+    for f in ["sheets/halo_cast.png", "sheets/halo_travel.json"] {
+        assert!(got.contains_key(f), "missing {f}: {:?}", got.keys().collect::<Vec<_>>());
+    }
+    // before Layer::Behind the halo was drawn in Effect: the sheet is the same bytes, only the previews change
+    let _g = ENV.lock().unwrap_or_else(|e| e.into_inner());
+    let (old, _) = run(&Halo { split: false }, "halo_old", "1");
+    let before = hashes(&old);
+    for f in ["sheets/halo.png", "sheets/halo_color.png", "sheets/halo_light.png", "halo_1x.png", "sheets/halo_cast.png"] {
+        assert_eq!(got.get(f), before.get(f), "{f}: Behind + Effect is the sheet the single layer drew");
+    }
+    assert_ne!(got.get("halo_4x_dark.png"), before.get("halo_4x_dark.png"), "the preview puts the halo behind the caster");
+    let js: beanfx::serde_json::Value =
+        beanfx::serde_json::from_str(&std::fs::read_to_string(old.join("sheets/halo.json")).unwrap()).unwrap();
+    let parts = &js["meta"]["beanfx"]["parts"];
+    assert_eq!(parts["cast"]["anchor"], "caster", "{parts}");
+    assert_eq!(parts["travel"]["speed"], 120, "{parts}");
+    assert_eq!(parts["travel"]["json"], "halo_travel.json", "{parts}");
+}

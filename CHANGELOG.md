@@ -3,6 +3,22 @@
 Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag `v<version>` on `main`; see
 `CONTRIBUTING.md`.
 
+## 2.5.0
+
+Shorter runs for long, caster to target effects (2026-11-24).
+
+- `Layer::Behind`: the part of the effect behind the character (a ring at the back, a halo). The sheet is `Behind`
+  then `Effect` on one canvas, the same bytes as drawing both in `Effect`; the previews draw it under the caster.
+- `Spec.parts` (`dr::Part`) and `Effect::part`: the runner writes, checks and lists cast, travel and impact sheets
+  beside the aura parts. The default `part` crops the sheet, so only a part on its own clock needs code. A
+  `parts` object in `Spec.extra` now joins the runner's parts instead of replacing the aura parts.
+- `cargo run --release -q -- quick`: the sheet's checks and light measure only, no previews, gif, parts, page or
+  reseeds, for the fix loop.
+- The gate without Jev lists each knob's `stated` and `applies` questions (`questions`), so the model decides from
+  one output and opens only the files of the knobs it asks, instead of reading all 18.
+- `SKILL.md`: look at the risky frames (hits, the widest, the last) before the first full run, and use `quick` while
+  fixing. New snapshot case `halo`; every earlier case is unchanged.
+
 ## 2.4.0
 
 The phases knob: how a cast's time splits, with timing recommendations (2026-11-24).

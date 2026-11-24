@@ -168,6 +168,14 @@ fn model_fallbacks() {
     assert_eq!(code, 0);
     assert_eq!(out["source"], "model");
     assert_eq!(out["knobs"].as_array().unwrap().len(), 18);
+    let qs = out["questions"].as_array().unwrap();
+    assert_eq!(qs.len(), 18, "one question entry per knob");
+    assert_eq!(qs[0]["name"], "role", "in knob order: {:?}", qs[0]);
+    assert!(qs.iter().all(|q| q["stated"].as_str().is_some_and(|s| s.contains('?'))), "every knob has its stated question");
+    let sound = qs.iter().find(|q| q["name"] == "sound").unwrap();
+    assert!(sound["applies"].as_str().is_some(), "an optional knob carries its applies question: {sound:?}");
+    let style = qs.iter().find(|q| q["name"] == "style").unwrap();
+    assert!(style.get("applies").is_none(), "a knob that always applies has no applies question: {style:?}");
     let missing = e.dir.join("nope.py");
     let (code, out) = e.run(&["x"], &[("BEANFX_JEV_PY", missing.to_str().unwrap())]);
     assert_eq!((code, out["reason"].as_str()), (0, Some("no jev.py")));

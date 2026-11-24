@@ -1,5 +1,6 @@
 //! dr: the draft runner. A draft fills a `Spec`, draws layers on a `Canvas` in `Effect::draw`, and the runner
-//! writes previews, sheets, JSON and page and runs the checks (commands: `look [frames]`, `glow`, `bench <id>`).
+//! writes previews, sheets, JSON and page and runs the checks (commands: `quick`, `look [frames]`, `glow`,
+//! `bench <id>`).
 
 use crate::serde_json::{json, Map, Value};
 use crate::{cs, ex, fc, img, lt, np, pfx, tg};
@@ -342,14 +343,39 @@ pub struct Cel {
     pub light: Array2<f64>,
 }
 
-/// The layer `Effect::draw` is asked for. The sheet is `Effect` alone; previews stack AuraBack, Caster,
-/// AuraFront and Effect over the target dummy.
+/// The layer `Effect::draw` is asked for. The sheet is `Behind` then `Effect` on one canvas; previews stack
+/// AuraBack, Behind, Caster, AuraFront and Effect over the target dummy, so `Behind` is the part of the effect
+/// that sits behind the character (a ring of suns at the back, a halo) and still ships in the sheet.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Layer {
     Effect,
     Caster,
     AuraBack,
     AuraFront,
+    Behind,
+}
+
+/// A part sheet of the effect beside the aura (cast, travel, impact; `export.md`): `frames` long, a w x h cell
+/// whose top-left sits at `origin` in world px, the part's pivot at `pivot` in cell px. The runner draws it with
+/// `Effect::part`, writes `<name>_<key>` and lists it in `meta.beanfx.parts.<key>` with `anchor` and `more`.
+#[derive(Clone, Debug)]
+pub struct Part {
+    pub key: String,
+    pub frames: usize,
+    pub w: usize,
+    pub h: usize,
+    pub origin: P,
+    pub pivot: P,
+    pub looped: bool,
+    pub anchor: String,
+    pub more: Value,
+}
+
+impl Part {
+    /// A one-shot part with no extra fields; set `looped` and `more` on the result.
+    pub fn new(key: &str, frames: usize, w: usize, h: usize, origin: P, pivot: P, anchor: &str) -> Part {
+        Part { key: key.into(), frames, w, h, origin, pivot, looped: false, anchor: anchor.into(), more: json!({}) }
+    }
 }
 
 /// Aura parts: own sheets round the caster's feet, `frames` long, cell w x h with the feet at pivot.
@@ -412,6 +438,8 @@ pub struct Spec {
     /// The caster's foot in world px (aura parts are cut round it).
     pub caster_foot: Option<P>,
     pub aura: Option<Aura>,
+    /// Part sheets beside the aura (cast, travel, impact), drawn by `Effect::part`.
+    pub parts: Vec<Part>,
     /// More meta.beanfx fields (caster binding, range note, sound).
     pub extra: Map<String, Value>,
     /// The framing check's trim limit (`ex::TRIM`); None when the empty space is wanted (caster room in the cell).
@@ -433,7 +461,7 @@ impl Spec {
             view: "side".into(), dirs: fc::Meta::default(), glow: "medium".into(), clarity: "clear".into(),
             light_ramp: vec!["#40306a".into(), "#c0a0ff".into(), "#f0e8ff".into(), "#ffffff".into()],
             steps: None, edge_fade: 0.0, hits: vec![], states: vec![], poses: vec![], windup: 0.0, target: None,
-            dummy: None, caster_foot: None, aura: None, extra: Map::new(), trim: Some(ex::TRIM), pick: vec![], takes: vec![],
+            dummy: None, caster_foot: None, aura: None, parts: vec![], extra: Map::new(), trim: Some(ex::TRIM), pick: vec![], takes: vec![],
             ramp: vec![], variants: vec![],
         }
     }
@@ -444,6 +472,14 @@ impl Spec {
 pub trait Effect {
     fn spec(&self) -> Spec;
     fn draw(&self, cv: &mut Canvas, f: usize, seed: u64, layer: Layer) -> Result<(), String>;
+    /// Frame f of the part `key` from `Spec.parts`, on a canvas placed at the part's origin (draw in world px).
+    /// The default draws the sheet's layers (Behind, then Effect) in that window, so a part that is a crop of
+    /// the sheet needs no code; a part with its own frame clock (a travel loop, an impact from contact) overrides it.
+    fn part(&self, cv: &mut Canvas, key: &str, f: usize, seed: u64) -> Result<(), String> {
+        let _ = key;
+        self.draw(cv, f, seed, Layer::Behind)?;
+        self.draw(cv, f, seed, Layer::Effect)
+    }
 }
 
 /// `fn main() -> ExitCode { dr::main(&Fx, env!("CARGO_MANIFEST_DIR")) }`: exit 0 clean, 1 on a failed check, 2 on
@@ -477,8 +513,13 @@ impl Ctx<'_> {
         Ok(cv.cel())
     }
 
-    fn full(&self, f: usize, seed: u64, layer: Layer) -> Result<Cel, String> {
-        self.layer(Canvas::new(self.sp.w, self.sp.h), f, seed, layer)
+    /// The sheet's frame f: Behind, then Effect, on one canvas.
+    fn sheet(&self, f: usize, seed: u64) -> Result<Cel, String> {
+        let mut cv = Canvas::new(self.sp.w, self.sp.h);
+        for layer in [Layer::Behind, Layer::Effect] {
+            self.fx.draw(&mut cv, f, seed, layer).map_err(|e| format!("frame {f} {layer:?}: {e}"))?;
+        }
+        Ok(cv.cel())
     }
 
     /// Light after gain and edge fade (the measured light), then stepped and tinted.
@@ -515,7 +556,7 @@ impl Ctx<'_> {
     }
 
     fn frame(&self, f: usize, seed: u64, gain: f64) -> Result<Frame, String> {
-        let c = self.full(f, seed, Layer::Effect)?;
+        let c = self.sheet(f, seed)?;
         let (measured, light) = self.finish_light(&c.light, gain)?;
         Ok(Frame { fin: pfx::composite(&c.col, &light, None)?, col: c.col, light, measured })
     }
@@ -523,7 +564,7 @@ impl Ctx<'_> {
     fn preview(&self, f: usize, gain: f64, bg: Option<&str>) -> Result<Array3<u8>, String> {
         let sp = &self.sp;
         let mut cv = Canvas::new(sp.w, sp.h);
-        for layer in [Layer::AuraBack, Layer::Caster, Layer::AuraFront, Layer::Effect] {
+        for layer in [Layer::AuraBack, Layer::Behind, Layer::Caster, Layer::AuraFront, Layer::Effect] {
             self.fx.draw(&mut cv, f, sp.seed, layer).map_err(|e| format!("frame {f} {layer:?}: {e}"))?;
         }
         let c = cv.cel();
@@ -674,6 +715,28 @@ fn command(ctx: &Ctx, out: &Path, args: &[String]) -> Result<u8, String> {
     let sp = &ctx.sp;
     let dark = "#101018";
     match args[0].as_str() {
+        "quick" => {
+            // the sheet's own checks only: no previews, gif, parts, page or reseeds; seconds instead of minutes
+            let frames = par(sp.n, |f| ctx.frame(f, sp.seed, 1.0))?;
+            let ms: Vec<(f64, f64)> = frames.iter().filter_map(|fr| measure(&fr.col, &fr.measured)).collect();
+            if !ms.is_empty() {
+                let cover = np::median(&ms.iter().map(|m| m.0).collect::<Vec<_>>());
+                let mean = np::median(&ms.iter().map(|m| m.1).collect::<Vec<_>>());
+                println!("light: cover {:.0} %, mean {:.3} (glow {}, clarity {})", 100.0 * cover, mean, sp.glow, sp.clarity);
+            }
+            let cols: Vec<Array3<u8>> = frames.iter().map(|fr| fr.col.clone()).collect();
+            let lights: Vec<Array3<f64>> = frames.into_iter().map(|fr| fr.light).collect();
+            let bad = ex::check(&cols, ex::Check {
+                light: Some((&lights).into()), looped: sp.looped, hold: sp.hold, max_colours: sp.steps.map(|_| 48.0),
+                trim: sp.trim, ..Default::default()
+            })?;
+            for line in &bad {
+                println!("{line}");
+            }
+            println!("{}", if bad.is_empty() { "quick: clean (the full run also checks parts, reseeds and the act)".to_string() }
+                           else { format!("quick: {} problems", bad.len()) });
+            return Ok(u8::from(!bad.is_empty()));
+        }
         "look" => {
             let mut pick: Vec<usize> = args[1..].iter().filter_map(|a| a.parse().ok()).filter(|&f| f < sp.n).collect();
             if pick.is_empty() {
@@ -704,7 +767,7 @@ fn command(ctx: &Ctx, out: &Path, args: &[String]) -> Result<u8, String> {
                          names: [sp.name.clone(), id.clone()], ..Default::default() })?;
             println!("bench.png");
         }
-        other => return Err(format!("unknown command {other}: look [frames], glow, bench <id>")),
+        other => return Err(format!("unknown command {other}: quick, look [frames], glow, bench <id>")),
     }
     Ok(0)
 }
@@ -767,6 +830,20 @@ pub fn run(fx: &(dyn Effect + Sync), dir: &Path, args: &[String]) -> Result<u8, 
         }
         extra.insert("parts".into(), Value::Object(parts));
     }
+    for pt in &sp.parts {
+        let cels = par(pt.frames, |f| {
+            let mut cv = Canvas::at(pt.w, pt.h, pt.origin[0], pt.origin[1]);
+            fx.part(&mut cv, &pt.key, f, sp.seed).map_err(|e| format!("part {} frame {f}: {e}", pt.key))?;
+            Ok(cv.cel())
+        })?;
+        let (entry, b) = write_part(&out, &format!("{name}_{}", pt.key), &cels, &sp.light_ramp, sp.fps, pt.pivot, pt.looped,
+                                    &pt.anchor, pt.more.clone(), &sp.glow)?;
+        bad.extend(b);
+        let parts = extra.entry("parts").or_insert_with(|| json!({}));
+        if let Some(m) = parts.as_object_mut() {
+            m.insert(pt.key.clone(), entry);
+        }
+    }
     if !sp.variants.is_empty() {
         let vs: Vec<Value> = sp.variants.iter()
             .map(|v| json!({"name": v.name, "sheet": format!("{name}_{}.png", v.name), "ramp": v.ramp, "light_ramp": v.light_ramp}))
@@ -774,7 +851,13 @@ pub fn run(fx: &(dyn Effect + Sync), dir: &Path, args: &[String]) -> Result<u8, 
         extra.insert("variants".into(), json!({"from": sp.ramp, "light_ramp": sp.light_ramp, "list": vs}));
     }
     for (k, v) in &sp.extra {
-        extra.insert(k.clone(), v.clone());
+        // parts in `extra` join the runner's (aura, Spec.parts) instead of replacing them
+        match (k.as_str(), v.as_object(), extra.get_mut(k).and_then(Value::as_object_mut)) {
+            ("parts", Some(add), Some(have)) => have.extend(add.clone()),
+            _ => {
+                extra.insert(k.clone(), v.clone());
+            }
+        }
     }
     let extra = Value::Object(extra);
     fc::check(&extra)?;
@@ -796,7 +879,7 @@ pub fn run(fx: &(dyn Effect + Sync), dir: &Path, args: &[String]) -> Result<u8, 
     // every seed's frames drawn in parallel first, then handed to check_seeds in its own order
     let (seeds, step) = ([2u64, 3, 7], 2);
     let order: Vec<(u64, usize)> = seeds.iter().flat_map(|&sd| (0..sp.n).step_by(step).map(move |f| (sd, f))).collect();
-    let mut drawn = par(order.len(), |i| ctx.full(order[i].1, order[i].0, Layer::Effect).map(|c| c.col))?.into_iter();
+    let mut drawn = par(order.len(), |i| ctx.sheet(order[i].1, order[i].0).map(|c| c.col))?.into_iter();
     bad.extend(ex::check_seeds(|_, _| drawn.next().unwrap_or_else(|| Array3::zeros((sp.h, sp.w, 4))), sp.n, &seeds, step)?);
     if let Some(act) = meta.pointer("/meta/beanfx/act") {
         bad.extend(ex::check_act(act, sp.n as i64, sp.fps, sp.looped)?);

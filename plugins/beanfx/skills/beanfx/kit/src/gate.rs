@@ -24,8 +24,9 @@ const USAGE: &str = "The /beanfx brief gate: which knobs to ask the owner about 
     beanfx gate - < prompt.txt
 
 Prints one JSON object and exits 0. Source \"jev\": `ask` (knob names in order) and `skip`. Source \"model\": Jev is
-not available (no jev.py, no key, breaker open, an error); the model reads each knob file's \"Fixed when\" and
-decides. BEANFX_GATE=model turns Jev off. BEANFX_KNOBS names the knobs folder. Exit 2 only on bad usage.";
+not available (no jev.py, no key, breaker open, an error); `questions` lists each knob's stated and applies
+questions so the model decides from this output and opens only the files of the knobs it asks.
+BEANFX_GATE=model turns Jev off. BEANFX_KNOBS names the knobs folder. Exit 2 only on bad usage.";
 
 /// Runs inside python3: asks Jev and prints one JSON line, {"fallback": reason} or {"answers", "ms"}.
 const JEV_SCRIPT: &str = r#"
@@ -156,8 +157,19 @@ fn dumps(v: &Value) -> String {
 
 fn fallback(knobs: &[Knob], reason: &str) -> i32 {
     let files: Vec<&str> = knobs.iter().map(|k| k.file.as_str()).collect();
-    let out = json!({"source": "model", "reason": reason, "knobs": files,
-        "note": "Read each knob file's 'Fixed when' and decide which to ask."});
+    // each knob's two frontmatter questions inline, so the model decides from one output and opens a knob file
+    // only for a knob it asks (reading all 18 files cost minutes per run)
+    let questions: Vec<Value> = knobs.iter().map(|k| {
+        let mut q = json!({"name": k.name, "stated": k.stated});
+        if let Some(a) = &k.applies {
+            q["applies"] = json!(a);
+        }
+        q["file"] = json!(k.file);
+        q
+    }).collect();
+    let out = json!({"source": "model", "reason": reason, "knobs": files, "questions": questions,
+        "note": "For each knob in order: skip it when its `applies` question is no, or its `stated` question is yes for \
+                 the prompt; ask the rest. Open a knob's file only to build the question for a knob you ask."});
     println!("{}", dumps(&out));
     0
 }

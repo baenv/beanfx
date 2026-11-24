@@ -82,8 +82,9 @@ PROMPT
   lists the knobs to ask, in order; `skip` the ones the prompt fixes or that do not apply. Follow it. Override
   one only when the owner's words plainly contradict it (the prompt gives "64x48" and `size` is in `ask`), and
   say so in one line.
-- `"source": "model"`: the default without Jev (or with `BEANFX_GATE=model`). Read each knob file's "Fixed when"
-  and "Applies" and decide yourself. A knob counts as fixed only when the prompt states it or an image shows it;
+- `"source": "model"`: the default without Jev (or with `BEANFX_GATE=model`). Decide from the `questions` list in
+  the output, each knob's `stated` and `applies` question, without opening the knob files: skip a knob whose
+  `applies` is no or whose `stated` is yes; open the files only of the knobs you ask. A knob counts as fixed only when the prompt states it or an image shows it;
   the subject's colour or name alone fixes neither palette nor shape.
 
 **Ask, one question per knob.** For each knob in `ask`, read its file and build the question from its "Ask" part:
@@ -134,7 +135,8 @@ upgrades.
 main element, a look, then the other elements with Edit.
 
 ```
-cd drafts/<name> && cargo run --release -q                 # every output and check; exit 1 a check, 2 an error
+cd drafts/<name> && cargo run --release -q -- quick        # the sheet's checks only, seconds: use it while fixing
+cargo run --release -q                                     # every output and check; exit 1 a check, 2 an error
 cargo run --release -q -- look <frames>                    # just those frames at 3x, in a second
 ```
 
@@ -170,11 +172,18 @@ first pass, so the cover lands in its row.
 character (`rig`) and the target dummy go into the previews only, and the binding goes into the JSON. Read
 `caster.md` when the brief has a caster; time blows on the character's contact frames and take slash arcs from
 the rig, never from a guess. Hits, poses, the target, directions and caster to target parts are fields of the
-`Spec` (`export.md`).
+`Spec` (`export.md`): the cast, travel and impact sheets are `Spec.parts`, and what sits behind the character (a
+ring at the back, a halo) is drawn in `Layer::Behind`, so the preview shows it behind the body.
 
 ## 3. Run, and fix only what fails
 
-Run the draft. Each run prints its checks and the light measure and exits 1 when a check fails.
+Run the draft. Each run prints its checks and the light measure and exits 1 when a check fails. A full run
+renders every frame many times (previews, aura and parts, three reseeds, the gif), so its cost grows with frames:
+
+- Before the first full run, `look` the risky frames once (each hit and its sparks, the widest frame, the last
+  frame): an edge cut or an empty end shows there in a second.
+- While fixing, rerun with `quick` (the sheet's checks and light measure only); go back to the full run for the
+  parts, the reseeds and the outputs. Run each command once per fix, never twice to filter its output.
 
 - Fix every check line (edge, empty frame, pop-off, loop seam, seed, framing, budget, act) and every error, then
   rerun. `kit/DRAFTS.md` says what each check means.
