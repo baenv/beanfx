@@ -71,3 +71,5 @@ add one only when a page links it, and remove one that nothing links any more. C
 2. Set the same version in `plugins/beanfx/.claude-plugin/plugin.json`.
 3. Merge to `main`, then `git tag v<version> && git push origin v<version>`. The release workflow checks the tag
    against `plugin.json` and publishes a GitHub release with that section of the changelog.
+   Where tags cannot be pushed, run the release workflow by hand on `main` (Actions, release, Run workflow): it
+   creates the tag `v<version>` from `plugin.json` on that commit and publishes the same release.
