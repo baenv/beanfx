@@ -1,6 +1,6 @@
 ---
 name: aura
-order: 16
+order: 17
 group: extra
 stated: Does the request say whether the caster shows an aura or glow round the body while casting, and what it looks like, or say the effect has no caster?
 applies: Is the effect cast by someone (a spell, a summon, a channelled or charged skill), so the caster could show power gathering round the body?

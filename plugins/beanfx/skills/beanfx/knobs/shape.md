@@ -1,6 +1,6 @@
 ---
 name: shape
-order: 6
+order: 7
 group: look
 stated: Does the request or a reference image describe the shape or silhouette of the effect's main moving part (for example a teardrop comet, a ring, a fan of streaks, a coiling dragon), beyond only naming the subject? A subject name alone ("fireball", "dragon") or a word with two readings ("slash") does not count.
 ---

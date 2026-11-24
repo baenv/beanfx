@@ -1,6 +1,6 @@
 ---
 name: glow
-order: 9
+order: 10
 group: look
 stated: Does the request say how strong the glow or light of the effect is (subtle, medium, strong, no glow), or show it in a reference image? "Sparkling" or "glowing" alone does not count.
 ---

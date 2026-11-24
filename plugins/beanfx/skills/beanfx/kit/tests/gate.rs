@@ -11,11 +11,11 @@ fn knobs() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../knobs")
 }
 
-const WANT: [&str; 17] = [
-    "role", "view", "size", "timing", "loop", "shape", "style", "palette", "glow", "clarity", "density", "states",
+const WANT: [&str; 18] = [
+    "role", "view", "size", "timing", "phases", "loop", "shape", "style", "palette", "glow", "clarity", "density", "states",
     "caster", "combo", "placement", "aura", "sound",
 ];
-const APPLIES: [&str; 8] = ["view", "density", "states", "caster", "combo", "placement", "aura", "sound"];
+const APPLIES: [&str; 9] = ["view", "phases", "density", "states", "caster", "combo", "placement", "aura", "sound"];
 
 /// The fake client: answers from a table (default 0.0 stated, 1.0 applies), records the request, and trips its
 /// breaker after three failures, as jev.py does.
@@ -139,7 +139,7 @@ fn knob_files_are_complete() {
 
     // Jev reads only the stated line, so an exclusion in a knob's "Fixed when" must be in that line too
     for (n, words) in [("palette", "subject"), ("size", "256"), ("timing", "Fast"), ("glow", "Sparkling"), ("shape", "subject name"),
-        ("role", "two readings"), ("sound", "With sound")]
+        ("role", "two readings"), ("sound", "With sound"), ("phases", "total length")]
     {
         let stated = &by[n].1;
         assert!(stated.contains(words) && stated.contains("not count"), "{n}: stated carries its exclusion");
@@ -167,7 +167,7 @@ fn model_fallbacks() {
     let (code, out) = e.run(&["x"], &[("BEANFX_GATE", "model")]);
     assert_eq!(code, 0);
     assert_eq!(out["source"], "model");
-    assert_eq!(out["knobs"].as_array().unwrap().len(), 17);
+    assert_eq!(out["knobs"].as_array().unwrap().len(), 18);
     let missing = e.dir.join("nope.py");
     let (code, out) = e.run(&["x"], &[("BEANFX_JEV_PY", missing.to_str().unwrap())]);
     assert_eq!((code, out["reason"].as_str()), (0, Some("no jev.py")));
@@ -194,7 +194,7 @@ fn ask_rule_through_fake_jev() {
     assert_eq!(out["knobs"]["states"]["ask"], true);
     let seen = e.seen();
     let q = seen["questions"].as_object().unwrap();
-    assert!(q.len() == 17 + 8 && q.values().all(|v| v["type"] == "noul"), "one call, 25 nouls");
+    assert!(q.len() == 18 + 9 && q.values().all(|v| v["type"] == "noul"), "one call, 27 nouls");
     assert_eq!(seen["state"]["reference_image"], "a blue comet sketch");
     assert!(seen["state"]["request"].as_str().unwrap().contains("fireball"));
     assert_eq!(seen["timeout"], 8.0);

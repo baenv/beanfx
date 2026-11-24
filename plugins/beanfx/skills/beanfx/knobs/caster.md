@@ -1,6 +1,6 @@
 ---
 name: caster
-order: 13
+order: 14
 group: extra
 stated: Does the request say whether to draw a caster figure (a character, silhouette or avatar) with the effect, or say to draw the effect alone?
 applies: Is the effect a skill cast by someone (a sword art, a palm strike, a summon), or does the request mention a character, silhouette or avatar?

@@ -1,6 +1,6 @@
 ---
 name: states
-order: 12
+order: 13
 group: extra
 stated: Does the request give the length or the form of each stage of the effect (for example how the swords gather and how they strike)?
 applies: Does the effect play in several stages in sequence (charge then release then strike), have more than one carrier, or hand off from one part to another?
@@ -9,7 +9,8 @@ applies: Does the effect play in several stages in sequence (charge then release
 
 An effect has several states when the prompt names a sequence ("charge up, the swords fly together, then
 strike"), more than one carrier (swords, a caster, a seal), or a hand-off from one part to the next. Ask again
-when the owner adds a state or changes how one plays.
+when the owner adds a state or changes how one plays. A plain cast (wind-up, release, impact, recovery) with
+no named stages is the `phases` knob, not this one; its timing recommendations apply inside each state too.
 
 1. Split it into states and put a state table in the reply: state, frames, seconds, what moves, which carrier.
 2. Ask (in place of the plain timing and shape questions where they overlap): the total length with the seconds

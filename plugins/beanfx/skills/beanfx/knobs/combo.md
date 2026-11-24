@@ -1,6 +1,6 @@
 ---
 name: combo
-order: 14
+order: 15
 group: extra
 stated: Does the request say how the hits of a combo are triggered in the game (one button press per hit, or one press that plays the whole string), or say the effect is a single blow?
 applies: Is the effect a combo or string of several blows (a multi-hit sword combo, a flurry, a chain of attacks)?
