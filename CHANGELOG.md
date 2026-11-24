@@ -3,7 +3,9 @@
 Versions follow `plugins/beanfx/.claude-plugin/plugin.json`. A release is a tag `v<version>` on `main`; see
 `CONTRIBUTING.md`.
 
-## Unreleased
+## 2.4.0
+
+The phases knob: how a cast's time splits, with timing recommendations (2026-11-24).
 
 - New knob `knobs/phases.md`: how a cast's time splits into wind-up, release, travel, impact and recovery, asked
   after `timing` for a cast, swing or caster to target effect. Four options (snappy, heavy charge, instant,
