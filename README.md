@@ -9,7 +9,7 @@ and exports a sprite sheet with JSON that any engine plays.
   <img src="docs/media/caster_sword_suc_dia_thanh_thon.gif" width="45%" alt="The sword caster cuts a space rift, runs into it and steps out of a second rift ahead">
 </p>
 
-**[Live demo and gallery](https://beanfx.vhbien000.workers.dev/)** · used in [Nine Heavens](https://play.nineheavens.online/)
+**[Live demo and gallery](https://beanfx.vhbien000.workers.dev/)** 
 
 ## Install
 
