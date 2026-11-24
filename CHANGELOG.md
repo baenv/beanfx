@@ -12,6 +12,8 @@ The phases knob: how a cast's time splits, with timing recommendations (2026-11-
   cinematic) with seconds and frames, an ASCII timeline, and timing recommendations (wind-up at least 3 frames and
   a short hold, a 1 to 2 frame release, travel from distance over speed, player skills under about 1 s to the
   impact, longer tells for enemies). The split goes into `Spec.windup` and `Spec.poses`. The gate now has 18 knobs.
+- The release workflow also runs by hand on `main`: it creates the tag `v<version>` from `plugin.json` and
+  publishes the release, for when tags cannot be pushed (`CONTRIBUTING.md`).
 
 ## 2.3.0
 
