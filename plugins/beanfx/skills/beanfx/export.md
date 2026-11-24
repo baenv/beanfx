@@ -69,7 +69,9 @@ the fields with `fc` (`kit/src/fc.rs`) and pass the whole meta through `fc::chec
   pass the rows to `ex::write`, which lays heading k after heading k - 1 and tags each: row k faces `tau * k / n`, y down (0 east, n/4 south); the JSON tells the engine
   `row = round(atan2(dy, dx) / tau * n) mod n`.
 - **Caster to target** (a projectile that lands, a beam, a strike on a foe): the distance between them changes in
-  play, so never only bake it into one sheet. Export three parts in `parts`, each from `fc::part(sheet, w, h, frames, fps, pivot, looped, anchor, extra)`: `cast`
+  play, so never only bake it into one sheet. Export three parts in `parts` (on the runner: `Spec.parts` entries, drawn by `Effect::part`; the default
+  crops the sheet, so only a travel loop or an impact on its own clock overrides it; in a draft's own `run()`:
+  `fc::part(sheet, w, h, frames, fps, pivot, looped, anchor, extra)`): `cast`
   (anchor caster, one-shot, the charge and release), `travel` (anchor travel, a loop the engine moves at `speed`
   px/s from the caster to the target, with its own direction rows for top-down or `facing` for side) and
   `impact` (anchor target, one-shot, the hit and dissolve). Keep the joined preview sheet and gif too, for review. When the owner wants one fixed-range sheet, record `target` and its mirror and say the range is

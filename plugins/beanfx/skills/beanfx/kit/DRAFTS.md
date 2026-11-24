@@ -17,6 +17,7 @@ fades in a 32x32 cell over 10 frames) that already writes the sheet and runs the
 
 ```
 cd drafts/<name> && cargo run --release -q     # writes out/, exits 1 when a check fails, 2 on an error
+cargo run --release -q -- quick                 # the sheet's checks and light measure only, seconds on a long sheet
 cargo run --release -q -- look 20 30 44         # just those frames, 3x, in a second
 cargo run --release -q -- glow                  # the three glow takes round the first hit
 ```

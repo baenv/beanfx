@@ -39,24 +39,33 @@ Read these before opening the kit source. `P = [f64; 2]` world px (y down), `Rgb
 
 ### dr
 
-- `dr::main(fx: &(dyn Effect + Sync), env!("CARGO_MANIFEST_DIR")) -> ExitCode`. Args: none (full run), `look [frames]`
+- `dr::main(fx: &(dyn Effect + Sync), env!("CARGO_MANIFEST_DIR")) -> ExitCode`. Args: none (full run), `quick` (the sheet's
+  own checks and light measure only: no previews, gif, parts, page or reseeds; seconds on a long sheet), `look [frames]`
   (out/look.png at 3x on dark, look_1x.png), `glow` (out/glow_takes.png at gains 0.6, 1.0, 1.3), `bench <id>`
   (out/bench.png against out/ref from tools/layers.mjs).
-- `trait Effect { fn spec(&self) -> Spec; fn draw(&self, cv: &mut Canvas, f: usize, seed: u64, layer: Layer) -> Result<(), String>; }`.
+- `trait Effect { fn spec(&self) -> Spec; fn draw(&self, cv: &mut Canvas, f: usize, seed: u64, layer: Layer) -> Result<(), String>;
+  fn part(&self, cv: &mut Canvas, key: &str, f: usize, seed: u64) -> Result<(), String> { /* Behind, then Effect */ } }`.
+  `part` draws frame f of a `Spec.parts` entry on a canvas placed at its origin (world px); the default crops the
+  sheet's layers, so override it only for a part with its own clock (a travel loop, an impact from contact).
   `draw` is pure in (f, seed, layer); return `Ok(())` untouched for a layer the effect lacks. Pass kit errors on with
   `?` (an `Err` stops the run with exit 2), never `let _ =`, which hides a missing caster.
 - The runner draws frames on every core (`dr::par`), so `Fx` must be `Sync`: a plain struct is; keep a cache in a
   `LazyLock` or `thread_local!`, never a `RefCell` field. The output is the same at any thread count;
   `BEANFX_THREADS=1` runs in order on one thread (for a debugger or a print trace).
-- `Layer::{Effect, Caster, AuraBack, AuraFront}`. The sheet is `Effect`. Previews stack AuraBack, Caster, AuraFront,
-  Effect over the dummy. Aura parts are cut round `caster_foot` with `Canvas::at`, so draw in world px.
+- `Layer::{Effect, Caster, AuraBack, AuraFront, Behind}`. The sheet is `Behind` then `Effect` on one canvas. Previews
+  stack AuraBack, Behind, Caster, AuraFront, Effect over the dummy: draw what sits behind the character (a ring at the
+  back, a halo, the far side of a swirl) in `Behind`, so the preview matches the game, and mark that part's `layer`
+  behind. A `match` on `layer` needs a `Behind` arm or `_ => {}`. Aura parts are cut round `caster_foot` with `Canvas::at`, so draw in world px.
 - `Spec::new(name, w, h, n, fps)`; fields and defaults: `pivot` [w/2, h/2], `seed` 7, `looped` false, `hold` false,
   `view` "side", `dirs: fc::Meta` (`facing` "east" or "west" for one row), `glow` "medium", `clarity` "clear", `light_ramp: Vec<String>` (dark to white),
   `steps: Option<lt::Steps>` (hard retro light, `Some(lt::Steps::default())`; also caps colours at 48 a frame, so take
   every colour from a ramp tone at a few fixed alphas, never a per-pixel blend), `edge_fade` 0.0 px, `hits: Vec<Value>`
   (`ex::hit`), `states: Vec<(String, [i64; 2])>`, `poses: Vec<Value>` (`ex::pose`), `windup` 0.0,
   `target: Option<Value>`, `dummy: Option<P>` (preview dummy foot), `caster_foot: Option<P>`,
-  `aura: Option<dr::Aura { frames, w, h, pivot }>`, `extra: Map` (more meta.beanfx), `trim: Option<f64>` (`ex::TRIM`;
+  `aura: Option<dr::Aura { frames, w, h, pivot }>`, `parts: Vec<dr::Part>` (cast, travel, impact sheets:
+  `dr::Part::new(key, frames, w, h, origin, pivot, anchor)` with `looped` and `more` fields; the runner draws each with
+  `Effect::part`, writes `<name>_<key>`, checks it and lists it in `meta.beanfx.parts` beside the aura parts),
+  `extra: Map` (more meta.beanfx; a `parts` object in it joins the runner's parts), `trim: Option<f64>` (`ex::TRIM`;
   None when the cell keeps room on purpose, such as the caster's side of a cast), `pick`, `takes` (frame lists).
 - Aura parts and the sheet pass the same checks: every frame needs colour (light alone is an empty frame) and a
   one-shot's last frame keeps at most 5 % of the peak pixels. `hold` does not exempt an aura: it starts with colour

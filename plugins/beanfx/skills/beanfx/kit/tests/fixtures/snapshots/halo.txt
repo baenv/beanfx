@@ -1,0 +1,17 @@
+83d6396e02ecd781 contact.png
+e30418a1954d925e halo.gif
+ffda15940b642dca halo_1x.png
+a875fb8573da30b7 halo_4x_dark.png
+e071ccfabc22dbaa halo_4x_mid.png
+2112e257404fe187 sheets/halo.json
+fda81d38e6badda8 sheets/halo.png
+74ce0a7e575f5461 sheets/halo_cast.json
+b1227efa552015a0 sheets/halo_cast.png
+d06fb1d58eabb329 sheets/halo_cast_color.png
+43c7fc8186de444c sheets/halo_cast_light.png
+988b54048192b469 sheets/halo_color.png
+3083b424dcb33dae sheets/halo_light.png
+0c53c7ba4bc3a7d9 sheets/halo_travel.json
+be318c15730d998d sheets/halo_travel.png
+be318c15730d998d sheets/halo_travel_color.png
+69f7563bfcc21c03 sheets/halo_travel_light.png

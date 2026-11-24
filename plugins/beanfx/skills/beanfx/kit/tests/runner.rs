@@ -28,6 +28,8 @@ impl Effect for Burst {
         if self.steps {
             sp.steps = Some(lt::Steps::default());
         }
+        let note = beanfx::fc::part("x.png", 8, 8, 2, FPS, [4.0, 4.0], false, "target", None);
+        sp.extra.insert("parts".into(), beanfx::serde_json::json!({"note_part": note}));
         if self.aura {
             sp.caster_foot = Some([16.0, 28.0]);
             sp.aura = Some(Aura { frames: 4, w: 16, h: 12, pivot: [8.0, 10.0] });
@@ -55,6 +57,7 @@ impl Effect for Burst {
                 cv.ellipse(16.0, 26.0 + dy, 4.0, 1.5, dr::hex("#80c0ff"), 0.8);
                 cv.glow(16.0, 26.0, 3.0, 0.3);
             }
+            Layer::Behind => {}
         }
         Ok(())
     }
@@ -91,6 +94,7 @@ fn run_writes_every_output_and_the_parts() {
     assert_eq!(bfx["glow"], "medium");
     assert_eq!(bfx["parts"]["aura_back"]["layer"], "behind");
     assert_eq!(bfx["parts"]["aura_front"]["layer"], "front");
+    assert_eq!(bfx["parts"]["note_part"]["anchor"], "target", "parts in Spec.extra join the aura parts: {}", bfx["parts"]);
     assert!(bfx["act"]["hits"].as_array().is_some_and(|h| h.len() == 1));
 }
 
@@ -101,6 +105,7 @@ fn run_with_stepped_light_and_the_commands() {
     assert!(dr::run(&fx, &dir, &[]).unwrap() <= 1);
     let out = dir.join("out");
 
+    assert!(dr::run(&fx, &dir, &args(&["quick"])).unwrap() <= 1);
     assert_eq!(dr::run(&fx, &dir, &args(&["look"])).unwrap(), 0);
     assert!(out.join("look.png").is_file() && out.join("look_1x.png").is_file());
     assert_eq!(dr::run(&fx, &dir, &args(&["look", "1", "4", "99"])).unwrap(), 0);
@@ -109,6 +114,23 @@ fn run_with_stepped_light_and_the_commands() {
 
     assert!(dr::run(&fx, &dir, &args(&["bench"])).unwrap_err().contains("pixelfx id"));
     assert!(dr::run(&fx, &dir, &args(&["nope"])).unwrap_err().contains("unknown command nope"));
+
+    // quick flags what the full run flags on the sheet: a disc cut by the cell edge exits 1
+    struct Cut;
+    impl Effect for Cut {
+        fn spec(&self) -> Spec {
+            Spec::new("cut", 16, 16, 4, FPS)
+        }
+        fn draw(&self, cv: &mut Canvas, _f: usize, _seed: u64, layer: Layer) -> Result<(), String> {
+            if layer == Layer::Effect {
+                cv.ellipse(1.0, 8.0, 4.0, 4.0, [1.0; 3], 1.0);
+            }
+            Ok(())
+        }
+    }
+    let quick = dr::run(&Cut, &dir, &args(&["quick"])).unwrap();
+    let full = dr::run(&Cut, &dir, &[]).unwrap();
+    assert_eq!((quick, full), (1, 1), "quick and the full run both fail an edge cut");
 }
 
 #[test]

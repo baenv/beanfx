@@ -1,7 +1,9 @@
 # Casters: the mockup caster and a game character
 
 Read only when the brief has a caster (`knobs/caster.md`). Signatures are in `kit/API.md`. On the runner, set
-`Spec.caster_foot` (size the cell so the caster and the foe both fit) and draw the caster in `Layer::Caster` with `cv.caster(..)`; the raw `cs` calls below are what it
+`Spec.caster_foot` (size the cell so the caster and the foe both fit) and draw the caster in `Layer::Caster` with `cv.caster(..)`; what sits behind the character (a ring of
+suns at the back, a halo) goes in `Layer::Behind`, which ships in the sheet and draws under the caster in the
+previews (mark the part `layer: behind`); the raw `cs` calls below are what it
 runs, and a draft writes them only in its own `run()`.
 
 **Mockup caster** (only when the brief says yes): `cs` (`kit/src/cs.rs`) draws a golden robed silhouette with no face,

@@ -90,7 +90,7 @@ node plugins/beanfx/skills/beanfx/tools/layers.mjs <id> --out <draft>/src --pixe
 - Each brief knob is a file in the skill's `knobs/` (role, view, size, timing, phases, loop, shape, style, palette, glow,
   clarity, density, states, caster, combo, placement, aura, sound). The gate, `<project>/.beanfx/bin/beanfx gate
   "<prompt>"`, says which knobs the prompt leaves open. It asks Jev (an optional prompt classifier, run through
-  `python3` only when its client is installed) in one call; without it the model decides from the files. Each open
+  `python3` only when its client is installed) in one call; without it the gate lists each knob's two frontmatter questions and the model decides from them, opening only the files of the knobs it asks. Each open
   knob is one AskUserQuestion question, and no draft file is written before the brief is in the reply.
 - Tests: `cd S/kit && cargo test --locked` (unit and integration tests of the crate, including the gate, the
   export, the facing fields and the preview page check), and `node S/tests/test_runtime.mjs` (the browser
