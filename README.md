@@ -38,6 +38,54 @@ The skill asks about anything the prompt leaves open, then writes the effect to 
 Two game characters ship with the plugin (a sword caster and a staff caster, side and top-down), so an effect can
 be drawn on a real sprite: pick "Game character" when the skill asks about a caster.
 
+## Examples
+
+These three ran on Claude Sonnet 5.5. Each time is one run, from the prompt to the first finished sheet, without
+the wait for usage limits. Average first pass: about 8 min.
+
+### Five element sword array
+
+<img src="https://raw.githubusercontent.com/baenv/beanfx/media/example_sword_array.gif" width="60%" alt="Five element sword array">
+
+Five swords appear in the generating order, shadow swords join, and all strike the centre. Generation time: about 16 min, including four rounds of brief questions.
+
+```
+/beanfx five element sword array, an ultimate: five main swords summoned one by one in the generating order,
+shadow swords, all converging into a finisher hit. effect area 256x240, 6 s.
+view: top-down 3/4. style: painterly HD, no outline.
+palette: pale jade xianxia (low saturation, white only at the hottest core), light #12262a #3f7a72 #bfe6d4 #ffffff.
+glow: strong. clarity: hazy. 24 fps.
+caster: nghich_tien_kiem_topdown with a body aura. no sound.
+```
+
+### Moon cleaving blade
+
+<img src="https://raw.githubusercontent.com/baenv/beanfx/media/example_moon_cleaver.gif" width="60%" alt="Moon cleaving blade">
+
+A green dragon crescent blade cuts a hanging moon in two. Generation time: about 3 min, or 8 min with two upgrade rounds.
+
+```
+/beanfx moon cleaving blade
+view: top-down 3/4. style: painterly HD, no outline.
+palette: pale jade xianxia (low saturation, white only at the hottest core), light #12262a #3f7a72 #bfe6d4 #ffffff.
+glow: strong. clarity: hazy. 24 fps.
+caster: nghich_tien_kiem_topdown with a body aura. no sound.
+```
+
+### Rain calling
+
+<img src="https://raw.githubusercontent.com/baenv/beanfx/media/example_rain_calling.gif" width="60%" alt="Rain calling">
+
+Wind brings the clouds, lightning strikes, jade rain falls. Generation time: about 6 min, or 10 min with two upgrade rounds.
+
+```
+/beanfx rain calling
+view: top-down 3/4. style: painterly HD, no outline.
+palette: pale jade xianxia (low saturation, white only at the hottest core).
+glow: strong. clarity: hazy. 24 fps.
+caster: nghich_tien_kiem_topdown with a body aura. no sound.
+```
+
 ## Play it in a game
 
 ```js
